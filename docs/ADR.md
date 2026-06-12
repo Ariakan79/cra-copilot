@@ -89,7 +89,7 @@ Workspace-Tooling: ADR-009.
 
 ## ADR-006 — Wizard-Frontend: Svelte 5 mit Vite
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Kontext:** Vorgabe: leichtgewichtig, Vite-basiert. Kandidaten: Vanilla-TS,
 React, Svelte. Der Wizard ist eine dünne Schale über der Engine: Fragenfluss,
@@ -132,7 +132,7 @@ Woche portierbar, falls nötig.
 
 ## ADR-007 — State-Handling: ein Antwort-Objekt, Engine leitet alles ab
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Entscheidung:**
 - Single Source of Truth ist ein **serialisierbares Antwort-Objekt**
@@ -161,7 +161,7 @@ Abbrüche durch Reload zeigt.
 
 ## ADR-008 — Teststack: Vitest, fast-check, Playwright; ESLint + Prettier
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Entscheidung:**
 
@@ -195,7 +195,7 @@ weil** Playwright schneller in CI läuft, Request-Interception erstklassig kann
 
 ## ADR-009 — Monorepo-Tooling: pnpm-Workspaces, kein Orchestrator
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Entscheidung:** pnpm-Workspaces; Node LTS via `engines` + `.nvmrc` gepinnt.
 Kein Turborepo/Nx: bei zwei Workspaces reichen `pnpm -r run test` u. Ä.
@@ -211,7 +211,7 @@ ist Bonus. Turborepo/Nx bleiben bewusst draußen, bis Build-Zeiten es rechtferti
 
 ## ADR-010 — Regeldaten: YAML als Quellformat, Validierung mit zod
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Entscheidung:**
 - **Quellformat YAML** in `packages/rules-engine/data/` (Fragenkatalog,
@@ -237,7 +237,7 @@ Escape-Orgien praktisch nicht reviewbar. Der Build-Schritt existiert ohnehin (Vi
 
 ## ADR-011 — i18n: Message-Kataloge ohne i18n-Bibliothek
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-12)
 
 **Entscheidung:** Alle UI-Texte liegen in `apps/wizard/src/locales/de.ts`
 (typisierter Katalog, Zugriff nur über Schlüssel — kein String-Literal im
