@@ -1,6 +1,6 @@
 # Teststrategie — CRA-Copilot Phase 1
 
-**Stand:** 2026-06-12 · **Status:** zur Freigabe (Phase B)
+**Stand:** 2026-06-12 · **Status:** akzeptiert (Freigabe Director 2026-06-12)
 **Bezug:** ADR-001 (Engine pur), ADR-002 (client-seitig), ADR-008 (Teststack),
 ADR-010 (Regeldaten-Validierung).
 
