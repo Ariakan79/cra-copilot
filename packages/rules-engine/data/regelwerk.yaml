@@ -12,7 +12,7 @@
 # Terminal-Regeln werden in Reihenfolge geprüft und beenden den Fluss vorzeitig,
 # sobald ihre Bedingungen beantwortet und erfüllt sind.
 
-rules_version: '0.1.0-draft'
+rules_version: '0.2.0-draft'
 stand: '2026-06-12'
 
 fragen:
@@ -141,11 +141,12 @@ fragen:
   - id: ausnahmebereich
     typ: einfachauswahl
     text:
-      de: 'Fällt das Produkt in einen dieser besonders regulierten Bereiche?'
+      de: 'Fällt das Produkt in einen dieser Sonderfälle?'
     erlaeuterung:
       de: >-
-        Für einige Branchen gelten eigene Cybersicherheits-Regime — dort ist der
-        CRA ganz oder teilweise nicht anwendbar.
+        Für einige Branchen gelten eigene Cybersicherheits-Regime, und einzelne
+        Produktarten nimmt der CRA ausdrücklich aus — dort ist die Verordnung
+        ganz oder teilweise nicht anwendbar.
     optionen:
       - wert: medizinprodukt
         text: { de: 'Medizinprodukt / In-vitro-Diagnostikum' }
@@ -153,8 +154,20 @@ fragen:
         text: { de: 'Fahrzeuge mit Typgenehmigung (z. B. UNECE R155)' }
       - wert: luftfahrt
         text: { de: 'Zivile Luftfahrt' }
+      - wert: schiffsausruestung
+        text: { de: 'Schiffsausrüstung' }
+        erlaeuterung:
+          de: 'Ausrüstung im Anwendungsbereich der Schiffsausrüstungsrichtlinie (EU) 2014/90.'
+      - wert: verteidigung
+        text: { de: 'Ausschließlich für Verteidigung / nationale Sicherheit' }
+      - wert: ersatzteil
+        text: { de: 'Ersatzteil, das eine identische Komponente ersetzt' }
+        erlaeuterung:
+          de: >-
+            Nur wenn das Teil nach denselben Spezifikationen gefertigt wird wie
+            die Komponente, die es ersetzt.
       - wert: keiner
-        text: { de: 'Keiner dieser Bereiche' }
+        text: { de: 'Keiner dieser Sonderfälle' }
     sichtbar_wenn:
       - frage: produktart
         ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
@@ -188,15 +201,42 @@ fragen:
     erlaeuterung:
       de: >-
         Der CRA stuft bestimmte Produktgruppen als „wichtig" oder „kritisch" ein —
-        dafür gelten strengere Nachweispflichten. Wählen Sie die Gruppe, die am
-        besten passt, sonst „Keine davon".
+        dafür gelten strengere Nachweispflichten. Trifft mehr als eine Gruppe zu
+        (z. B. Router mit Firewall-Funktion), wählen Sie die strengste zutreffende
+        Gruppe. Passt keine, wählen Sie „Keine davon".
     optionen:
       - wert: passwortmanager
         text: { de: 'Passwort-Manager' }
+      - wert: identity_management
+        text: { de: 'Identitätsverwaltung / privilegierte Zugriffsverwaltung' }
+        erlaeuterung:
+          de: 'Zum Beispiel Single-Sign-on, Verzeichnisdienste, PAM-Lösungen, Zugangskontrollsoftware.'
+      - wert: browser
+        text: { de: 'Browser (eigenständig oder eingebettet)' }
       - wert: antivirus
         text: { de: 'Virenschutz / Endpoint-Schutz' }
       - wert: vpn
         text: { de: 'VPN-Produkt' }
+      - wert: netzwerkmanagement
+        text: { de: 'Netzwerkmanagement-System' }
+      - wert: siem
+        text: { de: 'SIEM (Security Information & Event Management)' }
+      - wert: boot_manager
+        text: { de: 'Boot-Manager' }
+      - wert: remote_access
+        text: { de: 'Fernzugriffs-/Fernwartungssoftware' }
+      - wert: mdm
+        text: { de: 'Mobile-Device-Management (MDM)' }
+      - wert: netzwerk_schnittstelle
+        text: { de: 'Physische oder virtuelle Netzwerkschnittstelle' }
+      - wert: chip_sicherheit
+        text: { de: 'Mikroprozessor / Mikrocontroller / ASIC / FPGA mit Sicherheitsfunktionen' }
+        erlaeuterung:
+          de: 'Ohne Manipulationssicherheit — manipulationssichere Chips sind eine eigene Gruppe weiter unten.'
+      - wert: firewall_unternehmen
+        text: { de: 'Firewall / Intrusion Detection (nicht-industriell)' }
+        erlaeuterung:
+          de: 'Für Heim- oder Unternehmensnetze. Industrielle Umgebungen sind eine eigene Gruppe weiter unten.'
       - wert: router_consumer
         text: { de: 'Internet-Router oder Modem (Endkundenbereich)' }
       - wert: smarthome_sicherheit
@@ -339,6 +379,48 @@ regeln:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 3 i. V. m. (EU) 2018/1139' }
     review_status: pending
 
+  - id: s_ausnahme_schiff
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [schiffsausruestung]
+    verdikt: ausgenommen
+    titel: { de: 'Sektorale Ausnahme: Schiffsausrüstung' }
+    begruendung:
+      de: >-
+        Ausrüstung im Anwendungsbereich der Schiffsausrüstungsrichtlinie
+        unterliegt deren Anforderungen — der CRA ist hier nicht anwendbar.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 i. V. m. (EU) 2014/90' }
+    review_status: pending
+
+  - id: s_ausnahme_verteidigung
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [verteidigung]
+    verdikt: ausgenommen
+    titel: { de: 'Ausnahme: Verteidigung und nationale Sicherheit' }
+    begruendung:
+      de: >-
+        Produkte, die ausschließlich für Zwecke der Verteidigung oder der
+        nationalen Sicherheit entwickelt werden, sind vom CRA ausgenommen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 5–8' }
+    review_status: pending
+
+  - id: s_ausnahme_ersatzteil
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [ersatzteil]
+    verdikt: ausserhalb
+    titel: { de: 'Ersatzteil für identische Komponente' }
+    begruendung:
+      de: >-
+        Ersatzteile, die identische Komponenten ersetzen und nach denselben
+        Spezifikationen gefertigt werden, sind vom CRA nicht erfasst.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2' }
+    review_status: pending
+
   - id: s_oss_nicht_kommerziell
     art: terminal
     bedingungen:
@@ -376,6 +458,116 @@ regeln:
     review_status: pending
 
   # ---- Kategorie-Regeln (Annex-III/IV-Heuristik, Selbstauskunfts-Tiefe) ----
+  - id: k_annex3_identity_management
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [identity_management] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Identitäts-/Zugriffsverwaltung' }
+    begruendung:
+      de: >-
+        Identitätsverwaltungssysteme und Software für privilegierte
+        Zugriffsverwaltung sind in Anhang III Klasse I gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_browser
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [browser] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Browser' }
+    begruendung:
+      de: 'Eigenständige und eingebettete Browser sind in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_netzwerkmanagement
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [netzwerkmanagement] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Netzwerkmanagement' }
+    begruendung:
+      de: 'Netzwerkmanagement-Systeme sind in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_siem
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [siem] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: SIEM' }
+    begruendung:
+      de: >-
+        Systeme für Security Information & Event Management sind in Anhang III
+        Klasse I gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_boot_manager
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [boot_manager] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Boot-Manager' }
+    begruendung:
+      de: 'Boot-Manager sind in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_remote_access
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [remote_access] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Fernzugriffssoftware' }
+    begruendung:
+      de: 'Software für Fernzugriff und Fernwartung ist in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_mdm
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [mdm] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Mobile-Device-Management' }
+    begruendung:
+      de: 'Mobile-Device-Management-Software ist in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_netzwerk_schnittstelle
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [netzwerk_schnittstelle] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Netzwerkschnittstelle' }
+    begruendung:
+      de: 'Physische und virtuelle Netzwerkschnittstellen sind in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_chip_sicherheit
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [chip_sicherheit] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Chip mit Sicherheitsfunktionen' }
+    begruendung:
+      de: >-
+        Mikroprozessoren, Mikrocontroller, ASICs und FPGAs mit
+        sicherheitsbezogenen Funktionen sind in Anhang III Klasse I gelistet;
+        manipulationssichere Ausführungen fallen in Klasse II.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_firewall_unternehmen
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [firewall_unternehmen] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Firewall / IDS (nicht-industriell)' }
+    begruendung:
+      de: >-
+        Firewalls und Intrusion-Detection/-Prevention-Systeme außerhalb des
+        industriellen Einsatzes sind in Anhang III Klasse I gelistet; für den
+        industriellen Einsatz gilt Klasse II.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
   - id: k_annex3_passwortmanager
     art: kategorie
     bedingungen: [{ frage: produkttyp, ist_eine_von: [passwortmanager] }]
