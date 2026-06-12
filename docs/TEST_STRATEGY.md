@@ -152,3 +152,65 @@ strukturell ab; ein Zahlen-Gate käme erst, wenn Engine-Code ohne Datenbezug wä
 - **Fachliche Korrektheit der CRA-Einstufungen** — die sichert kein Test, sondern
   das `review_status`-Verfahren mit Director-Freigabe; Tests sichern nur, dass
   die Engine die freigegebenen Daten korrekt anwendet.
+
+---
+
+## 7. Phase 2 — Cockpit & API (Ergänzung, Status: zur Freigabe)
+
+Der Leitgedanke bleibt: Domänenlogik trägt das Testgewicht, UI bekommt Smoke.
+Neu ist die Persistenzschicht — dort testen wir gegen **echtes PostgreSQL**, nie
+gegen ein Ersatz-Backend.
+
+### 7.1 Katalog-Strukturtests (`packages/aufnahme-katalog`)
+
+Gleiches Muster wie das Regelwerk (zod + Strukturprüfung als Test), plus die
+Spec-Grundprinzipien als ausführbare Regeln:
+
+- **Jedes Output-Feld hat ≥ 1 Downstream-Konsumenten** (Grundprinzip 3 —
+  „Felder ohne Konsument fliegen raus" schlägt als Testfehler auf).
+- Jedes Feld erlaubt die Verdikte „unbekannt" und „existiert nicht" als
+  getrennte Werte, wo der Feldtyp das vorsieht (Grundprinzip 2).
+- Jede Annex-Referenz ist versioniert, jeder Eintrag trägt `review_status`.
+- Ebenen-Konsistenz (ADR-017): `mandant`-Felder liegen nicht in produktspezifischen
+  Blöcken; Block 0 enthält keine `produkt`-Felder.
+
+### 7.2 Domänen-Invarianten (Vitest + fast-check, gegen Postgres)
+
+| # | Invariante |
+|---|---|
+| D1 | Supersession-Ketten sind azyklisch und linear: je Feld/Kontext genau ein Knoten ohne Nachfolger (aktueller Stand) |
+| D2 | Evidenzknoten sind unveränderlich: UPDATE/DELETE auf Knoten schlägt fehl (DB-Constraint/Trigger, als Test verifiziert) |
+| D3 | Blockstatus-Ampel ist reine Funktion aus (Evidenzknoten, offenen Gaps) — zweimal berechnen ⇒ identisch; kein gespeicherter Ampelwert |
+| D4 | Gap-Statusübergänge folgen `offen → in_arbeit → erledigt → verifiziert`; unzulässige Übergänge werden abgelehnt |
+| D5 | Override-Auflösung (ADR-017): Produkt-Knoten verdeckt Mandanten-Default; ohne Override gilt der Default; Löschen des Overrides (Supersession auf „zurück auf Default") reaktiviert den Default |
+| D6 | `workshop_durchgefuehrt` ist genau dann setzbar, wenn alle Blöcke Status ≠ `nicht_bearbeitet` haben (auch „mit Lücken" zählt) |
+
+### 7.3 API-Tests
+
+- Vitest gegen die laufende Fastify-App mit **Testcontainers-PostgreSQL**
+  (pro Testlauf frische DB, Migrationen laufen im Test — das testet die
+  Migrationskette gleich mit).
+- Golden-Aufnahme: ein Fixture-Mandant („Musterfirma IoT GmbH", 2 Produkte,
+  geteilte CVD-Policy als Mandanten-Default, Produkt 2 mit Override) wird per
+  API durch alle Blöcke geführt; erwartet: definierter Gap-Report,
+  Blockstatus-Ampeln, SBOM-Profil-Export (YAML, 2 Streams bei Produkt 1).
+  Fixtures als YAML — Director-reviewbar wie Golden Cases.
+- Kein Auth-Testbedarf in Phase 2 (ADR-014), aber ein Test verifiziert
+  Binding an 127.0.0.1.
+
+**Gegenposition — SQLite/in-memory für Tests:** schneller, kein Docker.
+**Verworfen, weil** Dialekt-Drift (JSONB, Constraints, Trigger aus D2) genau
+die Fehlerklasse ist, die wir testen wollen; Testcontainers hält den Lauf
+unter einer Minute.
+
+### 7.4 Cockpit-E2E (Playwright, Smoke)
+
+Wie beim Wizard bewusst schmal: Aufnahme anlegen → einen Block ausfüllen
+(inkl. „unbekannt"-Antwort ⇒ Gap erscheint) → Ampel prüfen → Korrektur einer
+Antwort (Supersession sichtbar in der Historie) → Profil-Export lädt herunter →
+Bericht-Druckansicht rendert. Gegen echte API + Testcontainers-Postgres.
+
+### 7.5 CI-Erweiterung
+
+Bestehende Pipeline + ein Job mit Docker-in-CI (GitHub Actions unterstützt
+Testcontainers nativ). Engine-/Wizard-Jobs bleiben unverändert schnell.
