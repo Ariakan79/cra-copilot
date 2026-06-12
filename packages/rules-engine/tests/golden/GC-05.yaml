@@ -8,11 +8,11 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: firewall_industrie
+  produkttyp: firewall_ids_ips
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_2
-  begruendungspfad_enthaelt: [k_annex3_firewall_industrie]
+  begruendungspfad_enthaelt: [k_annex3_firewall_ids_ips]
   pflichten_stichprobe:
     - { id: p_meldung_schwachstellen, frist: '2026-09' }
     - { id: p_konformitaet_wichtig, frist: '2027-12' }

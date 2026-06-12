@@ -11,7 +11,7 @@ antworten:
   produkttyp: pki
 erwartung:
   geltungsbereich: in_scope
-  kategorie: wichtig_klasse_2
+  kategorie: wichtig_klasse_1
   begruendungspfad_enthaelt: [k_annex3_pki]
   pflichten_stichprobe:
     - { id: p_meldung_schwachstellen, frist: '2026-09' }

@@ -12,7 +12,7 @@
 # Terminal-Regeln werden in Reihenfolge geprüft und beenden den Fluss vorzeitig,
 # sobald ihre Bedingungen beantwortet und erfüllt sind.
 
-rules_version: '0.2.0-draft'
+rules_version: '0.3.0-draft'
 stand: '2026-06-12'
 
 fragen:
@@ -233,12 +233,12 @@ fragen:
         text: { de: 'Mikroprozessor / Mikrocontroller / ASIC / FPGA mit Sicherheitsfunktionen' }
         erlaeuterung:
           de: 'Ohne Manipulationssicherheit — manipulationssichere Chips sind eine eigene Gruppe weiter unten.'
-      - wert: firewall_unternehmen
-        text: { de: 'Firewall / Intrusion Detection (nicht-industriell)' }
+      - wert: firewall_ids_ips
+        text: { de: 'Firewall, Intrusion-Detection- oder Intrusion-Prevention-System' }
         erlaeuterung:
-          de: 'Für Heim- oder Unternehmensnetze. Industrielle Umgebungen sind eine eigene Gruppe weiter unten.'
-      - wert: router_consumer
-        text: { de: 'Internet-Router oder Modem (Endkundenbereich)' }
+          de: 'Unabhängig vom Einsatzbereich — Heim-, Unternehmens- und Industrieumgebungen.'
+      - wert: router_modem_switch
+        text: { de: 'Router, Modem für die Internetanbindung oder Switch' }
       - wert: smarthome_sicherheit
         text: { de: 'Smart-Home-Produkt mit Sicherheitsfunktion' }
         erlaeuterung:
@@ -248,13 +248,11 @@ fragen:
       - wert: spielzeug_vernetzt
         text: { de: 'Vernetztes Spielzeug mit Chat- oder Ortungsfunktion' }
       - wert: wearable_gesundheit
-        text: { de: 'Wearable mit Gesundheitsüberwachung' }
+        text: { de: 'Wearable zur Gesundheitsüberwachung oder für Kinder' }
       - wert: betriebssystem
         text: { de: 'Betriebssystem' }
       - wert: hypervisor_container
         text: { de: 'Hypervisor oder Container-Laufzeitumgebung' }
-      - wert: firewall_industrie
-        text: { de: 'Firewall / Intrusion Detection für industrielle Umgebungen' }
       - wert: pki
         text: { de: 'PKI / Ausstellung digitaler Zertifikate' }
       - wert: mcu_manipulationssicher
@@ -362,7 +360,7 @@ regeln:
       de: >-
         Fahrzeuge mit Typgenehmigung unterliegen dem eigenen Cybersicherheits-
         Regime (UNECE R155 / (EU) 2019/2144) — der CRA ist hier nicht anwendbar.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 4 i. V. m. (EU) 2019/2144' }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 2 i. V. m. (EU) 2019/2144' }
     review_status: pending
 
   - id: s_ausnahme_luftfahrt
@@ -390,7 +388,7 @@ regeln:
       de: >-
         Ausrüstung im Anwendungsbereich der Schiffsausrüstungsrichtlinie
         unterliegt deren Anforderungen — der CRA ist hier nicht anwendbar.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 i. V. m. (EU) 2014/90' }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 4 i. V. m. (EU) 2014/90' }
     review_status: pending
 
   - id: s_ausnahme_verteidigung
@@ -404,7 +402,7 @@ regeln:
       de: >-
         Produkte, die ausschließlich für Zwecke der Verteidigung oder der
         nationalen Sicherheit entwickelt werden, sind vom CRA ausgenommen.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 5–8' }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 7' }
     review_status: pending
 
   - id: s_ausnahme_ersatzteil
@@ -418,7 +416,7 @@ regeln:
       de: >-
         Ersatzteile, die identische Komponenten ersetzen und nach denselben
         Spezifikationen gefertigt werden, sind vom CRA nicht erfasst.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2' }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 6' }
     review_status: pending
 
   - id: s_oss_nicht_kommerziell
@@ -555,17 +553,17 @@ regeln:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
     review_status: pending
 
-  - id: k_annex3_firewall_unternehmen
+  - id: k_annex3_firewall_ids_ips
     art: kategorie
-    bedingungen: [{ frage: produkttyp, ist_eine_von: [firewall_unternehmen] }]
-    kategorie: wichtig_klasse_1
-    titel: { de: 'Wichtiges Produkt Klasse I: Firewall / IDS (nicht-industriell)' }
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [firewall_ids_ips] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: Firewall / IDS / IPS' }
     begruendung:
       de: >-
-        Firewalls und Intrusion-Detection/-Prevention-Systeme außerhalb des
-        industriellen Einsatzes sind in Anhang III Klasse I gelistet; für den
-        industriellen Einsatz gilt Klasse II.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+        Firewalls, Intrusion-Detection- und Intrusion-Prevention-Systeme sind in
+        der finalen Fassung von Anhang III ohne Einschränkung auf den
+        Einsatzbereich als Klasse II gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II Nr. 2' }
     review_status: pending
 
   - id: k_annex3_passwortmanager
@@ -600,17 +598,16 @@ regeln:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
     review_status: pending
 
-  - id: k_annex3_router_consumer
+  - id: k_annex3_router_modem_switch
     art: kategorie
-    bedingungen: [{ frage: produkttyp, ist_eine_von: [router_consumer] }]
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [router_modem_switch] }]
     kategorie: wichtig_klasse_1
-    titel: { de: 'Wichtiges Produkt Klasse I: Internet-Router (Endkundenbereich)' }
+    titel: { de: 'Wichtiges Produkt Klasse I: Router, Modem, Switch' }
     begruendung:
       de: >-
-        Internet-Router und Modems für den Endkundenbereich sind in Anhang III
-        als wichtige Produkte der Klasse I gelistet. Achtung Abgrenzung: Router
-        für industrielle Nutzung können in Klasse II fallen.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+        Router, Modems für die Internetanbindung und Switches sind in Anhang III
+        Klasse I gelistet — ohne Beschränkung auf den Endkundenbereich.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 12' }
     review_status: pending
 
   - id: k_annex3_smarthome_sicherheit
@@ -654,19 +651,21 @@ regeln:
     titel: { de: 'Wichtiges Produkt Klasse I: Gesundheits-Wearable' }
     begruendung:
       de: >-
-        Am Körper getragene Produkte zur Gesundheitsüberwachung sind in
-        Anhang III Klasse I gelistet (soweit nicht MDR/IVDR greift).
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+        Am Körper tragbare Produkte zur Gesundheitsüberwachung oder für Kinder
+        sind in Anhang III Klasse I gelistet (soweit nicht MDR/IVDR greift).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 19' }
     review_status: pending
 
   - id: k_annex3_betriebssystem
     art: kategorie
     bedingungen: [{ frage: produkttyp, ist_eine_von: [betriebssystem] }]
-    kategorie: wichtig_klasse_2
-    titel: { de: 'Wichtiges Produkt Klasse II: Betriebssystem' }
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Betriebssystem' }
     begruendung:
-      de: 'Betriebssysteme sind in Anhang III als wichtige Produkte der Klasse II gelistet.'
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+      de: >-
+        Betriebssysteme sind in der finalen Fassung von Anhang III als wichtige
+        Produkte der Klasse I gelistet (im Entwurf von 2022 noch Klasse II).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 11' }
     review_status: pending
 
   - id: k_annex3_hypervisor
@@ -682,28 +681,17 @@ regeln:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
     review_status: pending
 
-  - id: k_annex3_firewall_industrie
-    art: kategorie
-    bedingungen: [{ frage: produkttyp, ist_eine_von: [firewall_industrie] }]
-    kategorie: wichtig_klasse_2
-    titel: { de: 'Wichtiges Produkt Klasse II: Industrielle Firewall / IDS' }
-    begruendung:
-      de: >-
-        Firewalls sowie Intrusion-Detection/-Prevention-Systeme für den
-        industriellen Einsatz sind in Anhang III Klasse II gelistet.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
-    review_status: pending
-
   - id: k_annex3_pki
     art: kategorie
     bedingungen: [{ frage: produkttyp, ist_eine_von: [pki] }]
-    kategorie: wichtig_klasse_2
-    titel: { de: 'Wichtiges Produkt Klasse II: PKI / Zertifikatsausstellung' }
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: PKI / Zertifikatsausstellung' }
     begruendung:
       de: >-
-        Public-Key-Infrastrukturen und Software zur Ausstellung digitaler
-        Zertifikate sind in Anhang III Klasse II gelistet.
-    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+        Public-Key-Infrastrukturen und Software für die Ausstellung digitaler
+        Zertifikate sind in der finalen Fassung von Anhang III als Klasse I
+        gelistet (im Entwurf von 2022 noch Klasse II).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 9' }
     review_status: pending
 
   - id: k_annex3_mcu_manipulationssicher

@@ -48,11 +48,11 @@ prüft frei:
 | GC-01 | Passwortmanager (B2C) | wichtig_klasse_1 |
 | GC-02 | Smart-Home-Hub mit Sicherheitsfunktion (Schloss, Alarm) | wichtig_klasse_1 |
 | GC-03 | Smart-Home-Sprachassistent | wichtig_klasse_1 |
-| GC-04 | Consumer-WLAN-Router | wichtig_klasse_1 *(Abgrenzung zu Klasse II bitte prüfen)* |
+| GC-04 | WLAN-Router (Privat- und Unternehmenskunden) | wichtig_klasse_1 |
 | GC-05 | Firewall für Industrieumgebung | wichtig_klasse_2 |
-| GC-06 | Desktop-/Server-Betriebssystem | wichtig_klasse_2 |
+| GC-06 | Desktop-/Server-Betriebssystem | wichtig_klasse_1 *(final, Entwurf 2022 sagte II)* |
 | GC-07 | Hypervisor / Container-Runtime | wichtig_klasse_2 |
-| GC-08 | PKI-/Zertifikatsaussteller-Software | wichtig_klasse_2 |
+| GC-08 | PKI-/Zertifikatsaussteller-Software | wichtig_klasse_1 *(final, Entwurf 2022 sagte II)* |
 | GC-09 | Manipulationssicherer Mikrocontroller | wichtig_klasse_2 |
 | GC-10 | Smart-Meter-Gateway | kritisch (Annex IV) |
 | GC-11 | Smartcard / Secure Element | kritisch (Annex IV) |

@@ -8,11 +8,11 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: router_consumer
+  produkttyp: router_modem_switch
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1
-  begruendungspfad_enthaelt: [k_annex3_router_consumer]
+  begruendungspfad_enthaelt: [k_annex3_router_modem_switch]
   pflichten_stichprobe:
     - { id: p_meldung_schwachstellen, frist: '2026-09' }
     - { id: p_konformitaet_wichtig, frist: '2027-12' }

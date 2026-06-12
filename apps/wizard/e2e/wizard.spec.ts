@@ -25,7 +25,7 @@ const drehbuecher = {
     eu_markt: 'ja',
     ausnahmebereich: 'keiner',
     oss: 'nicht_oss',
-    produkttyp: 'firewall_industrie',
+    produkttyp: 'firewall_ids_ips',
   },
   kritisch: {
     rolle: 'hersteller',
