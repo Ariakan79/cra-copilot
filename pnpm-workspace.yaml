@@ -1,3 +1,7 @@
 packages:
   - packages/*
   - apps/*
+
+# Nur gelistete Abhängigkeiten dürfen Install-Skripte ausführen (Supply-Chain-Hygiene).
+allowBuilds:
+  esbuild: true

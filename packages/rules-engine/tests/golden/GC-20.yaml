@@ -1,0 +1,12 @@
+id: GC-20
+titel: 'Software als Medizinprodukt (MDR)'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: software_produkt
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: medizinprodukt
+erwartung:
+  geltungsbereich: ausgenommen
+  begruendungspfad_enthaelt: [s_ausnahme_medizin]

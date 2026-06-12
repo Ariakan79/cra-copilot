@@ -1,0 +1,18 @@
+id: GC-08
+titel: 'PKI-/Zertifikatsaussteller-Software'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: software_produkt
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: keiner
+  oss: nicht_oss
+  produkttyp: pki
+erwartung:
+  geltungsbereich: in_scope
+  kategorie: wichtig_klasse_2
+  begruendungspfad_enthaelt: [k_annex3_pki]
+  pflichten_stichprobe:
+    - { id: p_meldung_schwachstellen, frist: '2026-09' }
+    - { id: p_konformitaet_wichtig, frist: '2027-12' }

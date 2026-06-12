@@ -1,0 +1,10 @@
+id: GC-14
+titel: 'Offline-Desktopanwendung ohne jede Datenverbindung'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: software_produkt
+  datenverbindung: nein
+erwartung:
+  geltungsbereich: ausserhalb
+  begruendungspfad_enthaelt: [s_keine_datenverbindung]

@@ -1,0 +1,804 @@
+# Regelwerk CRA-Copilot — Selbstauskunfts-Tiefe (Wizard, Stufe 1)
+#
+# ADR-003/ADR-010: Regulatorische Referenzen sind Daten. Jede inhaltliche Aussage
+# trägt review_status (pending = fachlich ungeprüft, Freigabe durch Director).
+# Das rules-v0.1-Tag setzt 0 pending voraus (TEST_STRATEGY §3).
+#
+# Konventionen (von pruefeStruktur erzwungen):
+# - Frage `rolle` existiert, Werte sind gültige Rollen.
+# - Jede Option von `produkttyp` ist von mindestens einer Kategorie-Regel abgedeckt.
+# - Sichtbarkeitsbedingungen verweisen nur auf frühere Fragen (linearer Fluss).
+#
+# Terminal-Regeln werden in Reihenfolge geprüft und beenden den Fluss vorzeitig,
+# sobald ihre Bedingungen beantwortet und erfüllt sind.
+
+rules_version: '0.1.0-draft'
+stand: '2026-06-12'
+
+fragen:
+  - id: rolle
+    typ: einfachauswahl
+    text:
+      de: 'Welche Rolle hat Ihr Unternehmen für dieses Produkt?'
+    erlaeuterung:
+      de: >-
+        Der Cyber Resilience Act unterscheidet, wer ein Produkt herstellt, einführt
+        oder nur weiterverkauft — davon hängen die Pflichten ab. Wählen Sie die
+        Rolle, die am ehesten zutrifft. Bei mehreren Rollen: die mit der größten
+        Verantwortung (Hersteller vor Importeur vor Händler).
+    optionen:
+      - wert: hersteller
+        text: { de: 'Hersteller' }
+        erlaeuterung:
+          de: >-
+            Sie entwickeln das Produkt selbst oder lassen es entwickeln und bieten
+            es unter eigenem Namen oder eigener Marke an.
+      - wert: importeur
+        text: { de: 'Importeur' }
+        erlaeuterung:
+          de: >-
+            Sie bringen das Produkt eines Herstellers aus einem Land außerhalb der
+            EU erstmals auf den EU-Markt.
+      - wert: haendler
+        text: { de: 'Händler' }
+        erlaeuterung:
+          de: >-
+            Sie verkaufen Produkte anderer Anbieter weiter, ohne sie zu verändern
+            oder unter eigenem Namen anzubieten.
+      - wert: os_steward
+        text: { de: 'Open-Source-Steward' }
+        erlaeuterung:
+          de: >-
+            Sie sind eine Organisation (z. B. Stiftung), die Open-Source-Software
+            dauerhaft unterstützt, ohne sie kommerziell zu vertreiben.
+
+  - id: produktart
+    typ: einfachauswahl
+    text:
+      de: 'Was bieten Sie an?'
+    erlaeuterung:
+      de: >-
+        Der CRA gilt für „Produkte mit digitalen Elementen": Software oder
+        vernetzbare Hardware, die als Produkt auf den Markt kommt — im Laden, im
+        App-Store oder als Download.
+    optionen:
+      - wert: hardware_mit_software
+        text: { de: 'Ein Gerät mit Software' }
+        erlaeuterung:
+          de: 'Zum Beispiel ein IoT-Gerät, eine Maschine mit Steuerung, ein Netzwerkgerät.'
+      - wert: software_produkt
+        text: { de: 'Ein Software-Produkt' }
+        erlaeuterung:
+          de: >-
+            Eine App, ein Programm oder eine Bibliothek, die Kunden installieren
+            oder in eigene Produkte einbauen.
+      - wert: reine_dienstleistung
+        text: { de: 'Eine reine Online-Dienstleistung (SaaS)' }
+        erlaeuterung:
+          de: >-
+            Ihre Kunden nutzen die Lösung nur über das Internet, ohne dass Sie
+            ihnen ein Produkt liefern.
+      - wert: kein_digitales_produkt
+        text: { de: 'Weder Software noch vernetzbare Hardware' }
+
+  - id: dienstleistung_fuer_produkt
+    typ: einfachauswahl
+    text:
+      de: >-
+        Ist Ihre Online-Lösung notwendig, damit ein Produkt funktioniert, das Sie
+        selbst auf den Markt bringen?
+    erlaeuterung:
+      de: >-
+        Häufig übersehen: Eine Cloud, ohne die Ihr Gerät oder Ihre App nicht
+        funktioniert („entfernte Datenverarbeitung"), zählt rechtlich zum Produkt —
+        dann gilt der CRA auch für sie.
+    optionen:
+      - wert: ja
+        text: { de: 'Ja — sie gehört zu einem Produkt von uns' }
+      - wert: nein
+        text: { de: 'Nein — sie ist eine eigenständige Dienstleistung' }
+    sichtbar_wenn:
+      - frage: produktart
+        ist_eine_von: [reine_dienstleistung]
+
+  - id: datenverbindung
+    typ: einfachauswahl
+    text:
+      de: >-
+        Kann das Produkt Daten mit anderen Geräten oder Netzwerken austauschen —
+        direkt oder indirekt?
+    erlaeuterung:
+      de: >-
+        Auch indirekte Verbindungen zählen, etwa Synchronisation über USB oder
+        eine Companion-App. Nur Produkte ganz ohne Datenverbindung fallen aus dem
+        CRA heraus.
+    optionen:
+      - wert: ja
+        text: { de: 'Ja' }
+      - wert: nein
+        text: { de: 'Nein, vollständig offline' }
+    sichtbar_wenn:
+      - frage: produktart
+        ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
+
+  - id: eu_markt
+    typ: einfachauswahl
+    text:
+      de: 'Bieten Sie das Produkt in der EU an — oder planen Sie das?'
+    erlaeuterung:
+      de: >-
+        Der CRA knüpft an das Inverkehrbringen auf dem EU-Markt an. Auch ein
+        geplanter Markteintritt zählt für Ihre Vorbereitung.
+    optionen:
+      - wert: ja
+        text: { de: 'Ja, bereits am Markt oder geplant' }
+      - wert: nein
+        text: { de: 'Nein, kein EU-Vertrieb' }
+    sichtbar_wenn:
+      - frage: produktart
+        ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
+
+  - id: ausnahmebereich
+    typ: einfachauswahl
+    text:
+      de: 'Fällt das Produkt in einen dieser besonders regulierten Bereiche?'
+    erlaeuterung:
+      de: >-
+        Für einige Branchen gelten eigene Cybersicherheits-Regime — dort ist der
+        CRA ganz oder teilweise nicht anwendbar.
+    optionen:
+      - wert: medizinprodukt
+        text: { de: 'Medizinprodukt / In-vitro-Diagnostikum' }
+      - wert: kfz
+        text: { de: 'Fahrzeuge mit Typgenehmigung (z. B. UNECE R155)' }
+      - wert: luftfahrt
+        text: { de: 'Zivile Luftfahrt' }
+      - wert: keiner
+        text: { de: 'Keiner dieser Bereiche' }
+    sichtbar_wenn:
+      - frage: produktart
+        ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
+
+  - id: oss
+    typ: einfachauswahl
+    text:
+      de: 'Wie ist die Open-Source-Situation Ihres Produkts?'
+    erlaeuterung:
+      de: >-
+        Nicht-kommerzielle Open-Source-Software fällt nicht unter den CRA. Sobald
+        Sie mit der Software Geld verdienen — etwa durch Support, Dual-Lizenzen
+        oder eine gehostete Version — gelten die Pflichten aber.
+    optionen:
+      - wert: nicht_oss
+        text: { de: 'Kein Open Source (proprietär)' }
+      - wert: oss_kommerziell
+        text: { de: 'Open Source mit kommerzieller Verwertung' }
+        erlaeuterung:
+          de: 'Zum Beispiel bezahlter Support, Dual-Lizenzierung oder eine bezahlte Cloud-Version.'
+      - wert: oss_nicht_kommerziell
+        text: { de: 'Reines Open-Source-Projekt ohne Kommerzialisierung' }
+    sichtbar_wenn:
+      - frage: rolle
+        ist_eine_von: [hersteller]
+
+  - id: produkttyp
+    typ: einfachauswahl
+    text:
+      de: 'Entspricht das Produkt einer dieser Produktgruppen?'
+    erlaeuterung:
+      de: >-
+        Der CRA stuft bestimmte Produktgruppen als „wichtig" oder „kritisch" ein —
+        dafür gelten strengere Nachweispflichten. Wählen Sie die Gruppe, die am
+        besten passt, sonst „Keine davon".
+    optionen:
+      - wert: passwortmanager
+        text: { de: 'Passwort-Manager' }
+      - wert: antivirus
+        text: { de: 'Virenschutz / Endpoint-Schutz' }
+      - wert: vpn
+        text: { de: 'VPN-Produkt' }
+      - wert: router_consumer
+        text: { de: 'Internet-Router oder Modem (Endkundenbereich)' }
+      - wert: smarthome_sicherheit
+        text: { de: 'Smart-Home-Produkt mit Sicherheitsfunktion' }
+        erlaeuterung:
+          de: 'Zum Beispiel smarte Türschlösser, Alarmanlagen, Überwachungskameras, Babyfone.'
+      - wert: sprachassistent
+        text: { de: 'Smart-Home-Sprachassistent' }
+      - wert: spielzeug_vernetzt
+        text: { de: 'Vernetztes Spielzeug mit Chat- oder Ortungsfunktion' }
+      - wert: wearable_gesundheit
+        text: { de: 'Wearable mit Gesundheitsüberwachung' }
+      - wert: betriebssystem
+        text: { de: 'Betriebssystem' }
+      - wert: hypervisor_container
+        text: { de: 'Hypervisor oder Container-Laufzeitumgebung' }
+      - wert: firewall_industrie
+        text: { de: 'Firewall / Intrusion Detection für industrielle Umgebungen' }
+      - wert: pki
+        text: { de: 'PKI / Ausstellung digitaler Zertifikate' }
+      - wert: mcu_manipulationssicher
+        text: { de: 'Manipulationssicherer Mikroprozessor / Mikrocontroller' }
+      - wert: smart_meter_gateway
+        text: { de: 'Smart-Meter-Gateway' }
+      - wert: smartcard_secure_element
+        text: { de: 'Smartcard / Secure Element' }
+      - wert: hsm_security_box
+        text: { de: 'Hardware-Sicherheitsmodul (Gerät mit Security Box)' }
+      - wert: keine_davon
+        text: { de: 'Keine davon' }
+    sichtbar_wenn:
+      - frage: produktart
+        ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
+
+regeln:
+  # ---- Terminal: Geltungsbereich (Reihenfolge = Prüfreihenfolge) ----
+  - id: s_kein_digitales_produkt
+    art: terminal
+    bedingungen:
+      - frage: produktart
+        ist_eine_von: [kein_digitales_produkt]
+    verdikt: ausserhalb
+    titel: { de: 'Kein Produkt mit digitalen Elementen' }
+    begruendung:
+      de: >-
+        Der CRA gilt nur für Software und vernetzbare Hardware. Ohne digitale
+        Elemente ist die Verordnung nicht anwendbar.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1, Art. 3 Nr. 1' }
+    review_status: pending
+
+  - id: s_dienstleistung_ohne_produktbezug
+    art: terminal
+    bedingungen:
+      - frage: produktart
+        ist_eine_von: [reine_dienstleistung]
+      - frage: dienstleistung_fuer_produkt
+        ist_eine_von: [nein]
+    verdikt: ausserhalb
+    titel: { de: 'Eigenständige Dienstleistung (SaaS) ohne Produktbezug' }
+    begruendung:
+      de: >-
+        Reine Online-Dienstleistungen ohne Bezug zu einem in Verkehr gebrachten
+        Produkt fallen nicht unter den CRA. Hinweis: Für Dienste kann stattdessen
+        NIS2 einschlägig sein — das prüft dieser Check nicht.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 3 Nr. 2, Erwägungsgrund 12' }
+    review_status: pending
+
+  - id: s_keine_datenverbindung
+    art: terminal
+    bedingungen:
+      - frage: datenverbindung
+        ist_eine_von: [nein]
+    verdikt: ausserhalb
+    titel: { de: 'Keine direkte oder indirekte Datenverbindung' }
+    begruendung:
+      de: >-
+        Produkte, die weder direkt noch indirekt mit Geräten oder Netzwerken
+        verbunden werden können, sind vom CRA nicht erfasst.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1' }
+    review_status: pending
+
+  - id: s_kein_eu_markt
+    art: terminal
+    bedingungen:
+      - frage: eu_markt
+        ist_eine_von: [nein]
+    verdikt: ausserhalb
+    titel: { de: 'Kein Inverkehrbringen auf dem EU-Markt' }
+    begruendung:
+      de: >-
+        Der CRA knüpft an die Bereitstellung auf dem Unionsmarkt an. Ohne
+        EU-Vertrieb entstehen keine CRA-Pflichten — bei späterem Markteintritt
+        gilt die Verordnung aber ab dem ersten Tag.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1, Art. 3 Nr. 21/22' }
+    review_status: pending
+
+  - id: s_ausnahme_medizin
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [medizinprodukt]
+    verdikt: ausgenommen
+    titel: { de: 'Sektorale Ausnahme: Medizinprodukte' }
+    begruendung:
+      de: >-
+        Für Medizinprodukte und In-vitro-Diagnostika gelten die Cybersicherheits-
+        anforderungen der MDR/IVDR — der CRA ist hier nicht anwendbar.
+    referenz:
+      {
+        dokument: 'CRA (EU) 2024/2847',
+        stelle: 'Art. 2 Abs. 2 i. V. m. (EU) 2017/745, (EU) 2017/746',
+      }
+    review_status: pending
+
+  - id: s_ausnahme_kfz
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [kfz]
+    verdikt: ausgenommen
+    titel: { de: 'Sektorale Ausnahme: Fahrzeuge' }
+    begruendung:
+      de: >-
+        Fahrzeuge mit Typgenehmigung unterliegen dem eigenen Cybersicherheits-
+        Regime (UNECE R155 / (EU) 2019/2144) — der CRA ist hier nicht anwendbar.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 4 i. V. m. (EU) 2019/2144' }
+    review_status: pending
+
+  - id: s_ausnahme_luftfahrt
+    art: terminal
+    bedingungen:
+      - frage: ausnahmebereich
+        ist_eine_von: [luftfahrt]
+    verdikt: ausgenommen
+    titel: { de: 'Sektorale Ausnahme: Zivile Luftfahrt' }
+    begruendung:
+      de: >-
+        Produkte im Anwendungsbereich der EU-Luftfahrtsicherheitsverordnung
+        unterliegen deren Anforderungen — der CRA ist hier nicht anwendbar.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 3 i. V. m. (EU) 2018/1139' }
+    review_status: pending
+
+  - id: s_oss_nicht_kommerziell
+    art: terminal
+    bedingungen:
+      - frage: oss
+        ist_eine_von: [oss_nicht_kommerziell]
+    verdikt: ausserhalb
+    titel: { de: 'Nicht-kommerzielle Open-Source-Software' }
+    begruendung:
+      de: >-
+        Open-Source-Software, die außerhalb einer Geschäftstätigkeit entwickelt
+        und bereitgestellt wird, fällt nicht unter den CRA. Achtung: Kommerzielle
+        Verwertung (Support, Dual-Lizenz, gehostete Version) ändert das.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Erwägungsgründe 18/19' }
+    review_status: pending
+
+  - id: s_os_steward
+    art: terminal
+    bedingungen:
+      - frage: rolle
+        ist_eine_von: [os_steward]
+      - frage: datenverbindung
+        ist_eine_von: [ja]
+      - frage: eu_markt
+        ist_eine_von: [ja]
+      - frage: ausnahmebereich
+        ist_eine_von: [keiner]
+    verdikt: sonderregime_os_steward
+    titel: { de: 'Sonderregime Open-Source-Steward' }
+    begruendung:
+      de: >-
+        Für Open-Source-Stewards gilt ein erleichtertes Pflichtenregime: keine
+        CE-Kennzeichnung, aber eine Cybersicherheits-Policy, Kooperation mit
+        Behörden und Mitwirkung bei Meldepflichten.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24' }
+    review_status: pending
+
+  # ---- Kategorie-Regeln (Annex-III/IV-Heuristik, Selbstauskunfts-Tiefe) ----
+  - id: k_annex3_passwortmanager
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [passwortmanager] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Passwort-Manager' }
+    begruendung:
+      de: 'Passwort-Manager sind in Anhang III als wichtige Produkte der Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_antivirus
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [antivirus] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Virenschutz' }
+    begruendung:
+      de: >-
+        Software zur Erkennung und Entfernung von Schadsoftware ist in Anhang III
+        als wichtiges Produkt der Klasse I gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_vpn
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [vpn] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: VPN' }
+    begruendung:
+      de: 'VPN-Produkte sind in Anhang III als wichtige Produkte der Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_router_consumer
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [router_consumer] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Internet-Router (Endkundenbereich)' }
+    begruendung:
+      de: >-
+        Internet-Router und Modems für den Endkundenbereich sind in Anhang III
+        als wichtige Produkte der Klasse I gelistet. Achtung Abgrenzung: Router
+        für industrielle Nutzung können in Klasse II fallen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_smarthome_sicherheit
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [smarthome_sicherheit] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Smart-Home mit Sicherheitsfunktion' }
+    begruendung:
+      de: >-
+        Smart-Home-Produkte mit Sicherheitsfunktionen (z. B. smarte Türschlösser,
+        Kameras, Alarmanlagen, Babyfone) sind in Anhang III Klasse I gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_sprachassistent
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [sprachassistent] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Smart-Home-Sprachassistent' }
+    begruendung:
+      de: 'Virtuelle Sprachassistenten für das Smart Home sind in Anhang III Klasse I gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_spielzeug
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [spielzeug_vernetzt] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Vernetztes Spielzeug' }
+    begruendung:
+      de: >-
+        Vernetztes Spielzeug mit sozialen Interaktions- oder Ortungsfunktionen
+        ist in Anhang III Klasse I gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_wearable_gesundheit
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [wearable_gesundheit] }]
+    kategorie: wichtig_klasse_1
+    titel: { de: 'Wichtiges Produkt Klasse I: Gesundheits-Wearable' }
+    begruendung:
+      de: >-
+        Am Körper getragene Produkte zur Gesundheitsüberwachung sind in
+        Anhang III Klasse I gelistet (soweit nicht MDR/IVDR greift).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
+    review_status: pending
+
+  - id: k_annex3_betriebssystem
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [betriebssystem] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: Betriebssystem' }
+    begruendung:
+      de: 'Betriebssysteme sind in Anhang III als wichtige Produkte der Klasse II gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+    review_status: pending
+
+  - id: k_annex3_hypervisor
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [hypervisor_container] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: Hypervisor / Container-Runtime' }
+    begruendung:
+      de: >-
+        Hypervisoren und Container-Laufzeitumgebungen, die den virtualisierten
+        Betrieb von Betriebssystemen ermöglichen, sind in Anhang III Klasse II
+        gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+    review_status: pending
+
+  - id: k_annex3_firewall_industrie
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [firewall_industrie] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: Industrielle Firewall / IDS' }
+    begruendung:
+      de: >-
+        Firewalls sowie Intrusion-Detection/-Prevention-Systeme für den
+        industriellen Einsatz sind in Anhang III Klasse II gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+    review_status: pending
+
+  - id: k_annex3_pki
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [pki] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: PKI / Zertifikatsausstellung' }
+    begruendung:
+      de: >-
+        Public-Key-Infrastrukturen und Software zur Ausstellung digitaler
+        Zertifikate sind in Anhang III Klasse II gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+    review_status: pending
+
+  - id: k_annex3_mcu_manipulationssicher
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [mcu_manipulationssicher] }]
+    kategorie: wichtig_klasse_2
+    titel: { de: 'Wichtiges Produkt Klasse II: Manipulationssicherer Mikroprozessor/-controller' }
+    begruendung:
+      de: >-
+        Manipulationssichere Mikroprozessoren und Mikrocontroller sind in
+        Anhang III Klasse II gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
+    review_status: pending
+
+  - id: k_annex4_smart_meter_gateway
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [smart_meter_gateway] }]
+    kategorie: kritisch
+    titel: { de: 'Kritisches Produkt: Smart-Meter-Gateway' }
+    begruendung:
+      de: 'Smart-Meter-Gateways sind in Anhang IV als kritische Produkte gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
+    review_status: pending
+
+  - id: k_annex4_smartcard
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [smartcard_secure_element] }]
+    kategorie: kritisch
+    titel: { de: 'Kritisches Produkt: Smartcard / Secure Element' }
+    begruendung:
+      de: 'Smartcards und Secure Elements sind in Anhang IV als kritische Produkte gelistet.'
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
+    review_status: pending
+
+  - id: k_annex4_hsm
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [hsm_security_box] }]
+    kategorie: kritisch
+    titel: { de: 'Kritisches Produkt: Hardware mit Security Box' }
+    begruendung:
+      de: >-
+        Hardware-Geräte mit Security Boxes (z. B. Hardware-Sicherheitsmodule)
+        sind in Anhang IV als kritische Produkte gelistet.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
+    review_status: pending
+
+  - id: k_default
+    art: kategorie
+    bedingungen: [{ frage: produkttyp, ist_eine_von: [keine_davon] }]
+    kategorie: default
+    titel: { de: 'Standardkategorie' }
+    begruendung:
+      de: >-
+        Keine Produktgruppe aus Anhang III oder IV ist einschlägig. Es gelten die
+        grundlegenden Anforderungen; die Konformität kann in der Regel in
+        Eigenverantwortung bewertet werden (interne Kontrolle).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32 Abs. 1' }
+    review_status: pending
+
+pflichten:
+  # ---- Hersteller: Meldepflichten ab September 2026 ----
+  - id: p_meldung_schwachstellen
+    titel: { de: 'Meldepflicht: aktiv ausgenutzte Schwachstellen' }
+    beschreibung:
+      de: >-
+        Aktiv ausgenutzte Schwachstellen müssen binnen 24 Stunden (Frühwarnung)
+        und 72 Stunden (Folgemeldung) an die zuständige CSIRT-Stelle und die
+        ENISA gemeldet werden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14' }
+    frist: '2026-09'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_meldung_vorfaelle
+    titel: { de: 'Meldepflicht: schwerwiegende Sicherheitsvorfälle' }
+    beschreibung:
+      de: >-
+        Schwerwiegende Vorfälle mit Auswirkung auf die Produktsicherheit müssen
+        binnen 24/72 Stunden gemeldet und die Nutzer informiert werden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14' }
+    frist: '2026-09'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  # ---- Hersteller: volle Anwendung ab Dezember 2027 ----
+  - id: p_anforderungen_annex1
+    titel: { de: 'Grundlegende Cybersicherheitsanforderungen umsetzen' }
+    beschreibung:
+      de: >-
+        Das Produkt muss die Anforderungen aus Anhang I Teil I erfüllen — u. a.
+        sichere Standardkonfiguration, Zugriffskontrolle, Verschlüsselung,
+        Update-Mechanismus und Minimierung der Angriffsfläche.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13, Anhang I Teil I' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_schwachstellenmanagement
+    titel: { de: 'Schwachstellenmanagement-Prozess betreiben' }
+    beschreibung:
+      de: >-
+        Anhang I Teil II verlangt u. a. eine Software-Stückliste (SBOM), eine
+        Policy zur koordinierten Offenlegung (CVD), das unverzügliche Schließen
+        von Schwachstellen und kostenlose Sicherheitsupdates.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_techdoku
+    titel: { de: 'Technische Dokumentation erstellen' }
+    beschreibung:
+      de: >-
+        Vor dem Inverkehrbringen ist eine technische Dokumentation nach Anhang VII
+        zu erstellen und aktuell zu halten (u. a. Risikobewertung, Beschreibung
+        von Entwurf und Schwachstellenmanagement).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 31, Anhang VII' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_support_zeitraum
+    titel: { de: 'Support-Zeitraum festlegen und veröffentlichen' }
+    beschreibung:
+      de: >-
+        Für das Produkt ist ein Unterstützungszeitraum festzulegen (Orientierung:
+        erwartete Nutzungsdauer, im Regelfall mindestens fünf Jahre) und
+        transparent zu kommunizieren; währenddessen sind Sicherheitsupdates
+        bereitzustellen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13 Abs. 8' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_benutzerinfo
+    titel: { de: 'Nutzerinformationen bereitstellen' }
+    beschreibung:
+      de: >-
+        Den Nutzern sind die Informationen nach Anhang II mitzugeben — u. a.
+        Kontaktstelle für Schwachstellenmeldungen, Support-Zeitraum und
+        Anleitung für sicheren Einsatz und Updates.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang II' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  - id: p_konformitaet_default
+    titel: { de: 'Konformitätsbewertung: interne Kontrolle möglich' }
+    beschreibung:
+      de: >-
+        Für Produkte der Standardkategorie kann die Konformität in der Regel im
+        Verfahren der internen Kontrolle (Modul A) in Eigenverantwortung bewertet
+        werden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32, Anhang VIII' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller], kategorien: [default] }
+    review_status: pending
+
+  - id: p_konformitaet_wichtig
+    titel: { de: 'Konformitätsbewertung: Verfahren für wichtige Produkte' }
+    beschreibung:
+      de: >-
+        Für wichtige Produkte (Anhang III) ist die interne Kontrolle nur bei
+        vollständiger Anwendung einschlägiger harmonisierter Normen zulässig;
+        andernfalls ist ein Verfahren mit notifizierter Stelle erforderlich
+        (z. B. EU-Baumusterprüfung).
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32 Abs. 2/3, Anhang VIII' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller], kategorien: [wichtig_klasse_1, wichtig_klasse_2] }
+    review_status: pending
+
+  - id: p_konformitaet_kritisch
+    titel: { de: 'Konformitätsbewertung: kritische Produkte' }
+    beschreibung:
+      de: >-
+        Für kritische Produkte (Anhang IV) kann eine europäische
+        Cybersicherheitszertifizierung vorgeschrieben werden; bis dahin gelten
+        die Verfahren für wichtige Produkte der Klasse II.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 8, Art. 32' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller], kategorien: [kritisch] }
+    review_status: pending
+
+  - id: p_ce_kennzeichnung
+    titel: { de: 'CE-Kennzeichnung und EU-Konformitätserklärung' }
+    beschreibung:
+      de: >-
+        Nach erfolgreicher Konformitätsbewertung sind die EU-Konformitätserklärung
+        auszustellen und die CE-Kennzeichnung anzubringen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 28, Art. 30, Anhang V' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [hersteller] }
+    review_status: pending
+
+  # ---- Importeure ----
+  - id: p_imp_pruefung
+    titel: { de: 'Prüfpflicht vor dem Import' }
+    beschreibung:
+      de: >-
+        Importeure dürfen nur Produkte in Verkehr bringen, für die der Hersteller
+        die Konformitätsbewertung durchlaufen hat und die technische
+        Dokumentation, CE-Kennzeichnung und Nutzerinformationen vorliegen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [importeur] }
+    review_status: pending
+
+  - id: p_imp_angaben
+    titel: { de: 'Importeurangaben am Produkt' }
+    beschreibung:
+      de: >-
+        Name, eingetragener Handelsname und Kontaktanschrift des Importeurs sind
+        auf dem Produkt oder seiner Verpackung/Dokumentation anzugeben.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [importeur] }
+    review_status: pending
+
+  - id: p_imp_information
+    titel: { de: 'Informationspflicht bei Schwachstellen und Nichtkonformität' }
+    beschreibung:
+      de: >-
+        Bei Kenntnis einer Schwachstelle oder Nichtkonformität muss der Importeur
+        den Hersteller informieren und bei erheblichem Risiko auch die
+        Marktüberwachungsbehörden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [importeur] }
+    review_status: pending
+
+  # ---- Händler ----
+  - id: p_hdl_sorgfalt
+    titel: { de: 'Sorgfaltspflichten des Händlers' }
+    beschreibung:
+      de: >-
+        Vor der Bereitstellung ist zu prüfen, dass CE-Kennzeichnung,
+        Herstellerinformationen und Importeurangaben vorliegen; Lager- und
+        Transportbedingungen dürfen die Konformität nicht gefährden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 20' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [haendler] }
+    review_status: pending
+
+  - id: p_hdl_information
+    titel: { de: 'Informationspflicht des Händlers' }
+    beschreibung:
+      de: >-
+        Bei Kenntnis einer Schwachstelle oder Nichtkonformität sind Hersteller
+        bzw. Importeur zu informieren, bei erheblichem Risiko auch die
+        Marktüberwachungsbehörden.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 20' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [haendler] }
+    review_status: pending
+
+  # ---- Open-Source-Stewards ----
+  - id: p_stw_meldung
+    titel: { de: 'Mitwirkung an Meldepflichten' }
+    beschreibung:
+      de: >-
+        Stewards müssen an der Meldung aktiv ausgenutzter Schwachstellen
+        mitwirken, soweit sie in die Entwicklung der betroffenen Produkte
+        eingebunden sind.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14, Art. 24' }
+    frist: '2026-09'
+    gilt_fuer: { rollen: [os_steward] }
+    review_status: pending
+
+  - id: p_stw_policy
+    titel: { de: 'Cybersicherheits-Policy aufstellen' }
+    beschreibung:
+      de: >-
+        Stewards müssen eine Cybersicherheits-Policy einrichten, die sichere
+        Entwicklung und den Umgang mit Schwachstellen der betreuten Produkte
+        fördert.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24 Abs. 1' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [os_steward] }
+    review_status: pending
+
+  - id: p_stw_kooperation
+    titel: { de: 'Zusammenarbeit mit Marktüberwachungsbehörden' }
+    beschreibung:
+      de: >-
+        Stewards müssen mit den Marktüberwachungsbehörden zusammenarbeiten und
+        auf Verlangen die Dokumentation ihrer Policy bereitstellen.
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24 Abs. 2/3' }
+    frist: '2027-12'
+    gilt_fuer: { rollen: [os_steward] }
+    review_status: pending

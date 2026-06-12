@@ -1,0 +1,28 @@
+{
+  "name": "@cra-copilot/rules-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "gen": "tsx scripts/gen-data.ts",
+    "pending": "tsx scripts/gen-data.ts --report",
+    "test": "pnpm run gen && vitest run",
+    "typecheck": "pnpm run gen && tsc --noEmit",
+    "build": "pnpm run gen && tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.19.21",
+    "fast-check": "^4.3.0",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
