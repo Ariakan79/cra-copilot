@@ -1,6 +1,6 @@
 id: GC-29
 titel: 'Identity- und Access-Management-Suite'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: identity_management
+  produkttyp: [identity_management]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

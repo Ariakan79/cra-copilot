@@ -26,6 +26,7 @@ export const de = {
     schrittVon: (nummer: number, gesamt: number) => `Frage ${nummer} von ${gesamt}`,
     weiter: 'Weiter',
     zurueck: 'Zurück',
+    mehrfachHinweis: 'Mehrfachauswahl möglich — wählen Sie alle zutreffenden Gruppen.',
   },
   ergebnis: {
     titel: 'Ihre Ersteinschätzung',

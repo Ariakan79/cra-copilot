@@ -22,7 +22,14 @@ import {
  * einer Kategorie-Regel abgedeckt).
  */
 
-export type Antworten = Readonly<Record<string, string>>;
+/** Einfachauswahl: ein Wert. Mehrfachauswahl: Liste gewählter Werte. */
+export type AntwortWert = string | readonly string[];
+export type Antworten = Readonly<Record<string, AntwortWert>>;
+
+function alsListe(wert: AntwortWert | undefined): readonly string[] | undefined {
+  if (wert === undefined) return undefined;
+  return typeof wert === 'string' ? [wert] : wert;
+}
 
 export interface RegelRef {
   regel_id: string;
@@ -56,8 +63,8 @@ const SCHWERE: Record<Kategorie, number> = {
 };
 
 function bedingungErfuellt(bedingung: Bedingung, antworten: Antworten): boolean {
-  const antwort = antworten[bedingung.frage];
-  return antwort !== undefined && bedingung.ist_eine_von.includes(antwort);
+  const werte = alsListe(antworten[bedingung.frage]);
+  return werte !== undefined && werte.some((wert) => bedingung.ist_eine_von.includes(wert));
 }
 
 export function istSichtbar(frage: Frage, antworten: Antworten): boolean {
@@ -152,6 +159,7 @@ export function naechsterSchritt(regelwerk: Regelwerk, antworten: Antworten): Sc
     );
   }
 
+  // rolle ist per Konvention eine Einfachauswahl, bereinigeAntworten normalisiert auf string.
   const rolle = RolleSchema.parse(antworten['rolle']);
   const pfad = [...treffer].sort((a, b) => SCHWERE[b.kategorie] - SCHWERE[a.kategorie]).map(refVon);
 
@@ -173,13 +181,26 @@ export function naechsterSchritt(regelwerk: Regelwerk, antworten: Antworten): Sc
  * beendet. Antworten auf unerreichbar gewordene Folgefragen werden verworfen.
  */
 export function bereinigeAntworten(regelwerk: Regelwerk, antworten: Antworten): Antworten {
-  const behalten: Record<string, string> = {};
+  const behalten: Record<string, AntwortWert> = {};
   for (const frage of regelwerk.fragen) {
     if (ersteTerminalregel(regelwerk, behalten) !== null) break;
     if (!istSichtbar(frage, behalten)) continue;
-    const wert = antworten[frage.id];
-    if (wert === undefined || !frage.optionen.some((o) => o.wert === wert)) break;
-    behalten[frage.id] = wert;
+    const roh = antworten[frage.id];
+    if (roh === undefined) break;
+    if (frage.typ === 'einfachauswahl') {
+      if (typeof roh !== 'string' || !frage.optionen.some((o) => o.wert === roh)) break;
+      behalten[frage.id] = roh;
+    } else {
+      const gueltige = [
+        ...new Set(
+          (typeof roh === 'string' ? [roh] : roh).filter((wert) =>
+            frage.optionen.some((o) => o.wert === wert),
+          ),
+        ),
+      ];
+      if (gueltige.length === 0) break;
+      behalten[frage.id] = gueltige;
+    }
   }
   return behalten;
 }

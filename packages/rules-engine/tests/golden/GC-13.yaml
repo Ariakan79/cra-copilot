@@ -1,6 +1,6 @@
 id: GC-13
 titel: 'ERP-Software on-premise'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: keine_davon
+  produkttyp: [keine_davon]
 erwartung:
   geltungsbereich: in_scope
   kategorie: default

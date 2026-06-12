@@ -12,7 +12,7 @@
 # Terminal-Regeln werden in Reihenfolge geprüft und beenden den Fluss vorzeitig,
 # sobald ihre Bedingungen beantwortet und erfüllt sind.
 
-rules_version: '0.3.0-draft'
+rules_version: '0.1.0'
 stand: '2026-06-12'
 
 fragen:
@@ -195,15 +195,15 @@ fragen:
         ist_eine_von: [hersteller]
 
   - id: produkttyp
-    typ: einfachauswahl
+    typ: mehrfachauswahl
     text:
-      de: 'Entspricht das Produkt einer dieser Produktgruppen?'
+      de: 'Entspricht das Produkt einer oder mehreren dieser Produktgruppen?'
     erlaeuterung:
       de: >-
         Der CRA stuft bestimmte Produktgruppen als „wichtig" oder „kritisch" ein —
-        dafür gelten strengere Nachweispflichten. Trifft mehr als eine Gruppe zu
-        (z. B. Router mit Firewall-Funktion), wählen Sie die strengste zutreffende
-        Gruppe. Passt keine, wählen Sie „Keine davon".
+        dafür gelten strengere Nachweispflichten. Wählen Sie alle zutreffenden
+        Gruppen (z. B. Router mit Firewall-Funktion: beide); die Einstufung folgt
+        der strengsten. Passt keine, wählen Sie „Keine davon".
     optionen:
       - wert: passwortmanager
         text: { de: 'Passwort-Manager' }
@@ -265,6 +265,7 @@ fragen:
         text: { de: 'Hardware-Sicherheitsmodul (Gerät mit Security Box)' }
       - wert: keine_davon
         text: { de: 'Keine davon' }
+        exklusiv: true
     sichtbar_wenn:
       - frage: produktart
         ist_eine_von: [hardware_mit_software, software_produkt, reine_dienstleistung]
@@ -283,7 +284,7 @@ regeln:
         Der CRA gilt nur für Software und vernetzbare Hardware. Ohne digitale
         Elemente ist die Verordnung nicht anwendbar.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1, Art. 3 Nr. 1' }
-    review_status: pending
+    review_status: approved
 
   - id: s_dienstleistung_ohne_produktbezug
     art: terminal
@@ -300,7 +301,7 @@ regeln:
         Produkt fallen nicht unter den CRA. Hinweis: Für Dienste kann stattdessen
         NIS2 einschlägig sein — das prüft dieser Check nicht.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 3 Nr. 2, Erwägungsgrund 12' }
-    review_status: pending
+    review_status: approved
 
   - id: s_keine_datenverbindung
     art: terminal
@@ -314,7 +315,7 @@ regeln:
         Produkte, die weder direkt noch indirekt mit Geräten oder Netzwerken
         verbunden werden können, sind vom CRA nicht erfasst.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1' }
-    review_status: pending
+    review_status: approved
 
   - id: s_kein_eu_markt
     art: terminal
@@ -329,7 +330,7 @@ regeln:
         EU-Vertrieb entstehen keine CRA-Pflichten — bei späterem Markteintritt
         gilt die Verordnung aber ab dem ersten Tag.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 1, Art. 3 Nr. 21/22' }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_medizin
     art: terminal
@@ -347,7 +348,7 @@ regeln:
         dokument: 'CRA (EU) 2024/2847',
         stelle: 'Art. 2 Abs. 2 i. V. m. (EU) 2017/745, (EU) 2017/746',
       }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_kfz
     art: terminal
@@ -361,7 +362,7 @@ regeln:
         Fahrzeuge mit Typgenehmigung unterliegen dem eigenen Cybersicherheits-
         Regime (UNECE R155 / (EU) 2019/2144) — der CRA ist hier nicht anwendbar.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 2 i. V. m. (EU) 2019/2144' }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_luftfahrt
     art: terminal
@@ -375,7 +376,7 @@ regeln:
         Produkte im Anwendungsbereich der EU-Luftfahrtsicherheitsverordnung
         unterliegen deren Anforderungen — der CRA ist hier nicht anwendbar.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 3 i. V. m. (EU) 2018/1139' }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_schiff
     art: terminal
@@ -389,7 +390,7 @@ regeln:
         Ausrüstung im Anwendungsbereich der Schiffsausrüstungsrichtlinie
         unterliegt deren Anforderungen — der CRA ist hier nicht anwendbar.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 4 i. V. m. (EU) 2014/90' }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_verteidigung
     art: terminal
@@ -403,7 +404,7 @@ regeln:
         Produkte, die ausschließlich für Zwecke der Verteidigung oder der
         nationalen Sicherheit entwickelt werden, sind vom CRA ausgenommen.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 7' }
-    review_status: pending
+    review_status: approved
 
   - id: s_ausnahme_ersatzteil
     art: terminal
@@ -417,7 +418,7 @@ regeln:
         Ersatzteile, die identische Komponenten ersetzen und nach denselben
         Spezifikationen gefertigt werden, sind vom CRA nicht erfasst.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2 Abs. 6' }
-    review_status: pending
+    review_status: approved
 
   - id: s_oss_nicht_kommerziell
     art: terminal
@@ -432,7 +433,7 @@ regeln:
         und bereitgestellt wird, fällt nicht unter den CRA. Achtung: Kommerzielle
         Verwertung (Support, Dual-Lizenz, gehostete Version) ändert das.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Erwägungsgründe 18/19' }
-    review_status: pending
+    review_status: approved
 
   - id: s_os_steward
     art: terminal
@@ -453,7 +454,7 @@ regeln:
         CE-Kennzeichnung, aber eine Cybersicherheits-Policy, Kooperation mit
         Behörden und Mitwirkung bei Meldepflichten.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24' }
-    review_status: pending
+    review_status: approved
 
   # ---- Kategorie-Regeln (Annex-III/IV-Heuristik, Selbstauskunfts-Tiefe) ----
   - id: k_annex3_identity_management
@@ -466,7 +467,7 @@ regeln:
         Identitätsverwaltungssysteme und Software für privilegierte
         Zugriffsverwaltung sind in Anhang III Klasse I gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_browser
     art: kategorie
@@ -476,7 +477,7 @@ regeln:
     begruendung:
       de: 'Eigenständige und eingebettete Browser sind in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_netzwerkmanagement
     art: kategorie
@@ -486,7 +487,7 @@ regeln:
     begruendung:
       de: 'Netzwerkmanagement-Systeme sind in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_siem
     art: kategorie
@@ -498,7 +499,7 @@ regeln:
         Systeme für Security Information & Event Management sind in Anhang III
         Klasse I gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_boot_manager
     art: kategorie
@@ -508,7 +509,7 @@ regeln:
     begruendung:
       de: 'Boot-Manager sind in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_remote_access
     art: kategorie
@@ -518,7 +519,7 @@ regeln:
     begruendung:
       de: 'Software für Fernzugriff und Fernwartung ist in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_mdm
     art: kategorie
@@ -528,7 +529,7 @@ regeln:
     begruendung:
       de: 'Mobile-Device-Management-Software ist in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_netzwerk_schnittstelle
     art: kategorie
@@ -538,7 +539,7 @@ regeln:
     begruendung:
       de: 'Physische und virtuelle Netzwerkschnittstellen sind in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_chip_sicherheit
     art: kategorie
@@ -551,7 +552,7 @@ regeln:
         sicherheitsbezogenen Funktionen sind in Anhang III Klasse I gelistet;
         manipulationssichere Ausführungen fallen in Klasse II.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_firewall_ids_ips
     art: kategorie
@@ -564,7 +565,7 @@ regeln:
         der finalen Fassung von Anhang III ohne Einschränkung auf den
         Einsatzbereich als Klasse II gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II Nr. 2' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_passwortmanager
     art: kategorie
@@ -574,7 +575,7 @@ regeln:
     begruendung:
       de: 'Passwort-Manager sind in Anhang III als wichtige Produkte der Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_antivirus
     art: kategorie
@@ -586,7 +587,7 @@ regeln:
         Software zur Erkennung und Entfernung von Schadsoftware ist in Anhang III
         als wichtiges Produkt der Klasse I gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_vpn
     art: kategorie
@@ -596,7 +597,7 @@ regeln:
     begruendung:
       de: 'VPN-Produkte sind in Anhang III als wichtige Produkte der Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_router_modem_switch
     art: kategorie
@@ -608,7 +609,7 @@ regeln:
         Router, Modems für die Internetanbindung und Switches sind in Anhang III
         Klasse I gelistet — ohne Beschränkung auf den Endkundenbereich.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 12' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_smarthome_sicherheit
     art: kategorie
@@ -620,7 +621,7 @@ regeln:
         Smart-Home-Produkte mit Sicherheitsfunktionen (z. B. smarte Türschlösser,
         Kameras, Alarmanlagen, Babyfone) sind in Anhang III Klasse I gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_sprachassistent
     art: kategorie
@@ -630,7 +631,7 @@ regeln:
     begruendung:
       de: 'Virtuelle Sprachassistenten für das Smart Home sind in Anhang III Klasse I gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_spielzeug
     art: kategorie
@@ -642,7 +643,7 @@ regeln:
         Vernetztes Spielzeug mit sozialen Interaktions- oder Ortungsfunktionen
         ist in Anhang III Klasse I gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_wearable_gesundheit
     art: kategorie
@@ -654,7 +655,7 @@ regeln:
         Am Körper tragbare Produkte zur Gesundheitsüberwachung oder für Kinder
         sind in Anhang III Klasse I gelistet (soweit nicht MDR/IVDR greift).
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 19' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_betriebssystem
     art: kategorie
@@ -666,7 +667,7 @@ regeln:
         Betriebssysteme sind in der finalen Fassung von Anhang III als wichtige
         Produkte der Klasse I gelistet (im Entwurf von 2022 noch Klasse II).
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 11' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_hypervisor
     art: kategorie
@@ -679,7 +680,7 @@ regeln:
         Betrieb von Betriebssystemen ermöglichen, sind in Anhang III Klasse II
         gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_pki
     art: kategorie
@@ -692,7 +693,7 @@ regeln:
         Zertifikate sind in der finalen Fassung von Anhang III als Klasse I
         gelistet (im Entwurf von 2022 noch Klasse II).
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse I Nr. 9' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex3_mcu_manipulationssicher
     art: kategorie
@@ -704,7 +705,7 @@ regeln:
         Manipulationssichere Mikroprozessoren und Mikrocontroller sind in
         Anhang III Klasse II gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III Klasse II' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex4_smart_meter_gateway
     art: kategorie
@@ -714,7 +715,7 @@ regeln:
     begruendung:
       de: 'Smart-Meter-Gateways sind in Anhang IV als kritische Produkte gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex4_smartcard
     art: kategorie
@@ -724,7 +725,7 @@ regeln:
     begruendung:
       de: 'Smartcards und Secure Elements sind in Anhang IV als kritische Produkte gelistet.'
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
-    review_status: pending
+    review_status: approved
 
   - id: k_annex4_hsm
     art: kategorie
@@ -736,7 +737,7 @@ regeln:
         Hardware-Geräte mit Security Boxes (z. B. Hardware-Sicherheitsmodule)
         sind in Anhang IV als kritische Produkte gelistet.
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang IV' }
-    review_status: pending
+    review_status: approved
 
   - id: k_default
     art: kategorie
@@ -749,7 +750,7 @@ regeln:
         grundlegenden Anforderungen; die Konformität kann in der Regel in
         Eigenverantwortung bewertet werden (interne Kontrolle).
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32 Abs. 1' }
-    review_status: pending
+    review_status: approved
 
 pflichten:
   # ---- Hersteller: Meldepflichten ab September 2026 ----
@@ -763,7 +764,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14' }
     frist: '2026-09'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_meldung_vorfaelle
     titel: { de: 'Meldepflicht: schwerwiegende Sicherheitsvorfälle' }
@@ -774,7 +775,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14' }
     frist: '2026-09'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   # ---- Hersteller: volle Anwendung ab Dezember 2027 ----
   - id: p_anforderungen_annex1
@@ -787,7 +788,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13, Anhang I Teil I' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_schwachstellenmanagement
     titel: { de: 'Schwachstellenmanagement-Prozess betreiben' }
@@ -799,7 +800,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_techdoku
     titel: { de: 'Technische Dokumentation erstellen' }
@@ -811,7 +812,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 31, Anhang VII' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_support_zeitraum
     titel: { de: 'Support-Zeitraum festlegen und veröffentlichen' }
@@ -824,7 +825,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13 Abs. 8' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_benutzerinfo
     titel: { de: 'Nutzerinformationen bereitstellen' }
@@ -836,7 +837,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang II' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   - id: p_konformitaet_default
     titel: { de: 'Konformitätsbewertung: interne Kontrolle möglich' }
@@ -848,7 +849,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32, Anhang VIII' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller], kategorien: [default] }
-    review_status: pending
+    review_status: approved
 
   - id: p_konformitaet_wichtig
     titel: { de: 'Konformitätsbewertung: Verfahren für wichtige Produkte' }
@@ -861,7 +862,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32 Abs. 2/3, Anhang VIII' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller], kategorien: [wichtig_klasse_1, wichtig_klasse_2] }
-    review_status: pending
+    review_status: approved
 
   - id: p_konformitaet_kritisch
     titel: { de: 'Konformitätsbewertung: kritische Produkte' }
@@ -873,7 +874,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 8, Art. 32' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller], kategorien: [kritisch] }
-    review_status: pending
+    review_status: approved
 
   - id: p_ce_kennzeichnung
     titel: { de: 'CE-Kennzeichnung und EU-Konformitätserklärung' }
@@ -884,7 +885,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 28, Art. 30, Anhang V' }
     frist: '2027-12'
     gilt_fuer: { rollen: [hersteller] }
-    review_status: pending
+    review_status: approved
 
   # ---- Importeure ----
   - id: p_imp_pruefung
@@ -897,7 +898,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
     frist: '2027-12'
     gilt_fuer: { rollen: [importeur] }
-    review_status: pending
+    review_status: approved
 
   - id: p_imp_angaben
     titel: { de: 'Importeurangaben am Produkt' }
@@ -908,7 +909,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
     frist: '2027-12'
     gilt_fuer: { rollen: [importeur] }
-    review_status: pending
+    review_status: approved
 
   - id: p_imp_information
     titel: { de: 'Informationspflicht bei Schwachstellen und Nichtkonformität' }
@@ -920,7 +921,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 19' }
     frist: '2027-12'
     gilt_fuer: { rollen: [importeur] }
-    review_status: pending
+    review_status: approved
 
   # ---- Händler ----
   - id: p_hdl_sorgfalt
@@ -933,7 +934,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 20' }
     frist: '2027-12'
     gilt_fuer: { rollen: [haendler] }
-    review_status: pending
+    review_status: approved
 
   - id: p_hdl_information
     titel: { de: 'Informationspflicht des Händlers' }
@@ -945,7 +946,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 20' }
     frist: '2027-12'
     gilt_fuer: { rollen: [haendler] }
-    review_status: pending
+    review_status: approved
 
   # ---- Open-Source-Stewards ----
   - id: p_stw_meldung
@@ -958,7 +959,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14, Art. 24' }
     frist: '2026-09'
     gilt_fuer: { rollen: [os_steward] }
-    review_status: pending
+    review_status: approved
 
   - id: p_stw_policy
     titel: { de: 'Cybersicherheits-Policy aufstellen' }
@@ -970,7 +971,7 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24 Abs. 1' }
     frist: '2027-12'
     gilt_fuer: { rollen: [os_steward] }
-    review_status: pending
+    review_status: approved
 
   - id: p_stw_kooperation
     titel: { de: 'Zusammenarbeit mit Marktüberwachungsbehörden' }
@@ -981,4 +982,4 @@ pflichten:
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 24 Abs. 2/3' }
     frist: '2027-12'
     gilt_fuer: { rollen: [os_steward] }
-    review_status: pending
+    review_status: approved

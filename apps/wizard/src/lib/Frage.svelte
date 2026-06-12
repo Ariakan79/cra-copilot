@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Frage } from '@cra-copilot/rules-engine';
+  import type { AntwortWert, Frage } from '@cra-copilot/rules-engine';
   import { de } from '../locales/de';
 
   let {
@@ -13,19 +13,56 @@
     frage: Frage;
     nummer: number;
     gesamt: number;
-    aktuelleAntwort: string | undefined;
-    onAntwort: (wert: string) => void;
+    aktuelleAntwort: AntwortWert | undefined;
+    onAntwort: (wert: string | string[]) => void;
     onZurueck: () => void;
   } = $props();
+
+  // Initialwert genügt: Komponente wird pro Frage neu erzeugt ({#key} in App.svelte).
+  // svelte-ignore state_referenced_locally
+  const mehrfach = frage.typ === 'mehrfachauswahl';
 
   // Bewusst nur der Initialwert: App.svelte erzeugt die Komponente pro Frage
   // neu ({#key frage.id}), die Auswahl gehört danach der Nutzerin.
   // svelte-ignore state_referenced_locally
-  let ausgewaehlt = $state<string | null>(aktuelleAntwort ?? null);
+  let ausgewaehlt = $state<string[]>(
+    aktuelleAntwort === undefined
+      ? []
+      : typeof aktuelleAntwort === 'string'
+        ? [aktuelleAntwort]
+        : [...aktuelleAntwort],
+  );
+
+  function istGewaehlt(wert: string): boolean {
+    return ausgewaehlt.includes(wert);
+  }
+
+  function waehle(wert: string) {
+    if (!mehrfach) {
+      ausgewaehlt = [wert];
+      return;
+    }
+    const option = frage.optionen.find((o) => o.wert === wert);
+    if (istGewaehlt(wert)) {
+      ausgewaehlt = ausgewaehlt.filter((w) => w !== wert);
+    } else if (option?.exklusiv === true) {
+      // "Keine davon" verdrängt alles andere …
+      ausgewaehlt = [wert];
+    } else {
+      // … und wird selbst verdrängt, sobald eine echte Gruppe gewählt wird.
+      ausgewaehlt = [
+        ...ausgewaehlt.filter((w) => frage.optionen.find((o) => o.wert === w)?.exklusiv !== true),
+        wert,
+      ];
+    }
+  }
 
   function weiter(event: SubmitEvent) {
     event.preventDefault();
-    if (ausgewaehlt !== null) onAntwort(ausgewaehlt);
+    if (ausgewaehlt.length === 0) return;
+    const erster = ausgewaehlt[0];
+    if (erster === undefined) return;
+    onAntwort(mehrfach ? ausgewaehlt : erster);
   }
 </script>
 
@@ -41,16 +78,19 @@
       {#if frage.erlaeuterung}
         <p class="erlaeuterung">{frage.erlaeuterung.de}</p>
       {/if}
+      {#if mehrfach}
+        <p class="erlaeuterung mehrfach-hinweis">{de.frage.mehrfachHinweis}</p>
+      {/if}
 
-      <div class="optionen" role="radiogroup" aria-label={frage.text.de}>
+      <div class="optionen" role={mehrfach ? 'group' : 'radiogroup'} aria-label={frage.text.de}>
         {#each frage.optionen as option (option.wert)}
-          <label class="option" class:gewaehlt={ausgewaehlt === option.wert}>
+          <label class="option" class:gewaehlt={istGewaehlt(option.wert)}>
             <input
-              type="radio"
+              type={mehrfach ? 'checkbox' : 'radio'}
               name={frage.id}
               value={option.wert}
-              checked={ausgewaehlt === option.wert}
-              onchange={() => (ausgewaehlt = option.wert)}
+              checked={istGewaehlt(option.wert)}
+              onchange={() => waehle(option.wert)}
             />
             <span>
               <span class="option-text">{option.text.de}</span>
@@ -65,7 +105,7 @@
 
     <div class="aktionen">
       <button type="button" class="sekundaer" onclick={onZurueck}>{de.frage.zurueck}</button>
-      <button type="submit" class="primaer" disabled={ausgewaehlt === null}>
+      <button type="submit" class="primaer" disabled={ausgewaehlt.length === 0}>
         {de.frage.weiter}
       </button>
     </div>

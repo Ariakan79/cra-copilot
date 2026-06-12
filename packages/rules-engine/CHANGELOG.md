@@ -4,7 +4,20 @@ Inhaltliche Änderungen an `data/regelwerk.yaml` werden hier geführt und bei
 Release mit `rules-vX.Y` getaggt (siehe CLAUDE.md). Code-Änderungen an der
 Engine gehören nicht hierher.
 
-## [Unreleased] — 0.3.0-draft (Stand 2026-06-12)
+## rules-v0.1 — 0.1.0 (2026-06-12)
+
+**Erstes Release.** Konsolidiert die Entwürfe 0.1.0-draft bis 0.3.0-draft (s. u.).
+Fachliche Freigabe: Pauschalfreigabe durch den Director am 2026-06-12 (vorab,
+alle `review_status: approved`); juristische Detailprüfung — insbesondere
+Art.-2-Absatzreferenzen und Abgleich mit der Durchführungsverordnung
+(EU) 2025/2392 — bleibt als Auflage für rules-v0.2 vermerkt.
+
+- Neu gegenüber 0.3.0-draft: `produkttyp` ist **Mehrfachauswahl** (Engine wertet
+  alle zutreffenden Gruppen, die strengste Kategorie gewinnt, der
+  Begründungspfad nennt alle Treffer); Option „Keine davon" ist exklusiv;
+  Golden Case GC-33.
+
+## 0.3.0-draft (Stand 2026-06-12)
 
 Selbstprüfung gegen den finalen Verordnungstext (EUR-Lex / Anhang-Volltexte).
 Drei Einstufungen aus 0.1/0.2 beruhten auf dem **Entwurf von 2022** und waren in
@@ -41,7 +54,7 @@ Einträge `review_status: pending`):
   (Mehrfachauswahl als v1.1-Kandidat zurückgestellt).
 - 6 neue Golden Cases (GC-27 bis GC-32).
 
-## [Unreleased] — 0.1.0-draft (Stand 2026-06-12)
+## 0.1.0-draft (Stand 2026-06-12)
 
 Erstbefüllung in Selbstauskunfts-Tiefe; **alle Einträge `review_status: pending`**,
 fachliche Freigabe durch den Director steht aus. Das Tag `rules-v0.1` wird erst

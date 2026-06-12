@@ -83,3 +83,45 @@ describe('pflichtenFuer', () => {
     expect(importeur).not.toContain('p_meldung_schwachstellen');
   });
 });
+
+describe('Mehrfachauswahl (produkttyp)', () => {
+  const basis = {
+    rolle: 'hersteller',
+    produktart: 'hardware_mit_software',
+    datenverbindung: 'ja',
+    eu_markt: 'ja',
+    ausnahmebereich: 'keiner',
+    oss: 'nicht_oss',
+  };
+
+  it('mehrere Treffer: die strengste Kategorie gewinnt, der Pfad nennt alle', () => {
+    const schritt = naechsterSchritt(regelwerk, {
+      ...basis,
+      produkttyp: ['router_modem_switch', 'firewall_ids_ips'],
+    });
+    expect(schritt.typ).toBe('ergebnis');
+    if (schritt.typ === 'ergebnis') {
+      expect(schritt.ergebnis.kategorie).toBe('wichtig_klasse_2');
+      const pfad = schritt.ergebnis.begruendungspfad.map((r) => r.regel_id);
+      expect(pfad).toContain('k_annex3_firewall_ids_ips');
+      expect(pfad).toContain('k_annex3_router_modem_switch');
+      expect(pfad[0]).toBe('k_annex3_firewall_ids_ips');
+    }
+  });
+
+  it('bereinigeAntworten dedupliziert und verwirft unbekannte Werte', () => {
+    const nachher = bereinigeAntworten(regelwerk, {
+      ...basis,
+      produkttyp: ['vpn', 'vpn', 'gibt_es_nicht', 'browser'],
+    });
+    expect(nachher['produkttyp']).toEqual(['vpn', 'browser']);
+  });
+
+  it('leere Mehrfachauswahl gilt als unbeantwortet', () => {
+    const nachher = bereinigeAntworten(regelwerk, { ...basis, produkttyp: [] });
+    expect(nachher['produkttyp']).toBeUndefined();
+    const schritt = naechsterSchritt(regelwerk, nachher);
+    expect(schritt.typ).toBe('frage');
+    if (schritt.typ === 'frage') expect(schritt.frage.id).toBe('produkttyp');
+  });
+});

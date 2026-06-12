@@ -1,6 +1,6 @@
 id: GC-22
 titel: 'Vernetztes Spielzeug mit Chatfunktion'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: spielzeug_vernetzt
+  produkttyp: [spielzeug_vernetzt]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

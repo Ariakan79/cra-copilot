@@ -35,7 +35,7 @@
     angezeigteFrage === null ? 0 : sichtbare.findIndex((f) => f.id === angezeigteFrage.id) + 1,
   );
 
-  function beantworte(frageId: string, wert: string) {
+  function beantworte(frageId: string, wert: string | string[]) {
     antworten = bereinigeAntworten(regelwerk, { ...antworten, [frageId]: wert });
     zurueckZu = null;
   }

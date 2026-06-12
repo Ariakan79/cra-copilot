@@ -17,19 +17,30 @@ import {
 const maxSchritte = regelwerk.fragen.length + 1;
 
 function durchlauf(picks: readonly number[]): {
-  antworten: Record<string, string>;
+  antworten: Record<string, string | string[]>;
   ergebnis: Ergebnis;
 } {
-  const antworten: Record<string, string> = {};
+  const antworten: Record<string, string | string[]> = {};
   for (let schritte = 0; ; schritte++) {
     // P1: Terminierung — nie mehr Schritte als Fragen im Katalog.
     expect(schritte).toBeLessThanOrEqual(maxSchritte);
     const schritt = naechsterSchritt(regelwerk, antworten);
     if (schritt.typ === 'ergebnis') return { antworten, ergebnis: schritt.ergebnis };
+    const optionen = schritt.frage.optionen;
     const pick = picks[schritte % picks.length] ?? 0;
-    const option = schritt.frage.optionen[pick % schritt.frage.optionen.length];
-    if (option === undefined) throw new Error('unerreichbar: Frage ohne Optionen');
-    antworten[schritt.frage.id] = option.wert;
+    const erste = optionen[pick % optionen.length];
+    if (erste === undefined) throw new Error('unerreichbar: Frage ohne Optionen');
+    if (schritt.frage.typ === 'mehrfachauswahl') {
+      // 1–2 Auswahlen, dedupliziert — wie bereinigeAntworten normalisieren würde.
+      const zweite = optionen[(pick + 1) % optionen.length];
+      const werte =
+        pick % 2 === 1 && zweite !== undefined && zweite.wert !== erste.wert
+          ? [erste.wert, zweite.wert]
+          : [erste.wert];
+      antworten[schritt.frage.id] = werte;
+    } else {
+      antworten[schritt.frage.id] = erste.wert;
+    }
   }
 }
 
