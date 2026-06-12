@@ -1,0 +1,10 @@
+id: GC-15
+titel: 'B2B-SaaS ohne Produktcharakter (reine Dienstleistung)'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: reine_dienstleistung
+  dienstleistung_fuer_produkt: nein
+erwartung:
+  geltungsbereich: ausserhalb
+  begruendungspfad_enthaelt: [s_dienstleistung_ohne_produktbezug]

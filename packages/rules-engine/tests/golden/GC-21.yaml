@@ -1,0 +1,12 @@
+id: GC-21
+titel: 'Kfz-Steuergeraet (UNECE R155)'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: hardware_mit_software
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: kfz
+erwartung:
+  geltungsbereich: ausgenommen
+  begruendungspfad_enthaelt: [s_ausnahme_kfz]

@@ -1,0 +1,13 @@
+id: GC-17
+titel: 'Reines OSS-Projekt ohne Kommerzialisierung'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: software_produkt
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: keiner
+  oss: oss_nicht_kommerziell
+erwartung:
+  geltungsbereich: ausserhalb
+  begruendungspfad_enthaelt: [s_oss_nicht_kommerziell]

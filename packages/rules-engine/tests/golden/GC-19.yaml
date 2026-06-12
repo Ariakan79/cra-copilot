@@ -1,0 +1,16 @@
+id: GC-19
+titel: 'OSS-Foundation als Steward'
+review_status: pending
+antworten:
+  rolle: os_steward
+  produktart: software_produkt
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: keiner
+erwartung:
+  geltungsbereich: in_scope
+  sonderregime: os_steward
+  begruendungspfad_enthaelt: [s_os_steward]
+  pflichten_stichprobe:
+    - { id: p_stw_meldung, frist: '2026-09' }
+    - { id: p_stw_policy, frist: '2027-12' }

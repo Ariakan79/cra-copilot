@@ -1,0 +1,19 @@
+id: GC-16
+titel: 'Cloud-Backend als entfernte Datenverarbeitung eines IoT-Geraets'
+review_status: pending
+antworten:
+  rolle: hersteller
+  produktart: reine_dienstleistung
+  dienstleistung_fuer_produkt: ja
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: keiner
+  oss: nicht_oss
+  produkttyp: keine_davon
+erwartung:
+  geltungsbereich: in_scope
+  kategorie: default
+  begruendungspfad_enthaelt: [k_default]
+  pflichten_stichprobe:
+    - { id: p_schwachstellenmanagement, frist: '2027-12' }
+    - { id: p_konformitaet_default, frist: '2027-12' }

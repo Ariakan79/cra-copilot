@@ -1,0 +1,17 @@
+id: GC-24
+titel: 'Importeur eines Nicht-EU-Smart-Locks'
+review_status: pending
+antworten:
+  rolle: importeur
+  produktart: hardware_mit_software
+  datenverbindung: ja
+  eu_markt: ja
+  ausnahmebereich: keiner
+  produkttyp: smarthome_sicherheit
+erwartung:
+  geltungsbereich: in_scope
+  kategorie: wichtig_klasse_1
+  begruendungspfad_enthaelt: [k_annex3_smarthome_sicherheit]
+  pflichten_stichprobe:
+    - { id: p_imp_pruefung, frist: '2027-12' }
+    - { id: p_imp_information, frist: '2027-12' }
