@@ -79,6 +79,10 @@
     {/each}
   {/if}
 
+  {#if ergebnis.geltungsbereich === 'in_scope'}
+    <p class="hinweis">{de.ergebnis.bestandsproduktHinweis}</p>
+  {/if}
+
   <aside class="cta nicht-drucken">
     <p>{de.ergebnis.cta.text}</p>
     <a class="primaer knopf" href={de.ergebnis.cta.mailto}>{de.ergebnis.cta.knopf}</a>

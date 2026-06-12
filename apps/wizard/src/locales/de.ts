@@ -41,6 +41,8 @@ export const de = {
     begruendungTitel: 'Begründung',
     pflichtenTitel: 'Ihre Pflichten im Überblick',
     referenzPrefix: 'Referenz:',
+    bestandsproduktHinweis:
+      'Hinweis: Für Produkte, die vor dem Geltungsbeginn in Verkehr gebracht wurden und danach nicht wesentlich geändert werden, gilt der CRA nur eingeschränkt. Diese Ersteinschätzung bezieht sich auf Produkte, die ab Dezember 2027 (weiterhin) angeboten werden.',
     keinePflichten:
       'Aus dieser Einstufung ergeben sich keine CRA-Pflichten. Beachten Sie: Bei Änderungen (EU-Markteintritt, Kommerzialisierung, neue Produktfunktionen) kann sich das ändern.',
     cta: {
