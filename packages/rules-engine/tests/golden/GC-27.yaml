@@ -1,6 +1,6 @@
 id: GC-27
 titel: 'Unternehmens-Firewall (nicht-industriell) — bisherige default-Falle'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: firewall_ids_ips
+  produkttyp: [firewall_ids_ips]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_2

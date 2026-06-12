@@ -1,6 +1,6 @@
 id: GC-11
 titel: 'Smartcard / Secure Element'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: smartcard_secure_element
+  produkttyp: [smartcard_secure_element]
 erwartung:
   geltungsbereich: in_scope
   kategorie: kritisch

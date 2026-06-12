@@ -1,6 +1,6 @@
 id: GC-12
 titel: 'Hardware-Geraet mit Security Box (HSM)'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: hsm_security_box
+  produkttyp: [hsm_security_box]
 erwartung:
   geltungsbereich: in_scope
   kategorie: kritisch

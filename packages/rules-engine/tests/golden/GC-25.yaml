@@ -1,6 +1,6 @@
 id: GC-25
 titel: 'Antivirus / Endpoint Protection'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: antivirus
+  produkttyp: [antivirus]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

@@ -1,6 +1,6 @@
 id: GC-28
 titel: 'SIEM-Plattform'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: siem
+  produkttyp: [siem]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

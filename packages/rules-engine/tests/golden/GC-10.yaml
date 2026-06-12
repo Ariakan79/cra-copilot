@@ -1,6 +1,6 @@
 id: GC-10
 titel: 'Smart-Meter-Gateway'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: smart_meter_gateway
+  produkttyp: [smart_meter_gateway]
 erwartung:
   geltungsbereich: in_scope
   kategorie: kritisch

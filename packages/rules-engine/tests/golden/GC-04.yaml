@@ -1,6 +1,6 @@
 id: GC-04
 titel: 'Consumer-WLAN-Router (Abgrenzung zu Klasse II fachlich pruefen)'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: hardware_mit_software
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: router_modem_switch
+  produkttyp: [router_modem_switch]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

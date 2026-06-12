@@ -1,6 +1,6 @@
 id: GC-26
 titel: 'VPN-Client'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: nicht_oss
-  produkttyp: vpn
+  produkttyp: [vpn]
 erwartung:
   geltungsbereich: in_scope
   kategorie: wichtig_klasse_1

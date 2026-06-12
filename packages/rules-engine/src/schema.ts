@@ -23,11 +23,13 @@ export const OptionSchema = z.object({
   wert: z.string().min(1),
   text: LokalTextSchema,
   erlaeuterung: LokalTextSchema.optional(),
+  // Bei Mehrfachauswahl: Option schließt alle anderen aus (z. B. "Keine davon").
+  exklusiv: z.boolean().optional(),
 });
 
 export const FrageSchema = z.object({
   id: z.string().min(1),
-  typ: z.literal('einfachauswahl'),
+  typ: z.enum(['einfachauswahl', 'mehrfachauswahl']),
   text: LokalTextSchema,
   erlaeuterung: LokalTextSchema.optional(),
   optionen: z.array(OptionSchema).min(2),

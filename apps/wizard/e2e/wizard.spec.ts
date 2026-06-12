@@ -64,7 +64,7 @@ async function starten(page: Page) {
   await page.getByRole('button', { name: 'Check starten' }).click();
 }
 
-async function durchklicken(page: Page, antworten: Record<string, string>) {
+async function durchklicken(page: Page, antworten: Record<string, string | string[]>) {
   for (let schritt = 0; schritt < 20; schritt++) {
     await page.locator('[data-testid="ergebnis"], [data-testid="frage"]').first().waitFor();
     if (await page.getByTestId('ergebnis').isVisible()) return;
@@ -72,7 +72,9 @@ async function durchklicken(page: Page, antworten: Record<string, string>) {
     const frageId = await frage.getAttribute('data-frage-id');
     const wert = frageId === null ? undefined : antworten[frageId];
     if (wert === undefined) throw new Error(`Drehbuch hat keine Antwort für Frage ${frageId}`);
-    await frage.locator(`input[value="${wert}"]`).check();
+    for (const einzelwert of Array.isArray(wert) ? wert : [wert]) {
+      await frage.locator(`input[value="${einzelwert}"]`).check();
+    }
     await page.getByRole('button', { name: 'Weiter' }).click();
   }
   throw new Error('Ergebnis nach 20 Schritten nicht erreicht — Fluss hängt?');
@@ -157,6 +159,40 @@ test('ADR-007: Antwortänderung verwirft unerreichbare Folgeantworten', async ({
   // Zurück von hier überspringt die verworfene Zusatzfrage
   await page.getByRole('button', { name: 'Zurück' }).click();
   await expect(page.getByTestId('frage')).toHaveAttribute('data-frage-id', 'produktart');
+});
+
+test('Mehrfachauswahl: strengste Kategorie gewinnt, "Keine davon" ist exklusiv', async ({
+  page,
+}) => {
+  await starten(page);
+  await durchklicken(page, {
+    rolle: 'hersteller',
+    produktart: 'hardware_mit_software',
+    datenverbindung: 'ja',
+    eu_markt: 'ja',
+    ausnahmebereich: 'keiner',
+    oss: 'nicht_oss',
+    // bei produkttyp stoppen: Auswahl-Interaktion manuell testen
+  }).catch(() => {});
+  const frage = page.getByTestId('frage');
+  await expect(frage).toHaveAttribute('data-frage-id', 'produkttyp');
+
+  // VPN + Router wählen, dann "Keine davon" → verdrängt beide
+  await frage.locator('input[value="vpn"]').check();
+  await frage.locator('input[value="router_modem_switch"]').check();
+  await frage.locator('input[value="keine_davon"]').check();
+  await expect(frage.locator('input[value="vpn"]')).not.toBeChecked();
+  await expect(frage.locator('input[value="router_modem_switch"]')).not.toBeChecked();
+
+  // Echte Gruppe wählen → "Keine davon" fliegt raus; Firewall dazu → Klasse II
+  await frage.locator('input[value="vpn"]').check();
+  await expect(frage.locator('input[value="keine_davon"]')).not.toBeChecked();
+  await frage.locator('input[value="firewall_ids_ips"]').check();
+  await page.getByRole('button', { name: 'Weiter' }).click();
+
+  await expect(page.getByTestId('kategorie')).toHaveAttribute('data-wert', 'wichtig_klasse_2');
+  await expect(page.getByTestId('begruendungspfad')).toContainText('Firewall');
+  await expect(page.getByTestId('begruendungspfad')).toContainText('VPN');
 });
 
 test('Druckansicht: Bericht rendert, Bedienelemente verschwinden', async ({ page }) => {

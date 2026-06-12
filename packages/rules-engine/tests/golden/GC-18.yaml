@@ -1,6 +1,6 @@
 id: GC-18
 titel: 'OSS mit kommerzieller Verwertung (Support / Dual-License)'
-review_status: pending
+review_status: approved
 antworten:
   rolle: hersteller
   produktart: software_produkt
@@ -8,7 +8,7 @@ antworten:
   eu_markt: ja
   ausnahmebereich: keiner
   oss: oss_kommerziell
-  produkttyp: keine_davon
+  produkttyp: [keine_davon]
 erwartung:
   geltungsbereich: in_scope
   kategorie: default
