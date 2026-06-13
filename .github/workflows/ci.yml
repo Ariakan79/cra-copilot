@@ -35,7 +35,9 @@ jobs:
       - name: Wizard-E2E
         run: pnpm --filter @cra-copilot/wizard run e2e
 
-  # API & Cockpit: brauchen Docker (Testcontainers/Postgres) — eigener Job.
+  # API, Cockpit & Portal: brauchen Docker (Testcontainers/Postgres) — eigener Job.
+  # Der OSV-Sync (Netzzugriff) ist hier bewusst NICHT enthalten (TEST_STRATEGY §8.5);
+  # die Tests nutzen Fixtures.
   integration:
     runs-on: ubuntu-latest
     steps:
@@ -47,13 +49,16 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
-      - name: Typecheck (api, cockpit)
+      - name: Typecheck (api, cockpit, portal)
         run: |
           pnpm --filter @cra-copilot/api run typecheck
           pnpm --filter @cra-copilot/cockpit run typecheck
+          pnpm --filter @cra-copilot/portal run typecheck
       - name: API-Tests (Testcontainers-Postgres)
         run: pnpm --filter @cra-copilot/api run test
       - name: Playwright-Browser installieren
         run: pnpm --filter @cra-copilot/cockpit exec playwright install --with-deps chromium
       - name: Cockpit-E2E (echte API + Postgres)
         run: pnpm --filter @cra-copilot/cockpit run e2e
+      - name: Portal-E2E (echte API + Postgres + OSV-Fixture)
+        run: pnpm --filter @cra-copilot/portal run e2e

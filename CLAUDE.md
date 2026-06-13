@@ -33,6 +33,12 @@ vor statt still anzunehmen.
   Das steht als Produktversprechen in der UI und wird im E2E-Test erzwungen.
 - `apps/cockpit`: Svelte 5 + Vite, internes Werkzeug; spricht `apps/api` über den
   Vite-Proxy `/api` an. Konsumiert `aufnahme-katalog` direkt fürs Rendering.
+- `apps/portal`: Svelte 5 + Vite, **kundenseitig, self-hosted pro Kunde** (ADR-021).
+  SBOM-Ingestion (append-only Lieferungen, ADR-024), **lokaler OSV-Spiegel**
+  (ADR-022: Matching offline, keine Komponentenliste verlässt das System),
+  kontinuierliche Findings (ADR-027/028), Heartbeat (Lieferdisziplin, ADR-026),
+  einfaches Login + Ingestion-Tokens (ADR-025). Teilt API/Domänenmodell (ADR-023).
+  Meldeworkflow an ENISA/CSIRT ist Phase 4.
 - Regulatorische Referenzen sind **Daten, nicht Code** (ADR-003); Sprache Deutsch,
   i18n-Struktur ohne i18n-Lib (ADR-004, ADR-011).
 - Bei Einfachheit vs. Erweiterbarkeit gewinnt Einfachheit, solange ADR-001..005
@@ -53,13 +59,19 @@ pnpm --filter @cra-copilot/rules-engine run test
 pnpm --filter @cra-copilot/aufnahme-katalog run test
 pnpm --filter @cra-copilot/wizard run e2e
 
-# Cockpit-Stack (braucht Docker):
+# Cockpit-/Portal-Stack (braucht Docker):
 docker compose up -d                          # lokaler Postgres (Port 5433)
 pnpm --filter @cra-copilot/api run migrate     # Schema anlegen
 pnpm --filter @cra-copilot/api run dev         # API auf 127.0.0.1:3001
 pnpm --filter @cra-copilot/cockpit run dev     # Cockpit (Proxy /api → 3001)
-pnpm --filter @cra-copilot/api run test        # Testcontainers-Postgres, D1–D6
+pnpm --filter @cra-copilot/portal run dev      # Portal (Proxy /api → 3001)
+pnpm --filter @cra-copilot/api run test        # Testcontainers-Postgres, alle Invarianten
 pnpm --filter @cra-copilot/cockpit run e2e     # echter Stack (global-setup startet DB+API)
+pnpm --filter @cra-copilot/portal run e2e      # echter Stack + OSV-Fixture
+
+# OSV-Spiegel füllen (operatorgetrieben, NICHT in CI — ADR-022/§8.5):
+#   gsutil -m cp -r gs://osv-vulnerabilities/npm ./osv-data   # öffentliche OSV-Exporte
+pnpm --filter @cra-copilot/api exec tsx scripts/osv-sync.ts ./osv-data
 ```
 
 CI (`.github/workflows/ci.yml`) hat zwei Jobs: `einheit` (ohne Docker) und
