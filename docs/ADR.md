@@ -502,8 +502,7 @@ Cockpit lokal, Portal self-hosted).
 
 ## ADR-022 — Schwachstellenquelle OSV als lokaler Spiegel, Matching offline
 
-**Status:** Quelle festgezurrt (Director 2026-06-13); Spiegel-Mechanik
-vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Schwachstellendaten kommen von **OSV** (purl/package-basiert,
 nah an CycloneDX). Das Portal **spiegelt die OSV-Datenbank lokal** (periodischer
@@ -537,7 +536,7 @@ Quellen (ADR-027 hält die Finding-Herkunft als Feld vor).
 
 ## ADR-023 — Portal teilt API & Domänenmodell; neue App `apps/portal`
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** „Ein Backend, ein Domänenmodell, drei Oberflächen": Das Portal
 ist **kein zweites Backend**. `apps/api` wird um Ingestion-/Monitoring-Endpunkte
@@ -557,7 +556,7 @@ Instanz pro Kunde; ein Monolith mit klaren Modulen ist hier richtig.
 
 ## ADR-024 — Ingestion-Datenmodell: Lieferungen append-only, Komponenten & Findings
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Neue Tabellen (alle mit `mandant_id`/`produkt_id`):
 - `sbom_lieferung` — **append-only** je Eingang: Roh-SBOM (als Blob/JSONB),
@@ -584,7 +583,7 @@ selbst Compliance-Nachweis ist — dieselbe Begründung wie bei den Evidenzknote
 
 ## ADR-025 — Auth (self-hosted): Produkt-Ingestion-Tokens + einfache UI-Anmeldung
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Da eine Instanz = ein Kunde (ADR-021), keine Mandanten-
 Isolation, aber zwei Zugänge:
@@ -612,7 +611,7 @@ Produkt.
 
 ## ADR-026 — Heartbeat: geplante Prüfung der Lieferdisziplin (nicht CVE-Aktualität)
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Ein geplanter Job (Intervall konfigurierbar) prüft je Produkt/
 Stream das Alter der jüngsten profilkonformen Lieferung gegen
@@ -631,7 +630,7 @@ obwohl sich am Produkt nichts geändert hat).
 
 ## ADR-027 — Findings & Triage: kontinuierlicher Abgleich, Kontext-Hinweis, kein LLM-Urteil
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:**
 - **Kontinuierlicher Abgleich:** Nach jedem OSV-Sync (und nach neuer Lieferung)
@@ -659,7 +658,7 @@ CVSS wird angezeigt und sortiert, entscheidet aber nicht.
 
 ## ADR-028 — Trennung: SBOM-Erneuerung ereignisgetrieben, Neubewertung kontinuierlich
 
-**Status:** vorgeschlagen — zur Freigabe (Umsetzung der Spec-Trennung)
+**Status:** akzeptiert (Freigabe Director 2026-06-13) — Umsetzung der Spec-Trennung
 
 **Entscheidung:** Im Portal sind zwei Takte strikt getrennt:
 - **SBOM-Erneuerung = ereignisgetrieben:** Ein neues SBOM entsteht nur bei
