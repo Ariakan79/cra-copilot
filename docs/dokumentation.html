@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRA-Copilot — Projektdokumentation</title>
+    <style>
+      :root {
+        --tinte: #1b2733;
+        --leise: #5a6b7b;
+        --akzent: #14532d;
+        --akzent-hell: #e7f3ec;
+        --linie: #d3dae1;
+        --rot: #b91c1c;
+        --gelb: #b45309;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: var(--tinte);
+        font-size: 10.5pt;
+        line-height: 1.5;
+      }
+      body {
+        margin: 0;
+      }
+      h1,
+      h2,
+      h3 {
+        color: var(--akzent);
+        line-height: 1.25;
+      }
+      h1 {
+        font-size: 26pt;
+        margin: 0 0 0.2em;
+      }
+      h2 {
+        font-size: 15pt;
+        margin: 1.6em 0 0.4em;
+        border-bottom: 2px solid var(--akzent-hell);
+        padding-bottom: 0.15em;
+      }
+      h3 {
+        font-size: 11.5pt;
+        margin: 1.1em 0 0.3em;
+        color: var(--tinte);
+      }
+      p {
+        margin: 0.4em 0;
+      }
+      a {
+        color: var(--akzent);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--akzent);
+      }
+      code {
+        background: #f1f4f6;
+        padding: 0.05em 0.3em;
+        border-radius: 3px;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: 0.9em;
+      }
+      .leise {
+        color: var(--leise);
+      }
+      /* Deckblatt */
+      .cover {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 14mm;
+        page-break-after: always;
+      }
+      .cover .kicker {
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 9pt;
+        color: var(--akzent);
+        font-weight: 700;
+      }
+      .cover .untertitel {
+        font-size: 13pt;
+        color: var(--leise);
+        margin-top: 0.4em;
+        max-width: 30em;
+      }
+      .cover .meta {
+        margin-top: 3em;
+        font-size: 9.5pt;
+        color: var(--leise);
+      }
+      .cover .balken {
+        width: 64px;
+        height: 6px;
+        background: var(--akzent);
+        margin: 1.4em 0;
+      }
+      .inhalt {
+        padding: 0 14mm;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.6em 0;
+        font-size: 9.5pt;
+      }
+      th,
+      td {
+        border: 1px solid var(--linie);
+        padding: 5px 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--akzent-hell);
+        color: var(--akzent);
+      }
+      .box {
+        border: 1px solid var(--linie);
+        border-left: 4px solid var(--akzent);
+        background: #fafcfb;
+        padding: 8px 12px;
+        margin: 0.8em 0;
+        border-radius: 0 6px 6px 0;
+      }
+      .box.warn {
+        border-left-color: var(--gelb);
+        background: #fffaf3;
+      }
+      /* Workflow-Diagramm */
+      .flow {
+        display: flex;
+        gap: 6px;
+        align-items: stretch;
+        margin: 1em 0;
+      }
+      .flow .stufe {
+        flex: 1;
+        border: 1px solid var(--linie);
+        border-top: 4px solid var(--akzent);
+        border-radius: 4px;
+        padding: 8px;
+        background: #fff;
+      }
+      .flow .stufe .nr {
+        font-size: 8pt;
+        color: var(--akzent);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+      .flow .stufe strong {
+        display: block;
+        font-size: 10.5pt;
+        margin: 2px 0 4px;
+      }
+      .flow .stufe span {
+        font-size: 8.5pt;
+        color: var(--leise);
+      }
+      .flow .pfeil {
+        align-self: center;
+        color: var(--akzent);
+        font-weight: 700;
+        font-size: 14pt;
+      }
+      ul {
+        margin: 0.4em 0;
+        padding-left: 1.2em;
+      }
+      li {
+        margin: 0.2em 0;
+      }
+      .ref-liste {
+        font-size: 9pt;
+      }
+      .ref-liste li {
+        margin: 0.35em 0;
+        word-break: break-word;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 8pt;
+        background: var(--akzent-hell);
+        color: var(--akzent);
+        border-radius: 3px;
+        padding: 0 5px;
+        margin-left: 4px;
+      }
+      .seitenumbruch {
+        page-break-before: always;
+      }
+      footer.fuss {
+        margin-top: 2em;
+        padding-top: 0.6em;
+        border-top: 1px solid var(--linie);
+        font-size: 8pt;
+        color: var(--leise);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============================ Deckblatt ============================ -->
+    <section class="cover">
+      <div class="kicker">Projektdokumentation</div>
+      <h1>CRA-Copilot</h1>
+      <div class="balken"></div>
+      <div class="untertitel">
+        Ein Compliance-Werkzeug zum EU Cyber Resilience Act (Verordnung (EU)
+        2024/2847) für deutsche KMU — von der Betroffenheitsanalyse bis zur
+        Behördenmeldung.
+      </div>
+      <div class="meta">
+        Stand: 13. Juni 2026 · Fassung 1.0<br />
+        Inhalt: Anforderungen &amp; Referenzen · Workflow · Mehrwert des Vorgehens<br />
+        <span class="leise"
+          >Hinweis: Dieses Dokument ist eine technische Projektdokumentation und
+          keine Rechtsberatung. Alle regulatorischen Verweise sind vor
+          Produktiveinsatz juristisch zu prüfen.</span
+        >
+      </div>
+    </section>
+
+    <div class="inhalt">
+      <!-- ============================ 1. Überblick ============================ -->
+      <h2>1. Überblick</h2>
+      <p>
+        Der <strong>Cyber Resilience Act</strong> (CRA, Verordnung (EU)
+        2024/2847) verpflichtet Hersteller, Importeure und Händler von „Produkten
+        mit digitalen Elementen", über den gesamten Produktlebenszyklus für
+        Cybersicherheit zu sorgen — von der sicheren Entwicklung über ein
+        Schwachstellenmanagement bis zu Melde- und Dokumentationspflichten. Für
+        kleine und mittlere Unternehmen (KMU) ist die Umsetzung ohne
+        Werkzeugunterstützung aufwändig und fehleranfällig.
+      </p>
+      <p>
+        <strong>CRA-Copilot</strong> begleitet diesen Weg in vier aufeinander
+        aufbauenden Stufen mit <em>einem</em> Domänenmodell und
+        <em>einer</em> Regelbasis. Es übersetzt die regulatorischen Pflichten in
+        ein geführtes, evidenzbasiertes Verfahren und liefert am Ende belastbare
+        Artefakte: Klassifizierung, Pflichtenkatalog, technische Dokumentation,
+        SBOM-Überwachung und vorbereitete Behördenmeldungen.
+      </p>
+
+      <div class="box">
+        <strong>Grundhaltung des Werkzeugs.</strong> Das System
+        <em>strukturiert und formuliert</em>, es <em>bewertet aber nicht
+        automatisch</em>. Jede sicherheits- oder meldungsrelevante Entscheidung
+        trägt einen menschlichen Urheber. Regulatorische Verweise werden als
+        versionierte Daten gepflegt — juristische Korrekturen sind ohne
+        Software-Änderung möglich.
+      </div>
+
+      <!-- ============================ 2. Anforderungen ============================ -->
+      <h2>2. Anforderungen aus dem CRA und ihre Umsetzung</h2>
+      <p>
+        Die folgende Tabelle ordnet die wesentlichen CRA-Pflichten den
+        Funktionen des Werkzeugs zu. Die Spalte „Referenz" verweist auf die
+        einschlägige Stelle in der Verordnung bzw. auf weiterführende
+        Normen/Quellen (vollständige Linkliste in Abschnitt 5).
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 27%">Anforderung (CRA)</th>
+            <th style="width: 43%">Umsetzung im CRA-Copilot</th>
+            <th style="width: 30%">Referenz</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Anwendungsbereich &amp; Rolle</strong> bestimmen</td>
+            <td>
+              Öffentlicher Betroffenheits-Wizard ermittelt Rolle, Produktart,
+              EU-Inverkehrbringen und Ausnahmebereiche; rein clientseitig, keine
+              Datenübertragung.
+            </td>
+            <td>Art. 2 (Anwendungsbereich), Art. 3 (Begriffe)</td>
+          </tr>
+          <tr>
+            <td><strong>Klassifizierung</strong> (wichtig/kritisch)</td>
+            <td>
+              Regel-Engine schlägt die Kategorie (Standard / wichtig Klasse I/II
+              / kritisch) aus den Produktangaben vor; im Aufnahme-Cockpit
+              bestätigt oder mit Begründung überschrieben.
+            </td>
+            <td>Anhang III, Anhang IV; DVO (EU) 2025/2392</td>
+          </tr>
+          <tr>
+            <td><strong>Grundlegende Sicherheitsanforderungen</strong></td>
+            <td>
+              Strukturierte Erhebung des Erfüllungsgrads je Anforderung
+              (sichere Defaults, Zugriffskontrolle, Update-Mechanismus …); jede
+              Lücke erzeugt einen priorisierten Eintrag der Gap-Liste.
+            </td>
+            <td>Anhang I Teil I</td>
+          </tr>
+          <tr>
+            <td><strong>Schwachstellenmanagement</strong> &amp; SBOM</td>
+            <td>
+              Erfassung des Prozesses; Portal nimmt SBOMs (CycloneDX/SPDX)
+              entgegen und gleicht sie kontinuierlich gegen einen lokalen
+              OSV-Spiegel ab (Findings + Triage).
+            </td>
+            <td>Anhang I Teil II; BSI TR-03183-2; OSV</td>
+          </tr>
+          <tr>
+            <td><strong>Meldepflichten</strong> (24h/72h/Abschluss)</td>
+            <td>
+              Meldevorgang aus einem als „aktiv ausgenutzt" eingestuften Finding
+              oder als freie Vorfallmeldung; Fristenuhr, Eskalation und
+              generierter Melde-Entwurf zum manuellen Absenden.
+            </td>
+            <td>Art. 14 (Meldung), Art. 16 (Plattform)</td>
+          </tr>
+          <tr>
+            <td><strong>Support-Zeitraum</strong> festlegen &amp; kommunizieren</td>
+            <td>
+              Verbindliche Festlegung des Unterstützungszeitraums mit Begründung;
+              kundensichtbare Support-Zeitraum-Erklärung als Artefakt.
+            </td>
+            <td>Art. 13 Abs. 8</td>
+          </tr>
+          <tr>
+            <td><strong>Technische Dokumentation</strong> &amp; CE</td>
+            <td>
+              Gap-Analyse gegen die Anhang-VII-Gliederung; Markierung, was
+              vorhanden, generierbar oder zu liefern ist; Vorbereitung der
+              Konformitätserklärung.
+            </td>
+            <td>Art. 31, Anhang VII; Art. 28/30, Anhang V</td>
+          </tr>
+          <tr>
+            <td><strong>Benutzerinformationen</strong></td>
+            <td>
+              Prüfung, ob Kontaktstelle, Support-Zeitraum und Update-Anleitung in
+              Produkt/Doku integriert sind.
+            </td>
+            <td>Anhang II</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="box warn">
+        <strong>Geltungstermine.</strong> Die Meldepflichten gelten ab dem 11.
+        September 2026, die vollständige Anwendung des CRA ab dem 11. Dezember
+        2027 (Art. 71). Das Werkzeug ordnet jeder Pflicht den passenden
+        Zeithorizont zu.
+      </div>
+
+      <!-- ============================ 3. Workflow ============================ -->
+      <h2 class="seitenumbruch">3. Workflow — die vier Stufen</h2>
+      <p>
+        CRA-Copilot bildet den Compliance-Weg als durchgängige Kette ab. Alle
+        vier Oberflächen greifen auf <em>dasselbe</em> Backend und
+        <em>dieselbe</em> Regelbasis zu — es gibt keine doppelte Methodik.
+      </p>
+
+      <div class="flow">
+        <div class="stufe">
+          <div class="nr">STUFE 1</div>
+          <strong>Wizard</strong>
+          <span>Betroffenheit &amp; Klassifizierung. Öffentlich, clientseitig,
+            keine Datenübertragung. Ergebnis: Ersteinschätzung + Pflichtenübersicht.</span>
+        </div>
+        <div class="pfeil">→</div>
+        <div class="stufe">
+          <div class="nr">STUFE 2</div>
+          <strong>Cockpit</strong>
+          <span>Geführtes Aufnahme-Interview (Blöcke 0–8). Jede Antwort ein
+            Evidenzknoten. Ergebnis: Stammdaten, Gap-Liste, SBOM-Profil.</span>
+        </div>
+        <div class="pfeil">→</div>
+        <div class="stufe">
+          <div class="nr">STUFE 3</div>
+          <strong>Portal</strong>
+          <span>SBOM-Ingestion, lokaler OSV-Abgleich, Heartbeat, Findings-Triage.
+            Self-hosted beim Kunden.</span>
+        </div>
+        <div class="pfeil">→</div>
+        <div class="stufe">
+          <div class="nr">STUFE 4</div>
+          <strong>Meldung</strong>
+          <span>Meldevorgang nach Art. 14 mit Fristenuhr (24h/72h/Abschluss),
+            Eskalation und generiertem Entwurf.</span>
+        </div>
+      </div>
+
+      <h3>Stufe 1 — Betroffenheits-Wizard</h3>
+      <p>
+        Ein anonymer Selbsttest beantwortet die erste Frage jedes Anbieters:
+        „Betrifft mich der CRA, und wie?" Der Wizard läuft vollständig im Browser
+        — als Produktversprechen, technisch durch einen Test abgesichert, der
+        jeden ausgehenden Netzwerk-Aufruf unterbindet. Ergebnis ist eine
+        Kategorie mit Begründungspfad, ein Pflichtenkatalog mit Fristen und eine
+        druckbare Ersteinschätzung.
+      </p>
+
+      <h3>Stufe 2 — Aufnahme-Cockpit</h3>
+      <p>
+        Im moderierten Workshop wird das Produkt entlang von neun Themenblöcken
+        (Mandant &amp; Rollen, Produktabgrenzung, Klassifizierung, Risikokontext,
+        Schwachstellenmanagement, Support, Lieferkette, SBOM-Profil,
+        Dokumentation) strukturiert erfasst. Kernprinzipien:
+      </p>
+      <ul>
+        <li>
+          <strong>Evidenz statt Freitext:</strong> Jede Aussage wird als
+          unveränderlicher Evidenzknoten mit Quelle (Person, Datum,
+          Gesprächsleiter) persistiert; Korrekturen erzeugen neue Knoten, der
+          Verlauf bleibt lückenlos.
+        </li>
+        <li>
+          <strong>Lücken sind First-Class:</strong> „unbekannt" und „existiert
+          nicht" sind gültige, getrennte Antworten; jede Lücke wird zur
+          priorisierten Hausaufgabe mit Annex-Bezug.
+        </li>
+        <li>
+          <strong>Klassifizierungsvorschlag:</strong> Dieselbe Regel-Engine wie
+          im Wizard schlägt die Kategorie vor; der Gesprächsleiter bestätigt oder
+          überschreibt sie mit dokumentierter Begründung.
+        </li>
+      </ul>
+
+      <h3>Stufe 3 — Kundenportal (Monitoring)</h3>
+      <p>
+        Das Portal wird <strong>beim Kunden betrieben</strong> (self-hosted) und
+        nimmt die SBOMs aus der CI entgegen. Die Software-Stückliste wird
+        kontinuierlich gegen einen <strong>lokal gespiegelten</strong> Stand der
+        Open-Source-Schwachstellendatenbank OSV abgeglichen — die
+        Komponentenliste verlässt das System nicht. Zwei Takte sind bewusst
+        getrennt: die SBOM-Erneuerung ist <em>ereignisgetrieben</em>
+        (Produktänderung), die Schwachstellen-Neubewertung läuft
+        <em>kontinuierlich</em> gegen das unveränderte SBOM. Ein „Heartbeat"
+        überwacht nur die Lieferdisziplin, nicht die CVE-Aktualität.
+      </p>
+
+      <h3>Stufe 4 — Meldeworkflow (Art. 14)</h3>
+      <p>
+        Wird ein Finding durch einen Menschen als „aktiv ausgenutzt" eingestuft
+        — oder ein Vorfall ohne zugeordnete Schwachstelle gemeldet — eröffnet das
+        Portal einen Meldevorgang mit drei Stufen und abgeleiteten Fristen:
+        <strong>Frühwarnung binnen 24 Stunden</strong>,
+        <strong>Meldung binnen 72 Stunden</strong> und Abschlussbericht (14 Tage
+        bei aktiv ausgenutzter Schwachstelle bzw. ein Monat bei schwerwiegendem
+        Vorfall). Das System erzeugt je Stufe einen strukturierten Entwurf; das
+        Absenden über die offizielle ENISA/CSIRT-Plattform bleibt ein bewusster,
+        menschlicher Schritt. Eingereichte Stufen sind als Nachweis
+        unveränderlich.
+      </p>
+
+      <!-- ============================ 4. Mehrwert ============================ -->
+      <h2 class="seitenumbruch">4. Mehrwert des Vorgehens</h2>
+      <p>
+        Der Nutzen entsteht weniger aus einzelnen Funktionen als aus durchgängig
+        angewandten Konstruktionsprinzipien:
+      </p>
+
+      <h3>4.1 Regulatorik als Daten, nicht als Code</h3>
+      <p>
+        Artikel- und Annex-Verweise, Schwellenwerte und Fristen liegen in
+        versionierten Datendateien mit Review-Status. Eine juristische Korrektur
+        (z. B. eine angepasste Frist oder eine neue harmonisierte Norm) ist eine
+        Datenänderung mit Freigabe-Vermerk — keine Software-Auslieferung. Das
+        senkt die Pflegekosten und macht den fachlichen Review unabhängig vom
+        Entwicklungszyklus.
+      </p>
+
+      <h3>4.2 Eine Methodik, vier Oberflächen</h3>
+      <p>
+        Wizard, Cockpit und Portal teilen sich Regel-Engine und Domänenmodell.
+        Die Klassifizierung, die der Anbieter im Selbsttest sieht, ist
+        dieselbe, die im Workshop verbindlich gemacht wird — keine widersprüchlichen
+        Zweitlogiken, keine Methodik-Duplikation.
+      </p>
+
+      <h3>4.3 Beweisbarkeit durch Unveränderlichkeit</h3>
+      <p>
+        Evidenzknoten, SBOM-Lieferungen und eingereichte Meldungen sind
+        append-only und auf Datenbankebene gegen Änderung gesichert. Wer hat wann
+        auf welcher Grundlage was festgestellt oder gemeldet — das ist
+        nachweisbar. Für ein Compliance-Produkt ist diese lückenlose Historie
+        kein Beiwerk, sondern das Kernversprechen.
+      </p>
+
+      <h3>4.4 Datenhoheit über die gesamte Kette</h3>
+      <p>
+        Der Wizard überträgt nichts, das Cockpit läuft lokal, das Portal wird
+        beim Kunden betrieben, und der Schwachstellenabgleich erfolgt gegen einen
+        lokalen OSV-Spiegel. Sensible Architekturinformationen (die
+        Abhängigkeitsliste eines Produkts) verlassen die Kundeninfrastruktur
+        nicht. Die einzige bewusste Ausnahme ist die menschlich ausgelöste
+        Meldung an die Behörde.
+      </p>
+
+      <h3>4.5 Mensch entscheidet, Maschine strukturiert</h3>
+      <p>
+        Das System bewertet keine Risiken automatisch und meldet nichts von
+        selbst. Die Schwelle „aktiv ausgenutzt" etwa ist eine bewusste
+        Tatsachenfeststellung mit Urheber — eine Fehlmeldung an die Behörde hat
+        reale Folgen. Diese Trennung schützt vor Automatisierungs-Fehlern und
+        hält die Verantwortung dort, wo sie hingehört.
+      </p>
+
+      <h3>4.6 Qualität ist nachgewiesen</h3>
+      <p>
+        Die fachliche Logik ist durch tabellengetriebene Fallkataloge und
+        Eigenschafts-Tests abgesichert, die Persistenz gegen eine echte
+        PostgreSQL-Datenbank, die Oberflächen durch schlanke End-to-End-Tests
+        inklusive der „keine-Datenübertragung"-Zusicherung. Jede Änderung läuft
+        nur bei grünem Teststand in die Hauptlinie.
+      </p>
+
+      <div class="box">
+        <strong>Zusammengefasst:</strong> CRA-Copilot verwandelt einen
+        unübersichtlichen, juristisch getriebenen Pflichtenkatalog in einen
+        geführten, nachweisbaren und datensouveränen Prozess — vom ersten
+        „Betrifft mich das?" bis zur fristgerechten Behördenmeldung, mit dem
+        Menschen an jeder bewertenden Stelle.
+      </div>
+
+      <!-- ============================ 5. Referenzen ============================ -->
+      <h2 class="seitenumbruch">5. Online-Referenzen</h2>
+      <h3>Verordnung &amp; Durchführung</h3>
+      <ul class="ref-liste">
+        <li>
+          Verordnung (EU) 2024/2847 (Cyber Resilience Act), konsolidierter Text —
+          EUR-Lex:
+          <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202402847"
+            >eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202402847</a
+          >
+        </li>
+        <li>
+          Durchführungsverordnung (EU) 2025/2392 (technische Beschreibungen der
+          Produktkategorien nach Anhang III/IV):
+          <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202502392"
+            >eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202502392</a
+          >
+        </li>
+        <li>
+          Europäische Kommission — „Shaping Europe's digital future", CRA-Überblick:
+          <a href="https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act"
+            >digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act</a
+          >
+        </li>
+      </ul>
+      <h3>Einzelne Pflichten (Artikel/Anhänge)</h3>
+      <ul class="ref-liste">
+        <li>Art. 2 Anwendungsbereich · Art. 3 Begriffsbestimmungen</li>
+        <li>Art. 13 Pflichten der Hersteller (Abs. 8: Support-Zeitraum)</li>
+        <li>Art. 14 Meldepflichten (24h/72h/Abschluss) · Art. 16 einheitliche Meldeplattform</li>
+        <li>Art. 28/30 CE-Kennzeichnung &amp; EU-Konformitätserklärung (Anhang V)</li>
+        <li>Art. 31, Anhang VII technische Dokumentation</li>
+        <li>Art. 71 Zeitpunkt der Anwendung (Meldepflichten 09/2026, volle Anwendung 12/2027)</li>
+        <li>Anhang I Teil I grundlegende Anforderungen · Teil II Schwachstellenmanagement</li>
+        <li>Anhang II Benutzerinformationen · Anhang III/IV Produktkategorien</li>
+      </ul>
+      <h3>Normen, Datenquellen &amp; Formate</h3>
+      <ul class="ref-liste">
+        <li>
+          BSI TR-03183-2 „Software Bill of Materials (SBOM)":
+          <a
+            href="https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/Technische-Richtlinien/TR-nach-Thema-sortiert/tr03183/TR-03183_node.html"
+            >bsi.bund.de — TR-03183</a
+          >
+        </li>
+        <li>
+          ENISA (Agentur der EU für Cybersicherheit):
+          <a href="https://www.enisa.europa.eu/">enisa.europa.eu</a>
+        </li>
+        <li>
+          OSV — Open Source Vulnerabilities (Schwachstellendatenbank &amp;
+          Schema): <a href="https://osv.dev/">osv.dev</a>
+        </li>
+        <li>
+          CycloneDX (SBOM-Standard): <a href="https://cyclonedx.org/">cyclonedx.org</a>
+          · SPDX: <a href="https://spdx.dev/">spdx.dev</a>
+        </li>
+      </ul>
+
+      <div class="box warn" style="margin-top: 1.4em">
+        <strong>Rechtlicher Hinweis.</strong> Diese Dokumentation dient der
+        technischen Erläuterung des Werkzeugs CRA-Copilot. Sie ersetzt keine
+        Rechtsberatung. Sämtliche Artikel- und Anhang-Verweise sowie Fristen sind
+        vor einem Produktiveinsatz juristisch zu prüfen; im Werkzeug sind
+        regulatorische Inhalte entsprechend als prüfpflichtig markiert.
+      </div>
+
+      <footer class="fuss">
+        CRA-Copilot · Projektdokumentation 1.0 · 13. Juni 2026 — Erstellt zur
+        technischen Erläuterung; keine Rechtsberatung.
+      </footer>
+    </div>
+  </body>
+</html>
