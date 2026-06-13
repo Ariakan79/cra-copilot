@@ -673,3 +673,133 @@ CVSS wird angezeigt und sortiert, entscheidet aber nicht.
 **Begründung:** Wörtliche Umsetzung der Spec („Wichtige Trennung"). Ohne diese
 Trennung würde man entweder unnötige Neulieferungen verlangen oder neue CVEs an
 unveränderten Produkten übersehen.
+
+---
+
+# Phase 4 — Meldeworkflow (CRA Art. 14)
+
+Fachliche Wahrheitsquelle: `docs/AUFNAHME_LEITFADEN_SPEC.md` (Block 4) und CRA
+Art. 14/16. Director-Entscheidungen 2026-06-13: Meldekanal = generierter Entwurf
+zum manuellen Absenden; Auslöser = Finding *und* freie Vorfälle; voller
+24h/72h/Abschluss-Zeitplan mit Eskalation.
+
+Fristen (am Verordnungstext verifiziert, tragen dennoch `review_status: pending`):
+Frühwarnung **24 h**, Meldung **72 h**, Abschluss **14 Tage** (aktiv ausgenutzte
+Schwachstelle, nach Verfügbarkeit der Korrekturmaßnahme) bzw. **1 Monat**
+(schwerwiegender Vorfall, nach Vorfallmeldung). Empfänger: CSIRT + ENISA über die
+einheitliche Meldeplattform (Art. 16).
+
+---
+
+## ADR-029 — Phase-4-Zuschnitt: Meldeworkflow Art. 14
+
+**Status:** festgezurrt (Director 2026-06-13)
+
+**Entscheidung:** Phase 4 liefert den Melde-/Eskalationsworkflow: Eröffnung eines
+**Meldevorgangs** (aus einem als aktiv ausgenutzt eingestuften Finding *oder* als
+freie Vorfallmeldung), die drei Meldestufen (Frühwarnung/Meldung/Abschluss) mit
+Fristenuhr und Eskalation, sowie die Erzeugung des strukturierten Melde-Entwurfs.
+Damit ist die CRA-Kette von der SBOM-Lieferung bis zur Behördenmeldung vollständig.
+
+---
+
+## ADR-030 — Meldekanal: generierter Entwurf, menschlich abgesendet
+
+**Status:** festgezurrt (Director 2026-06-13)
+
+**Entscheidung:** Das Portal erzeugt je Stufe einen **strukturierten Melde-Entwurf**
+(Felder gemäß Behördenvorgabe). Ein Mensch prüft ihn und reicht ihn über das
+offizielle ENISA/CSIRT-Portal ein; das System übermittelt **nicht automatisch**.
+Pro Stufe wird die Einreichung als Audit festgehalten (wer, wann, was — der
+eingereichte Inhalt unveränderlich archiviert).
+
+**Konsequenzen:**
+- Datenlokalität bleibt gewahrt (ADR-021): kein automatischer Outbound; die
+  einzige ausgehende Kommunikation ist die menschliche Einreichung bei der Behörde.
+- Die Meldeentscheidung trägt einen menschlichen Urheber (Spec-Nicht-Ziel: keine
+  automatische Bewertung) — siehe ADR-034.
+- Die ENISA-Single-Reporting-Platform-API kann später additiv andocken
+  (ADR-031 hält den Einreichungskanal als Feld vor), ohne Modellumbau.
+
+---
+
+## ADR-031 — Meldevorgang-Datenmodell
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Neue Tabellen (mandant-/produktgebunden):
+- `meldevorgang` — `art: schwachstelle | vorfall`, `quelle_finding_id` (NULL bei
+  freier Vorfallmeldung), `status: offen | gemeldet | abgeschlossen | eingestellt`,
+  `titel`, `eroeffnet_am`, `eroeffnet_von`, `korrekturmassnahme_ab` (NULL, setzt
+  die Abschlussfrist bei Schwachstellen).
+- `meldung_stufe` — je Vorgang bis zu drei Stufen
+  (`fruehwarnung | meldung | abschluss`): `frist_bis` (berechnet, ADR-032),
+  `inhalt` (JSONB, der ausgefüllte Entwurf), `eingereicht_am`, `eingereicht_von`,
+  `kanal`. **Append-only ab Einreichung**: ist `eingereicht_am` gesetzt, ist die
+  Stufe unveränderlich (DB-Trigger, analog Evidenz/Lieferung) — der Nachweis, was
+  wann gemeldet wurde, ist beweisfest.
+
+**Gegenposition — Meldungen als Status-Feld am Finding statt eigener Vorgang:**
+spart eine Tabelle. **Verworfen, weil** (a) freie Vorfälle keinen Finding haben,
+(b) ein Vorgang mehrere zeitlich gestaffelte Stufen mit eigenem Inhalt/Audit
+trägt — das passt nicht in ein Statusfeld.
+
+---
+
+## ADR-032 — Fristenberechnung & Eskalation als abgeleiteter Zustand
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:**
+- **Fristen abgeleitet, nicht gespeichert** (analog Ampeln ADR-019/D3):
+  Frühwarnung = `eroeffnet_am + 24h`, Meldung = `eroeffnet_am + 72h`,
+  Abschluss = bei Schwachstelle `korrekturmassnahme_ab + 14 Tage`, bei Vorfall
+  `meldung.eingereicht_am + 1 Monat`. Die Zahlen liegen als versionierte Daten
+  (ADR-033), nicht im Code. Eine Stufe ist `ueberfaellig`, wenn `frist_bis < jetzt`
+  und noch nicht eingereicht — reine Funktion aus (Vorgang, jetzt).
+- **Eskalation aus Block-4-Evidenz:** Verantwortliche/Vertretung und der
+  Eskalationsweg werden aus den im Cockpit erfassten Feldern gelesen
+  (`s_meldung_csirt_zustaendig`, `s_fruehwarnung_24h_realistisch`,
+  Eskalation bis Geschäftsführung) — nicht im Portal dupliziert. Überfällige
+  Stufen erzeugen einen Eskalations-Hinweis an diese Kontakte.
+
+**Gegenposition — Fristen bei Eröffnung fix einspeichern:** einfacher
+abzufragen. **Verworfen, weil** sich Bezugszeitpunkte ändern (z. B.
+`korrekturmassnahme_ab` wird später gesetzt) — gespeicherte Fristen driften dann
+von der Wahrheit ab. Ableiten ist konsistent mit dem Ampel-/Gap-Prinzip.
+
+---
+
+## ADR-033 — Meldungsinhalt & Fristen als versionierte Daten
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Die Feldvorlagen je Meldestufe und Meldungstyp (welche Angaben
+die Behörde erwartet) und die Fristwerte (24h/72h/14d/1M) liegen als versionierte
+Daten — gleiches Muster wie Regelwerk/Katalog: zod-Schema, `meldung_version`,
+`review_status: pending`, `meldung-vX.Y`-Tag, Changelog. Jede regulatorische
+Angabe trägt eine Art.-Referenz. Damit ziehen juristische Korrekturen (Feldnamen,
+Fristanpassungen, Plattform-Vorgaben) ohne Logikänderung nach (Grundprinzip 5).
+
+**Gegenposition — Vorlagen/Fristen im Code:** schneller gebaut. **Verworfen,
+weil** es Grundprinzip 5 verletzt; die Meldevorgaben der einheitlichen Plattform
+(Art. 16) sind in Entwicklung und ändern sich absehbar.
+
+---
+
+## ADR-034 — Trennung Finding-Triage ↔ Meldepflicht; menschlicher Urheber
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Der Triage-Status `bestaetigt` eines Findings (ADR-027) bedeutet
+„im Produktkontext relevant" — **nicht** „meldepflichtig". Ein Meldevorgang
+entsteht erst durch eine **separate, ausdrückliche menschliche Einstufung**
+„aktiv ausgenutzt / schwerwiegend" (mit Begründung, als Urheber festgehalten).
+Das System schlägt nichts automatisch zur Meldung vor und bewertet nicht
+(Spec-Nicht-Ziel, konsistent mit ADR-027).
+
+**Gegenposition — bestätigte Findings ab Schweregrad X automatisch zur Meldung
+vorschlagen:** spart einen Klick. **Verworfen, weil** „aktiv ausgenutzt" eine
+Tatsachenfeststellung ist, die CVSS/Triage nicht hergeben — und eine Fehlmeldung
+an die Behörde reale Folgen hat. Die Schwelle ist bewusst eine menschliche
+Entscheidung.
