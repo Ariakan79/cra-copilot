@@ -1,0 +1,96 @@
+# Golden-Aufnahme (TEST_STRATEGY §7.3): Musterfirma IoT GmbH, zwei Produkte,
+# geteilte CVD-Policy als Mandanten-Default, Produkt 2 mit Kontakt-Override.
+mandant: Musterfirma IoT GmbH
+
+# Mandantenweite Evidenz (produktId NULL): Block 0 + Block-4-Defaults.
+mandant_evidenz:
+  m_firmenname: Musterfirma IoT GmbH (GmbH)
+  m_sitz: Beispielstraße 1, 50667 Köln
+  m_compliance_verantwortlicher: Dr. Muster, compliance@musterfirma.de
+  m_rollen: [hersteller]
+  m_unternehmensgroesse: klein
+  s_cvd_policy_vorhanden: ja
+  s_cvd_kontaktstelle: security@musterfirma.de
+  s_triage_zustaendig: Security-Team, SLA 72h kritisch
+  s_updates_erreichen_bestand: ja
+  s_sicherheitsupdates_kostenlos_getrennt: ja
+  s_meldung_csirt_zustaendig: CISO meldet an BSI-CSIRT
+  s_fruehwarnung_24h_realistisch: ja
+  l_due_diligence: Lieferantenfragebogen, Sicherheitszusagen vertraglich
+  l_artefakt_signierung: ja
+
+produkte:
+  - name: Smart-Lock Pro
+    evidenz:
+      p_produktname: Smart-Lock Pro 2.0
+      p_produktumfang: [hardware, lokale_software, entfernte_datenverarbeitung, companion_app]
+      p_inverkehrbringen: am_markt
+      p_oss_konstellation: kommerziell
+      k_kategorie: wichtig_klasse_1
+      k_kategorie_begruendung: Smart-Home mit Sicherheitsfunktion, Anhang III Klasse I
+      k_konformitaetsroute: eu_baumusterpruefung
+      r_bestimmungsgemaesse_verwendung: Vernetztes Türschloss für Privathaushalte
+      r_fehlanwendung: Einsatz in Hochsicherheitsbereichen ohne Zusatzmaßnahmen
+      r_einsatzumgebung: [internet_exponiert, cloud]
+      r_datenkategorien: [personenbezogen]
+      r_sf_sichere_defaults: erfuellt
+      r_sf_zugriffskontrolle: erfuellt
+      r_sf_update_mechanismus: erfuellt
+      sup_zeitraum_jahre: '7'
+      sup_versionspolitik: Aktueller Major + Vorgänger erhalten Sicherheitsupdates
+      sup_eol_kommunikation: E-Mail + In-App 12 Monate vor EOL
+      l_komponentenherkunft: [eigenentwicklung, oss]
+      l_kritische_abhaengigkeiten: OpenSSL, Zephyr RTOS
+      sb_konformitaetsziel: bsi_tr_03183_2
+      sb_mindesttiefe: vollstaendig_transitiv
+      d_vorhandene_artefakte: [architektur, testberichte]
+      d_av_risikobewertung: fehlt # erzeugt einen Gap (hoch)
+      d_ce_prozess_definiert: ja
+      d_benutzerinfo_integriert: ja
+    sbom_streams:
+      - {
+          name: Firmware,
+          format: 'cyclonedx-1.6',
+          tool: syft,
+          kanal: ci_webhook,
+          maxAgeHeartbeatTage: '90',
+        }
+      - {
+          name: Cloud-Backend,
+          format: 'spdx-2.3',
+          tool: trivy,
+          kanal: api_token,
+          maxAgeHeartbeatTage: '30',
+        }
+
+  - name: Smart-Cam Mini
+    evidenz:
+      p_produktname: Smart-Cam Mini 1.0
+      p_produktumfang: [hardware, entfernte_datenverarbeitung]
+      p_inverkehrbringen: geplant
+      p_oss_konstellation: kommerziell
+      k_kategorie: wichtig_klasse_1
+      k_kategorie_begruendung: Sicherheitskamera, Anhang III Klasse I
+      k_konformitaetsroute: eu_baumusterpruefung
+      r_bestimmungsgemaesse_verwendung: Überwachungskamera für Privathaushalte
+      r_fehlanwendung: Heimliche Überwachung Dritter
+      r_einsatzumgebung: [internet_exponiert, cloud]
+      r_datenkategorien: [personenbezogen, besondere_kategorien]
+      r_sf_sichere_defaults: teilweise # erzeugt einen Gap (hoch)
+      r_sf_zugriffskontrolle: erfuellt
+      r_sf_update_mechanismus: erfuellt
+      sup_zeitraum_jahre: '5'
+      sup_versionspolitik: Aktueller Major erhält Sicherheitsupdates
+      sup_eol_kommunikation: E-Mail 6 Monate vor EOL
+      l_komponentenherkunft: [eigenentwicklung, kommerzielle_dritt, oss]
+      l_kritische_abhaengigkeiten: FFmpeg, MQTT-Broker
+      sb_konformitaetsziel: bsi_tr_03183_2
+      sb_mindesttiefe: top_level_plus_known_critical
+      d_vorhandene_artefakte: [architektur]
+      d_av_risikobewertung: generierbar_aus_aufnahme
+      d_ce_prozess_definiert: ja
+      d_benutzerinfo_integriert: ja
+    overrides:
+      s_cvd_kontaktstelle: produktsec-cam@musterfirma.de
+    sbom_streams:
+      - { name: Firmware, format: 'cyclonedx-1.6', tool: cdxgen, kanal: manueller_upload }

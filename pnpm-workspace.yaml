@@ -3,5 +3,10 @@ packages:
   - apps/*
 
 # Nur gelistete Abhängigkeiten dürfen Install-Skripte ausführen (Supply-Chain-Hygiene).
+# testcontainers-Native-Builds (ssh2/cpu-features/protobufjs) bleiben aus: wir
+# sprechen den Docker-Socket direkt an, kein Docker-over-SSH nötig.
 allowBuilds:
+  cpu-features: false
   esbuild: true
+  protobufjs: false
+  ssh2: false

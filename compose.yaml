@@ -1,0 +1,22 @@
+# Lokaler PostgreSQL für das Cockpit (ADR-014: lokal, Single-User).
+# Bindet nur an localhost — Mandantendaten verlassen den Rechner nicht.
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: cra_copilot_db
+    environment:
+      POSTGRES_USER: cra
+      POSTGRES_PASSWORD: cra_local_dev
+      POSTGRES_DB: cra_copilot
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - cra_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cra -d cra_copilot']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  cra_pgdata:
