@@ -447,3 +447,229 @@ Workshops an eine Kunden-Hausaufgabe von Wochen. **Gegenposition — Spec
 wörtlich:** ein einziger, harter Abschlussbegriff. **Verworfen**, weil zwei
 ehrliche Stati genau abbilden, was passiert ist, und der Abo-Trigger erhalten
 bleibt.
+
+---
+
+# Phase 3 — Portal (SBOM-Ingestion & kontinuierliches Monitoring)
+
+Fachliche Wahrheitsquelle: `docs/AUFNAHME_LEITFADEN_SPEC.md` (Block 7, Abschnitt
+„Wichtige Trennung"). Director-Entscheidungen 2026-06-13: Zuschnitt
+Ingestion + Monitoring (Meldeworkflow = Phase 4), Schwachstellenquelle OSV,
+Betrieb self-hosted pro Kunde.
+
+---
+
+## ADR-020 — Phase-3-Zuschnitt: Ingestion + Monitoring, Meldeworkflow später
+
+**Status:** festgezurrt (Director 2026-06-13)
+
+**Entscheidung:** Phase 3 liefert: SBOM-Ingestion (Upload + maschineller
+Kanal), Validierung der Lieferung gegen das Block-7-Profil, Heartbeat-
+Überwachung der Lieferdisziplin, kontinuierlicher Schwachstellen-Abgleich gegen
+OSV und eine Findings-Liste mit Triage. **Nicht in Phase 3:** der Melde-/
+Eskalationsworkflow an ENISA/CSIRT (24h/72h, Art. 14) — das ist Phase 4.
+
+**Konsequenz:** Findings tragen bereits einen Triage-Status und einen
+Exploitability-Hinweis (ADR-027), damit Phase 4 darauf aufsetzen kann, ohne
+nachzuerfassen. Die Findings-Daten sind die Eingabe des späteren Meldeworkflows.
+
+---
+
+## ADR-021 — Betrieb: self-hosted pro Kunde (Datenlokalität end-to-end)
+
+**Status:** festgezurrt (Director 2026-06-13)
+
+**Entscheidung:** Das Portal läuft in der Infrastruktur des Kunden (on-prem /
+eigene Cloud), eine Instanz pro Kunde. Damit bleibt das „Ihre Daten bleiben
+lokal"-Versprechen über die gesamte Produktlinie konsistent (Wizard client-only,
+Cockpit lokal, Portal self-hosted).
+
+**Konsequenzen:**
+- **Keine zentrale Mandantentrennung nötig:** eine Instanz = ein Kunde. Das
+  `mandant_id`-Modell aus Phase 2 bleibt erhalten (eine Instanz kann die
+  mehreren Produktlinien *eines* Kunden tragen), aber es gibt keine
+  cross-tenant-Isolationsanforderung. Auth wird dadurch einfacher (ADR-025).
+- **Kein zentrales Abo/Monitoring beim Anbieter:** Der Abo-Trigger der Spec
+  („Abo beginnt mit erster profilkonformer SBOM-Lieferung") wird als **Ereignis
+  im Portal markiert** (`onboarding_abgeschlossen` auf dem Produkt, ADR-019),
+  aber die kaufmännische Abrechnung liegt außerhalb des Portals (kein
+  Phone-home). Das Ereignis ist exportierbar, nicht automatisch gemeldet.
+- **OSV-Anbindung muss datenlokal sein** → ADR-022.
+- Deployment-Artefakt: `docker compose` (Portal-API + Postgres + OSV-Sync), das
+  der Kunde startet — Erweiterung der `compose.yaml` aus Phase 2.
+
+---
+
+## ADR-022 — Schwachstellenquelle OSV als lokaler Spiegel, Matching offline
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Schwachstellendaten kommen von **OSV** (purl/package-basiert,
+nah an CycloneDX). Das Portal **spiegelt die OSV-Datenbank lokal** (periodischer
+Sync der per-Ökosystem-Exporte) und matcht die SBOM-Komponenten **offline**
+gegen den Spiegel. Kein Per-Query-Aufruf an osv.dev mit der Komponentenliste.
+
+**Begründung:** ADR-021 verlangt Datenlokalität. Ein Live-Batch-Query an
+osv.dev würde die vollständige Abhängigkeitsliste des Kunden an einen Dritten
+offenlegen — genau das, was das Produktversprechen ausschließt. Der einzige
+ausgehende Verkehr ist der Download der öffentlichen OSV-Datenbank (enthält
+keine Kundendaten).
+
+**Gegenposition A — Live OSV-Batch-API (`/v1/querybatch`):** einfacher, immer
+aktuell, kein lokaler Speicher. **Verworfen, weil** es die Komponentenliste
+(= Architektur-Interna des Kundenprodukts) an osv.dev sendet — Bruch des
+Datenlokalitäts-Versprechens (ADR-021). Inakzeptabel.
+
+**Gegenposition B — kein Spiegel, sondern offline-Tool (z. B. osv-scanner als
+Subprozess):** delegiert Matching an ein fertiges CLI. **Verworfen, weil** wir
+das Matching gegen das **unveränderte, gespeicherte** SBOM kontinuierlich neu
+fahren (Spec: ereignisgetriebene Erneuerung vs. kontinuierliche Neubewertung,
+ADR-028) und die Findings mit Produktkontext anreichern (ADR-027) — das braucht
+Kontrolle über den Matching-Schritt, nicht nur ein Scan-Ergebnis. Der OSV-Sync
+selbst darf gern ein schlankes Tool nutzen; das Matching ist eigene Logik.
+
+**Risiko:** OSV deckt proprietäre/Hardware-Komponenten schwächer ab (vom
+Director akzeptiert). Mitigation: Das Findings-Modell erlaubt später weitere
+Quellen (ADR-027 hält die Finding-Herkunft als Feld vor).
+
+---
+
+## ADR-023 — Portal teilt API & Domänenmodell; neue App `apps/portal`
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** „Ein Backend, ein Domänenmodell, drei Oberflächen": Das Portal
+ist **kein zweites Backend**. `apps/api` wird um Ingestion-/Monitoring-Endpunkte
+und Auth (ADR-025) erweitert; `apps/portal` ist eine neue Svelte-App (kundensicht:
+Lieferstatus, Findings, Heartbeat-Ampel). Profil, Evidenz, Produkte stammen aus
+demselben Domänenmodell wie das Cockpit — das Portal liest das in Block 7
+erfasste SBOM-Profil direkt.
+
+**Gegenposition — eigenständiger Portal-Service:** klarere Trennung
+Cockpit/Portal. **Verworfen, weil** beide auf demselben Produkt-/Profil-Modell
+operieren; ein zweiter Service bedeutete Schema-Duplikation und Sync zwischen
+zwei Datenbanken — genau die Methodik-/Modell-Duplikation, die ADR-001/023 für
+das gesamte Produkt ausschließt. Self-hosted (ADR-021) heißt ohnehin eine
+Instanz pro Kunde; ein Monolith mit klaren Modulen ist hier richtig.
+
+---
+
+## ADR-024 — Ingestion-Datenmodell: Lieferungen append-only, Komponenten & Findings
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Neue Tabellen (alle mit `mandant_id`/`produkt_id`):
+- `sbom_lieferung` — **append-only** je Eingang: Roh-SBOM (als Blob/JSONB),
+  Format+Version, Kanal, Trigger, Zeitstempel, `profil_konform` (Validierungs-
+  ergebnis), `stream_name` (welcher Block-7-Stream). Nie überschreiben — die
+  Lieferhistorie ist Nachweis (analog Evidenzknoten, ADR-015).
+- `komponente` — die aus der jüngsten profilkonformen Lieferung extrahierten
+  Komponenten (purl, name, version, lieferant) je Stream. Bei neuer Lieferung
+  ersetzt (die SBOM-Erneuerung ist ereignisgetrieben, ADR-028).
+- `finding` — Treffer aus dem OSV-Matching gegen die aktuellen Komponenten:
+  Schwachstellen-ID, betroffene Komponente, Schweregrad, Quelle, Triage-Status,
+  Exploitability-Hinweis, erste/letzte Sichtung. Kontinuierlich neu bewertet.
+
+**Validierung der Lieferung** gegen das Block-7-Profil: Format/Version stimmt,
+Pflichtfelder (aus `konformitaetsziel` abgeleitet, ADR-018) vorhanden,
+Mindesttiefe plausibel. `profil_konform=false` → Lieferung wird gespeichert,
+aber nicht als aktuelle Komponentenquelle übernommen; erzeugt eine Warnung.
+
+**Gegenposition — Lieferungen überschreiben statt append-only:** spart Platz.
+**Verworfen, weil** die Lieferhistorie (wann kam welches SBOM, war es konform)
+selbst Compliance-Nachweis ist — dieselbe Begründung wie bei den Evidenzknoten.
+
+---
+
+## ADR-025 — Auth (self-hosted): Produkt-Ingestion-Tokens + einfache UI-Anmeldung
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Da eine Instanz = ein Kunde (ADR-021), keine Mandanten-
+Isolation, aber zwei Zugänge:
+- **Ingestion-Token je Produkt** (für CI): zufälliges Token, **nur als Hash
+  gespeichert**, im Klartext einmalig bei Erstellung gezeigt. CI sendet es im
+  `Authorization`-Header beim SBOM-Upload. Widerrufbar/rotierbar.
+- **UI-Anmeldung**: ein einfaches Session-Login (Benutzer+Passwort, Passwort
+  als Argon2-Hash) für das Kundenteam. Kein OIDC/Rollenmodell in Phase 3.
+
+**Gegenposition A — gar keine UI-Auth (wie Cockpit, nur Netzwerkperimeter):**
+**Verworfen, weil** das Portal kundensichtbare Schwachstellendaten zeigt und
+übers Kundennetz erreichbar ist (nicht nur localhost wie das Cockpit) — ein
+Minimal-Login ist Pflicht. Die Ingestion braucht ohnehin ein Maschinen-Credential.
+
+**Gegenposition B — volles OIDC/SSO ab Phase 3:** integriert sich in
+Kunden-IdP. **Verworfen für Phase 3 (nicht dauerhaft):** „Einfachheit gewinnt";
+self-hosted-Kunden sind heterogen, ein erzwungenes OIDC vor erstem Feldfeedback
+ist verfrüht. Session-Login ist später additiv durch OIDC ersetzbar.
+
+**Sicherheit:** Tokens nur gehasht; Secrets nie ins Repo (CLAUDE.md-Regel);
+Argon2 für Passwörter; das Ingestion-Token autorisiert nur Upload für *sein*
+Produkt.
+
+---
+
+## ADR-026 — Heartbeat: geplante Prüfung der Lieferdisziplin (nicht CVE-Aktualität)
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Ein geplanter Job (Intervall konfigurierbar) prüft je Produkt/
+Stream das Alter der jüngsten profilkonformen Lieferung gegen
+`max_age_heartbeat_tage` aus dem Block-7-Profil. Überschreitung → Heartbeat-
+Status `ueberfaellig` (UI-Ampel + Ereignis). Der Heartbeat überwacht **nur
+Lieferdisziplin** — er sagt nichts über CVE-Aktualität (die läuft kontinuierlich,
+ADR-028). Diese Trennung steht so in der Spec und wird hier 1:1 umgesetzt.
+
+**Gegenposition — Heartbeat an CVE-Funde koppeln:** „kein neues SBOM, aber neue
+CVEs → Alarm". **Verworfen, weil** die Spec beide bewusst trennt: ein
+unverändertes Produkt braucht kein neues SBOM (ereignisgetrieben), während die
+Neubewertung trotzdem läuft. Vermischung erzeugt Fehlalarme („liefere neu",
+obwohl sich am Produkt nichts geändert hat).
+
+---
+
+## ADR-027 — Findings & Triage: kontinuierlicher Abgleich, Kontext-Hinweis, kein LLM-Urteil
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:**
+- **Kontinuierlicher Abgleich:** Nach jedem OSV-Sync (und nach neuer Lieferung)
+  werden die aktuellen Komponenten neu gegen den OSV-Spiegel gematcht. Neue
+  Treffer → neue Findings; verschwundene Treffer (Komponente entfernt oder
+  Advisory zurückgezogen) → Finding auf `behoben_durch_daten`.
+- **Triage-Lebenszyklus** analog Gaps (ADR-019): `neu → in_pruefung →
+  bestaetigt | nicht_relevant → behoben`. Übergänge validiert.
+- **Exploitability-Hinweis aus Produktkontext:** Block 3 (`r_einsatzumgebung`,
+  Angriffsoberfläche) liefert eine **Heuristik** „im Produktkontext plausibel
+  exploitierbar?" als *Vorschlag* — die Spec nennt genau das („Einsatzumgebung
+  steuert Exploitability-Vorschläge"). Es bleibt ein Hinweis; **die Bewertung
+  trägt einen menschlichen Urheber** (Spec-Nicht-Ziel: keine automatische
+  Risikobewertung, kein LLM-Urteil).
+- **Finding-Herkunft** als Feld (`quelle: osv | …`), damit weitere Quellen
+  später additiv andocken (ADR-022-Risiko-Mitigation).
+
+**Gegenposition — Auto-Triage nach CVSS-Schwelle (z. B. ≥7 = bestätigt):**
+spart Handarbeit. **Verworfen, weil** CVSS-Basiswert den Produktkontext
+ignoriert (eine „kritische" CVE in einer nicht erreichbaren Komponente ist
+irrelevant) und die Spec menschliche Urheberschaft jeder Bewertung verlangt.
+CVSS wird angezeigt und sortiert, entscheidet aber nicht.
+
+---
+
+## ADR-028 — Trennung: SBOM-Erneuerung ereignisgetrieben, Neubewertung kontinuierlich
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13) — Umsetzung der Spec-Trennung
+
+**Entscheidung:** Im Portal sind zwei Takte strikt getrennt:
+- **SBOM-Erneuerung = ereignisgetrieben:** Ein neues SBOM entsteht nur bei
+  Produktänderung (Release/Hotfix/Dependency-Change) und kommt per Lieferung
+  herein. Die `komponente`-Tabelle ändert sich nur dann (ADR-024).
+- **Schwachstellen-Neubewertung = kontinuierlich:** Läuft gegen das
+  **unveränderte** gespeicherte SBOM, getaktet durch den OSV-Sync — unabhängig
+  davon, ob eine neue Lieferung kam.
+- Der **Heartbeat** (ADR-026) überwacht ausschließlich, ob Lieferungen
+  vereinbart-häufig eintreffen — nicht die CVE-Lage.
+
+**Begründung:** Wörtliche Umsetzung der Spec („Wichtige Trennung"). Ohne diese
+Trennung würde man entweder unnötige Neulieferungen verlangen oder neue CVEs an
+unveränderten Produkten übersehen.
