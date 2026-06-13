@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { api, type Finding, type Lieferung, type Produkt, type StreamHeartbeat } from './api';
+  import {
+    api,
+    type Entwurf,
+    type Finding,
+    type Lieferung,
+    type Meldevorgang,
+    type Produkt,
+    type StreamHeartbeat,
+    type StufenFrist,
+  } from './api';
 
   let mandantId = $state('');
   let benutzername = $state('');
@@ -12,6 +21,9 @@
   let lieferungen = $state<Lieferung[]>([]);
   let findings = $state<Finding[]>([]);
   let neuesToken = $state<string | null>(null);
+  let vorgaenge = $state<Meldevorgang[]>([]);
+  let fristenJeVorgang = $state<Record<string, StufenFrist[]>>({});
+  let aktiverEntwurf = $state<{ vorgangId: string; entwurf: Entwurf } | null>(null);
 
   const angemeldet = $derived(mandantId !== '');
   const triageNext: Record<string, string[]> = {
@@ -41,12 +53,64 @@
       api.lieferungen(id),
       api.findings(id),
     ]);
+    await vorgaengeLaden();
+  }
+
+  async function vorgaengeLaden() {
+    vorgaenge = await api.meldevorgaenge(aktivesProdukt);
+    const eintraege = await Promise.all(
+      vorgaenge.map(async (v) => [v.id, await api.fristen(v.id)] as const),
+    );
+    fristenJeVorgang = Object.fromEntries(eintraege);
   }
 
   async function triagieren(f: Finding, status: string) {
     await api.triage(f.id, status);
     findings = await api.findings(aktivesProdukt);
   }
+
+  async function alsAktivAusgenutztMelden(f: Finding) {
+    fehler = null;
+    try {
+      await api.meldenAusFinding(
+        f.id,
+        `Aktiv ausgenutzt: ${f.schwachstelleId}`,
+        `Vom Bearbeiter als aktiv ausgenutzt eingestuft (${f.komponenteName ?? f.komponentePurl}).`,
+        benutzername,
+      );
+      await vorgaengeLaden();
+    } catch (e) {
+      fehler = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  async function entwurfOeffnen(vorgangId: string, stufe: string) {
+    aktiverEntwurf = { vorgangId, entwurf: await api.entwurf(vorgangId, stufe) };
+  }
+
+  async function entwurfEinreichen() {
+    if (aktiverEntwurf === null) return;
+    fehler = null;
+    try {
+      const inhalt = Object.fromEntries(aktiverEntwurf.entwurf.felder.map((f) => [f.id, f.wert]));
+      await api.einreichen(
+        aktiverEntwurf.vorgangId,
+        aktiverEntwurf.entwurf.stufe,
+        inhalt,
+        benutzername,
+      );
+      aktiverEntwurf = null;
+      await vorgaengeLaden();
+    } catch (e) {
+      fehler = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  const stufeText: Record<string, string> = {
+    fruehwarnung: 'Frühwarnung (24h)',
+    meldung: 'Meldung (72h)',
+    abschluss: 'Abschlussbericht',
+  };
 
   async function tokenErzeugen() {
     const r = await api.tokenErstellen(aktivesProdukt, 'CI-Upload');
@@ -135,6 +199,13 @@
                     >→ {ziel}</button
                   >
                 {/each}
+                <button
+                  type="button"
+                  class="klein melden"
+                  data-testid={`melden-${f.id}`}
+                  title="Als aktiv ausgenutzt einstufen und Meldevorgang eröffnen (Art. 14)"
+                  onclick={() => alsAktivAusgenutztMelden(f)}>⚠ aktiv ausgenutzt → melden</button
+                >
               </div>
             </li>
           {/each}
@@ -142,6 +213,80 @@
               Keine offenen Findings.
             </li>{/if}
         </ul>
+      </section>
+
+      <section class="block">
+        <h2>Meldevorgänge (CRA Art. 14)</h2>
+        <ul class="vorgaenge" data-testid="meldevorgaenge">
+          {#each vorgaenge as v (v.id)}
+            <li>
+              <div class="finding-kopf">
+                <strong>{v.titel}</strong>
+                <span class="leise">{v.art}</span>
+                <span class="triage-status">{v.status}</span>
+              </div>
+              <div class="stufen">
+                {#each fristenJeVorgang[v.id] ?? [] as s (s.stufe)}
+                  <div class="stufe" data-testid={`stufe-${v.id}-${s.stufe}`}>
+                    <span>{stufeText[s.stufe]}</span>
+                    {#if s.eingereichtAm}
+                      <span class="ampel aktuell" data-testid={`eingereicht-${v.id}-${s.stufe}`}
+                        >eingereicht</span
+                      >
+                    {:else if s.ueberfaellig}
+                      <span class="ampel ueberfaellig">überfällig</span>
+                    {:else if s.fristBis}
+                      <span class="leise"
+                        >Frist: {new Date(s.fristBis).toLocaleString('de-DE')}</span
+                      >
+                    {:else}
+                      <span class="leise">—</span>
+                    {/if}
+                    {#if !s.eingereichtAm}
+                      <button
+                        type="button"
+                        class="klein"
+                        data-testid={`entwurf-${v.id}-${s.stufe}`}
+                        onclick={() => entwurfOeffnen(v.id, s.stufe)}>Entwurf</button
+                      >
+                    {/if}
+                  </div>
+                {/each}
+              </div>
+            </li>
+          {/each}
+          {#if vorgaenge.length === 0}<li class="leise">Kein offener Meldevorgang.</li>{/if}
+        </ul>
+
+        {#if aktiverEntwurf}
+          <div class="entwurf" data-testid="entwurf">
+            <h3>{aktiverEntwurf.entwurf.titel}</h3>
+            {#if aktiverEntwurf.entwurf.hinweis}<p class="hinweis">
+                {aktiverEntwurf.entwurf.hinweis}
+              </p>{/if}
+            {#each aktiverEntwurf.entwurf.felder as feld (feld.id)}
+              <label
+                >{feld.label}{#if feld.pflicht}<span class="pflicht">*</span>{/if}
+                <input bind:value={feld.wert} data-testid={`feld-${feld.id}`} /></label
+              >
+            {/each}
+            <p class="leise">
+              Entwurf zum Einreichen über das offizielle ENISA/CSIRT-Portal. Nach dem Einreichen ist
+              die Stufe als Nachweis gesperrt.
+            </p>
+            <div class="triage-knoepfe">
+              <button
+                type="button"
+                class="primaer klein"
+                data-testid="einreichen"
+                onclick={entwurfEinreichen}>Als eingereicht markieren</button
+              >
+              <button type="button" class="klein" onclick={() => (aktiverEntwurf = null)}
+                >Abbrechen</button
+              >
+            </div>
+          </div>
+        {/if}
       </section>
 
       <section class="block">

@@ -44,6 +44,37 @@ test('falsches Passwort meldet Fehler', async ({ page }) => {
   await expect(page.getByTestId('fehler')).toBeVisible();
 });
 
+test('Meldeworkflow: Finding einstufen → Meldevorgang mit Fristen → Frühwarnung einreichen', async ({
+  page,
+}) => {
+  await anmelden(page);
+  const findings = page.getByTestId('findings');
+  await expect(findings).toContainText('GHSA-p6mc-m468-83gw');
+  // Das lodash-Finding als aktiv ausgenutzt einstufen.
+  await findings.getByRole('button', { name: 'aktiv ausgenutzt', exact: false }).first().click();
+
+  // Meldevorgang erscheint mit Frühwarnung (24h) und Meldung (72h).
+  const vorgaenge = page.getByTestId('meldevorgaenge');
+  await expect(vorgaenge).toContainText('Frühwarnung (24h)');
+  await expect(vorgaenge).toContainText('Meldung (72h)');
+
+  // Frühwarnung-Entwurf öffnen, ausfüllen, einreichen.
+  const vorgangId = await vorgaenge
+    .locator('[data-testid^="stufe-"]')
+    .first()
+    .getAttribute('data-testid');
+  const vid = vorgangId!.replace('stufe-', '').replace('-fruehwarnung', '');
+  await page.getByTestId(`entwurf-${vid}-fruehwarnung`).click();
+  const entwurf = page.getByTestId('entwurf');
+  await expect(entwurf).toBeVisible();
+  // erstes Pflichtfeld füllen
+  await entwurf.locator('input').first().fill('Smart-Lock Pro');
+  await page.getByTestId('einreichen').click();
+
+  // Stufe ist jetzt als eingereicht markiert.
+  await expect(page.getByTestId(`eingereicht-${vid}-fruehwarnung`)).toBeVisible();
+});
+
 test('Datenlokalität: kein Request an osv.dev', async ({ page }) => {
   const fremde: string[] = [];
   page.on('request', (r) => {
