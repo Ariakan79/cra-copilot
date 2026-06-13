@@ -1,0 +1,545 @@
+# Aufnahme-Katalog CRA-Copilot — Blöcke 0–8 (Cockpit, Phase 2)
+#
+# ADR-016: Der Katalog ist versionierte Datengrundlage. Jedes Feld trägt
+# review_status (pending = fachlich ungeprüft), eine Ebene (ADR-017) und
+# mindestens einen Downstream-Konsumenten (Spec, Grundprinzip 3). Gap-Regeln
+# erzeugen Einträge in der Gap-Liste; Lücken-Verdikte "unbekannt"/"existiert
+# nicht" sind über alle Felder zulässige, getrennte Antworten (Grundprinzip 2).
+#
+# Quelle der Block-/Feldstruktur: docs/AUFNAHME_LEITFADEN_SPEC.md
+
+katalog_version: '0.1.0-draft'
+stand: '2026-06-13'
+
+bloecke:
+  # ============================================================ Block 0
+  - id: block_0_mandant
+    nummer: 0
+    titel: { de: 'Mandant & Rollen' }
+    ziel:
+      de: >-
+        Rechtliche Identität und Rolle in der Lieferkette festlegen — davon
+        hängt der gesamte Pflichtenkatalog ab.
+    ebene: mandant
+    felder:
+      - id: m_firmenname
+        typ: text
+        frage: { de: 'Vollständiger Firmenname und Rechtsform?' }
+        ebene: mandant
+        konsumenten: [konformitaetserklaerung, technische_doku_annex_vii]
+        review_status: pending
+      - id: m_sitz
+        typ: text
+        frage: { de: 'Eingetragener Sitz (Anschrift)?' }
+        ebene: mandant
+        konsumenten: [konformitaetserklaerung, technische_doku_annex_vii]
+        review_status: pending
+      - id: m_compliance_verantwortlicher
+        typ: text
+        frage: { de: 'Wer ist die/der Compliance-Verantwortliche (Name, Kontakt)?' }
+        ebene: mandant
+        konsumenten: [portal_konfiguration, cvd_policy]
+        review_status: pending
+      - id: m_rollen
+        typ: mehrfachauswahl
+        frage: { de: 'Welche Rolle(n) hat das Unternehmen in der Lieferkette?' }
+        erlaeuterung:
+          de: 'Mehrfachrollen möglich; pro Produkt wird in Block 1 verfeinert.'
+        ebene: mandant
+        optionen:
+          - { wert: hersteller, text: { de: 'Hersteller' } }
+          - { wert: importeur, text: { de: 'Importeur' } }
+          - { wert: haendler, text: { de: 'Händler' } }
+          - { wert: os_steward, text: { de: 'Open-Source-Steward' } }
+          - { wert: auftragsfertiger, text: { de: 'Auftragsfertiger' } }
+        konsumenten: [konformitaetserklaerung, betroffenheitsmatrix]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 3 Nr. 13 ff.' }
+        review_status: pending
+      - id: m_managementsysteme
+        typ: mehrfachauswahl
+        frage: { de: 'Welche Managementsysteme/Zertifikate bestehen?' }
+        erlaeuterung:
+          de: 'Jedes Zertifikat wird als wiederverwendbarer Evidenzknoten erfasst (Scope, Gültigkeit, Auditor).'
+        ebene: mandant
+        pflicht: false
+        optionen:
+          - { wert: iso_27001, text: { de: 'ISO/IEC 27001' } }
+          - { wert: iec_62443, text: { de: 'IEC 62443' } }
+          - { wert: tisax, text: { de: 'TISAX' } }
+          - { wert: bsi_grundschutz, text: { de: 'BSI IT-Grundschutz' } }
+          - { wert: keine, text: { de: 'Keine' } }
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        review_status: pending
+      - id: m_unternehmensgroesse
+        typ: einfachauswahl
+        frage: { de: 'Unternehmensgröße?' }
+        erlaeuterung: { de: 'Relevant für mögliche Erleichterungen.' }
+        ebene: mandant
+        optionen:
+          - { wert: kleinst, text: { de: 'Kleinstunternehmen' } }
+          - { wert: klein, text: { de: 'Kleinunternehmen' } }
+          - { wert: mittel, text: { de: 'Mittleres Unternehmen' } }
+          - { wert: gross, text: { de: 'Großunternehmen' } }
+        konsumenten: [betroffenheitsmatrix]
+        review_status: pending
+
+  # ============================================================ Block 1
+  - id: block_1_produkt
+    nummer: 1
+    titel: { de: 'Produktabgrenzung & Inverkehrbringen' }
+    ziel:
+      de: >-
+        Den Produktbegriff sauber schneiden — Remote-Komponenten und
+        Begleitsoftware werden am häufigsten vergessen.
+    ebene: produkt
+    felder:
+      - id: p_produktname
+        typ: text
+        frage: { de: 'Produktname und aktuelle Version(en)?' }
+        ebene: produkt
+        konsumenten: [technische_doku_annex_vii, sbom_profil, konformitaetserklaerung]
+        review_status: pending
+      - id: p_varianten
+        typ: text
+        frage: { de: 'Varianten/Editionen — je eigenes Produkt oder begründet zusammengefasst?' }
+        ebene: produkt
+        pflicht: false
+        konsumenten: [technische_doku_annex_vii]
+        review_status: pending
+      - id: p_produktumfang
+        typ: mehrfachauswahl
+        frage: { de: 'Woraus besteht das Produkt?' }
+        erlaeuterung:
+          de: >-
+            Entfernte Datenverarbeitung, die für die Produktfunktion erforderlich
+            ist, zählt zum Produkt!
+        ebene: produkt
+        optionen:
+          - { wert: hardware, text: { de: 'Hardware-Anteil' } }
+          - { wert: lokale_software, text: { de: 'Lokale Software' } }
+          - { wert: entfernte_datenverarbeitung, text: { de: 'Erforderliche entfernte Datenverarbeitung' } }
+          - { wert: companion_app, text: { de: 'Companion-App' } }
+          - { wert: bibliotheken, text: { de: 'Mitgelieferte Bibliotheken' } }
+        konsumenten: [sbom_profil, technische_doku_annex_vii, betroffenheitsmatrix]
+        review_status: pending
+      - id: p_inverkehrbringen
+        typ: einfachauswahl
+        frage: { de: 'Status des Inverkehrbringens in der EU?' }
+        ebene: produkt
+        optionen:
+          - { wert: am_markt, text: { de: 'Bereits am Markt' } }
+          - { wert: geplant, text: { de: 'Markteintritt geplant' } }
+          - { wert: nicht_geplant, text: { de: 'Kein EU-Vertrieb geplant' } }
+        konsumenten: [betroffenheitsmatrix, konformitaetserklaerung]
+        review_status: pending
+      - id: p_wesentliche_aenderung
+        typ: ja_nein
+        frage: { de: 'Sind wesentliche Änderungen geplant (lösen Neubewertung aus)?' }
+        ebene: produkt
+        pflicht: false
+        konsumenten: [betroffenheitsmatrix, risikobewertung]
+        review_status: pending
+      - id: p_oss_konstellation
+        typ: einfachauswahl
+        frage: { de: 'Open-Source-Konstellation?' }
+        ebene: produkt
+        optionen:
+          - { wert: kommerziell, text: { de: 'Rein kommerziell' } }
+          - { wert: oss_kommerziell, text: { de: 'OSS mit kommerzieller Verwertung' } }
+          - { wert: oss_beitrag, text: { de: 'Reiner OSS-Beitrag' } }
+        konsumenten: [betroffenheitsmatrix]
+        review_status: pending
+
+  # ============================================================ Block 2
+  - id: block_2_klassifizierung
+    nummer: 2
+    titel: { de: 'Klassifizierung & Konformitätsroute' }
+    ziel: { de: 'Wizard-Ergebnis mit Fachblick verifizieren und verbindlich machen.' }
+    ebene: produkt
+    felder:
+      - id: k_kategorie
+        typ: einfachauswahl
+        frage: { de: 'Verbindliche CRA-Kategorie?' }
+        erlaeuterung:
+          de: 'Regel-Engine schlägt aus Block-1-Daten vor; Override wird mit Begründung persistiert.'
+        ebene: produkt
+        optionen:
+          - { wert: default, text: { de: 'Standard' } }
+          - { wert: wichtig_klasse_1, text: { de: 'Wichtig Klasse I' } }
+          - { wert: wichtig_klasse_2, text: { de: 'Wichtig Klasse II' } }
+          - { wert: kritisch, text: { de: 'Kritisch' } }
+        konsumenten: [konformitaetserklaerung, technische_doku_annex_vii, betroffenheitsmatrix]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III/IV' }
+        review_status: pending
+      - id: k_kategorie_begruendung
+        typ: text
+        frage: { de: 'Begründungspfad — welche Annex-Position greift (oder warum keine)?' }
+        ebene: produkt
+        konsumenten: [konformitaetserklaerung, risikobewertung]
+        review_status: pending
+      - id: k_konformitaetsroute
+        typ: einfachauswahl
+        frage: { de: 'Konformitätsbewertungsroute?' }
+        ebene: produkt
+        optionen:
+          - { wert: interne_kontrolle, text: { de: 'Interne Kontrolle (Modul A)' } }
+          - { wert: eu_baumusterpruefung, text: { de: 'EU-Baumusterprüfung' } }
+          - { wert: umfassende_qs, text: { de: 'Umfassende Qualitätssicherung' } }
+          - { wert: zertifizierung, text: { de: 'Europäische Cybersicherheitszertifizierung' } }
+        konsumenten: [konformitaetserklaerung]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 32, Anhang VIII' }
+        review_status: pending
+      - id: k_ziel_volle_konformitaet
+        typ: datum
+        frage: { de: 'Zieltermin volle Konformität?' }
+        ebene: produkt
+        pflicht: false
+        konsumenten: [portal_konfiguration]
+        review_status: pending
+
+  # ============================================================ Block 3
+  - id: block_3_risikokontext
+    nummer: 3
+    titel: { de: 'Einsatzumgebung & Risikokontext' }
+    ziel: { de: 'Bestimmungsgemäße Verwendung und Bedrohungskontext — Fundament der Risikobewertung.' }
+    ebene: produkt
+    felder:
+      - id: r_bestimmungsgemaesse_verwendung
+        typ: text
+        frage: { de: 'Bestimmungsgemäße Verwendung (ein kundenbestätigter Satz)?' }
+        ebene: produkt
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I' }
+        review_status: pending
+      - id: r_fehlanwendung
+        typ: text
+        frage: { de: 'Vernünftigerweise vorhersehbare Fehlanwendung?' }
+        ebene: produkt
+        konsumenten: [risikobewertung]
+        review_status: pending
+      - id: r_einsatzumgebung
+        typ: mehrfachauswahl
+        frage: { de: 'Typische Einsatzumgebung(en)?' }
+        ebene: produkt
+        optionen:
+          - { wert: internet_exponiert, text: { de: 'Internet-exponiert' } }
+          - { wert: unternehmensnetz, text: { de: 'Unternehmensnetz' } }
+          - { wert: isoliert, text: { de: 'Isoliert' } }
+          - { wert: feldgeraet, text: { de: 'Feldgerät' } }
+          - { wert: cloud, text: { de: 'Cloud' } }
+        konsumenten: [risikobewertung, portal_konfiguration]
+        review_status: pending
+      - id: r_datenkategorien
+        typ: mehrfachauswahl
+        frage: { de: 'Verarbeitete Datenkategorien?' }
+        ebene: produkt
+        optionen:
+          - { wert: personenbezogen, text: { de: 'Personenbezogene Daten' } }
+          - { wert: besondere_kategorien, text: { de: 'Besondere Kategorien' } }
+          - { wert: betriebsgeheimnisse, text: { de: 'Betriebsgeheimnisse' } }
+          - { wert: steuerungsdaten, text: { de: 'Steuerungsdaten' } }
+          - { wert: keine, text: { de: 'Keine sensiblen Daten' } }
+        konsumenten: [risikobewertung]
+        review_status: pending
+      - id: r_sf_sichere_defaults
+        typ: einfachauswahl
+        frage: { de: 'Anhang I: Sichere Standardkonfiguration — Status?' }
+        ebene: produkt
+        optionen:
+          - { wert: erfuellt, text: { de: 'Erfüllt' } }
+          - { wert: teilweise, text: { de: 'Teilweise' } }
+          - { wert: nicht_erfuellt, text: { de: 'Nicht erfüllt' } }
+          - { wert: nicht_anwendbar, text: { de: 'Nicht anwendbar (mit Begründung)' } }
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. b' }
+        gap_regel:
+          bei_werten: [teilweise, nicht_erfuellt]
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. b' }
+          hinweis: { de: 'Sichere Standardkonfiguration ist nicht vollständig umgesetzt.' }
+        review_status: pending
+      - id: r_sf_zugriffskontrolle
+        typ: einfachauswahl
+        frage: { de: 'Anhang I: Zugriffskontrolle — Status?' }
+        ebene: produkt
+        optionen:
+          - { wert: erfuellt, text: { de: 'Erfüllt' } }
+          - { wert: teilweise, text: { de: 'Teilweise' } }
+          - { wert: nicht_erfuellt, text: { de: 'Nicht erfüllt' } }
+          - { wert: nicht_anwendbar, text: { de: 'Nicht anwendbar (mit Begründung)' } }
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. d' }
+        gap_regel:
+          bei_werten: [teilweise, nicht_erfuellt]
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. d' }
+          hinweis: { de: 'Zugriffskontrolle ist nicht vollständig umgesetzt.' }
+        review_status: pending
+      - id: r_sf_update_mechanismus
+        typ: einfachauswahl
+        frage: { de: 'Anhang I: Sicherer Update-Mechanismus — Status?' }
+        ebene: produkt
+        optionen:
+          - { wert: erfuellt, text: { de: 'Erfüllt' } }
+          - { wert: teilweise, text: { de: 'Teilweise' } }
+          - { wert: nicht_erfuellt, text: { de: 'Nicht erfüllt' } }
+          - { wert: nicht_anwendbar, text: { de: 'Nicht anwendbar (mit Begründung)' } }
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. c' }
+        gap_regel:
+          bei_werten: [teilweise, nicht_erfuellt]
+          prioritaet: kritisch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. c' }
+          hinweis: { de: 'Sicherer Update-Mechanismus ist nicht vollständig umgesetzt — hohe Priorität.' }
+        review_status: pending
+
+  # ============================================================ Block 4
+  - id: block_4_schwachstellenmanagement
+    nummer: 4
+    titel: { de: 'Schwachstellenmanagement-Prozess' }
+    ziel: { de: 'Den gelebten (oder fehlenden) Prozess erfassen — hier entstehen die meisten Hausaufgaben.' }
+    ebene: mandant_mit_override
+    felder:
+      - id: s_cvd_policy_vorhanden
+        typ: ja_nein
+        frage: { de: 'Existiert eine veröffentlichte CVD-Policy?' }
+        ebene: mandant_mit_override
+        konsumenten: [cvd_policy, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 5' }
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 5' }
+          hinweis: { de: 'CVD-Policy fehlt — aus Template generierbar (Hausaufgabe mit Frist).' }
+        review_status: pending
+      - id: s_cvd_kontaktstelle
+        typ: text
+        frage: { de: 'Kontaktstelle für Schwachstellenmeldungen (security.txt, E-Mail)?' }
+        ebene: mandant_mit_override
+        konsumenten: [cvd_policy, portal_konfiguration]
+        review_status: pending
+      - id: s_triage_zustaendig
+        typ: text
+        frage: { de: 'Wer triagiert eingehende Schwachstellen, mit welchen SLAs?' }
+        ebene: mandant_mit_override
+        konsumenten: [technische_doku_annex_vii, portal_konfiguration]
+        review_status: pending
+      - id: s_updates_erreichen_bestand
+        typ: ja_nein
+        frage: { de: 'Erreichen Sicherheitsupdates alle Bestandsgeräte?' }
+        ebene: mandant_mit_override
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 8' }
+          hinweis: { de: 'Updates erreichen nicht alle Bestandsgeräte.' }
+        review_status: pending
+      - id: s_sicherheitsupdates_kostenlos_getrennt
+        typ: ja_nein
+        frage: { de: 'Sind Sicherheitsupdates kostenlos und getrennt von Funktionsupdates möglich?' }
+        ebene: mandant_mit_override
+        konsumenten: [technische_doku_annex_vii, support_zeitraum_erklaerung]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 8' }
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 8' }
+          hinweis: { de: 'Sicherheitsupdates sind nicht kostenlos/getrennt — CRA-Pflicht verletzt.' }
+        review_status: pending
+      - id: s_meldung_csirt_zustaendig
+        typ: text
+        frage: { de: 'Wer meldet aktiv ausgenutzte Schwachstellen an ENISA/CSIRT?' }
+        ebene: mandant_mit_override
+        konsumenten: [portal_konfiguration, technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14' }
+        review_status: pending
+      - id: s_fruehwarnung_24h_realistisch
+        typ: ja_nein
+        frage: { de: 'Ist die 24h-Frühwarnung im Ernstfall realistisch erreichbar?' }
+        ebene: mandant_mit_override
+        konsumenten: [portal_konfiguration]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2' }
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: mittel
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2' }
+          hinweis: { de: '24h-Frühwarnung ist nicht realistisch sichergestellt — Eskalationsweg klären.' }
+        review_status: pending
+
+  # ============================================================ Block 5
+  - id: block_5_support
+    nummer: 5
+    titel: { de: 'Support-Zeitraum & Lebenszyklus' }
+    ziel: { de: 'Die Festlegung, die der Kunde am liebsten vermeiden würde, verbindlich machen.' }
+    ebene: produkt
+    felder:
+      - id: sup_zeitraum_jahre
+        typ: zahl
+        frage: { de: 'Festgelegter Support-Zeitraum in Jahren?' }
+        erlaeuterung:
+          de: 'Default-Erwartung: erwartete Nutzungsdauer, mindestens regulatorischer Rahmen (Richtwert 5 Jahre).'
+        ebene: produkt
+        konsumenten: [support_zeitraum_erklaerung, portal_konfiguration]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13 Abs. 8' }
+        review_status: pending
+      - id: sup_begruendung
+        typ: text
+        frage: { de: 'Begründung des Support-Zeitraums (bei < 5 Jahren Pflicht)?' }
+        ebene: produkt
+        pflicht: false
+        konsumenten: [support_zeitraum_erklaerung]
+        review_status: pending
+      - id: sup_versionspolitik
+        typ: text
+        frage: { de: 'Welche Branches erhalten Sicherheitsupdates (Backport-Strategie)?' }
+        ebene: produkt
+        konsumenten: [support_zeitraum_erklaerung, technische_doku_annex_vii]
+        review_status: pending
+      - id: sup_eol_kommunikation
+        typ: text
+        frage: { de: 'Wie und wann werden Nutzer über EOL informiert?' }
+        ebene: produkt
+        konsumenten: [support_zeitraum_erklaerung]
+        gap_regel:
+          bei_luecke: true
+          prioritaet: mittel
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 13 Abs. 8' }
+          hinweis: { de: 'EOL-Kommunikation ist nicht festgelegt.' }
+        review_status: pending
+
+  # ============================================================ Block 6
+  - id: block_6_lieferkette
+    nummer: 6
+    titel: { de: 'Lieferkette & Komponenten' }
+    ziel: { de: 'Sorgfaltspflichten und Build-Realität erfassen — Vorbereitung für das SBOM-Profil.' }
+    ebene: mandant_mit_override
+    felder:
+      - id: l_komponentenherkunft
+        typ: mehrfachauswahl
+        frage: { de: 'Herkunft der Komponenten?' }
+        ebene: produkt
+        optionen:
+          - { wert: eigenentwicklung, text: { de: 'Eigenentwicklung' } }
+          - { wert: kommerzielle_dritt, text: { de: 'Kommerzielle Drittkomponenten' } }
+          - { wert: oss, text: { de: 'Open-Source-Komponenten' } }
+        konsumenten: [sbom_profil, risikobewertung]
+        review_status: pending
+      - id: l_kritische_abhaengigkeiten
+        typ: text
+        frage: { de: 'Kritische Abhängigkeiten benennen?' }
+        ebene: produkt
+        konsumenten: [sbom_profil, risikobewertung]
+        review_status: pending
+      - id: l_due_diligence
+        typ: text
+        frage: { de: 'Due-Diligence-Praxis bei Drittkomponenten (Auswahlkriterien, Sicherheitszusagen)?' }
+        ebene: mandant_mit_override
+        konsumenten: [risikobewertung, technische_doku_annex_vii]
+        review_status: pending
+      - id: l_artefakt_signierung
+        typ: ja_nein
+        frage: { de: 'Werden Build-Artefakte signiert?' }
+        ebene: mandant_mit_override
+        konsumenten: [sbom_profil, technische_doku_annex_vii]
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: mittel
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 1' }
+          hinweis: { de: 'Artefakte werden nicht signiert — Integritätsnachweis schwächer.' }
+        review_status: pending
+      - id: l_bekannte_altlasten
+        typ: text
+        frage: { de: 'Bekannte Altlasten (unmaintainte/gepinnte Abhängigkeiten, Vendored Code)?' }
+        ebene: produkt
+        pflicht: false
+        konsumenten: [sbom_profil, risikobewertung]
+        review_status: pending
+
+  # ============================================================ Block 7
+  - id: block_7_sbom_profil
+    nummer: 7
+    titel: { de: 'SBOM-Profil' }
+    ziel: { de: 'Technischer Handshake zwischen Workshop und Portal — pro Produkt ein Profil.' }
+    ebene: produkt
+    felder:
+      - id: sb_konformitaetsziel
+        typ: einfachauswahl
+        frage: { de: 'SBOM-Konformitätsziel (Zielniveau)?' }
+        ebene: produkt
+        optionen:
+          - { wert: bsi_tr_03183_2, text: { de: 'BSI TR-03183-2' } }
+          - { wert: ntia_minimum, text: { de: 'NTIA Minimum Elements' } }
+          - { wert: eigen, text: { de: 'Eigenes Zielniveau (Abweichungen begründen)' } }
+        konsumenten: [sbom_profil]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 1' }
+        review_status: pending
+      - id: sb_mindesttiefe
+        typ: einfachauswahl
+        frage: { de: 'Geforderte Mindesttiefe der SBOM?' }
+        ebene: produkt
+        optionen:
+          - { wert: vollstaendig_transitiv, text: { de: 'Vollständig transitiv' } }
+          - { wert: top_level_plus_known_critical, text: { de: 'Top-Level + bekannte kritische' } }
+        konsumenten: [sbom_profil]
+        review_status: pending
+
+  # ============================================================ Block 8
+  - id: block_8_dokumentation
+    nummer: 8
+    titel: { de: 'Bestandsaufnahme Dokumentation & Konformität' }
+    ziel: { de: 'Gap-Analyse gegen die technische Dokumentation (Annex-VII-Mapping).' }
+    ebene: produkt
+    felder:
+      - id: d_vorhandene_artefakte
+        typ: mehrfachauswahl
+        frage: { de: 'Welche Dokumentationsartefakte existieren bereits?' }
+        ebene: produkt
+        optionen:
+          - { wert: architektur, text: { de: 'Architektur-Doku' } }
+          - { wert: testberichte, text: { de: 'Testberichte' } }
+          - { wert: pentest, text: { de: 'Pentest-Reports' } }
+          - { wert: entwicklungsprozess, text: { de: 'Entwicklungsprozess-Doku' } }
+          - { wert: benutzerinfo, text: { de: 'Benutzerinformationen/Anleitungen' } }
+          - { wert: keine, text: { de: 'Keine' } }
+        konsumenten: [technische_doku_annex_vii]
+        review_status: pending
+      - id: d_av_risikobewertung
+        typ: einfachauswahl
+        frage: { de: 'Annex VII: Risikobewertung — Status?' }
+        ebene: produkt
+        optionen:
+          - { wert: vorhanden, text: { de: 'Vorhanden' } }
+          - { wert: generierbar_aus_aufnahme, text: { de: 'Aus Aufnahme generierbar' } }
+          - { wert: fehlt, text: { de: 'Fehlt' } }
+        konsumenten: [technische_doku_annex_vii]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang VII Nr. 3' }
+        gap_regel:
+          bei_werten: [fehlt]
+          prioritaet: hoch
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang VII Nr. 3' }
+          hinweis: { de: 'Risikobewertung in der technischen Doku fehlt.' }
+        review_status: pending
+      - id: d_ce_prozess_definiert
+        typ: ja_nein
+        frage: { de: 'Ist der CE-Kennzeichnungsprozess definiert (wer zeichnet die Konformitätserklärung)?' }
+        ebene: produkt
+        konsumenten: [konformitaetserklaerung]
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: mittel
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 28, Art. 30' }
+          hinweis: { de: 'CE-Kennzeichnungsprozess ist nicht definiert.' }
+        review_status: pending
+      - id: d_benutzerinfo_integriert
+        typ: ja_nein
+        frage: { de: 'Sind kundensichtbare Angaben (Kontaktstelle, Support-Zeitraum, Update-Anleitung) integriert?' }
+        ebene: produkt
+        konsumenten: [technische_doku_annex_vii, support_zeitraum_erklaerung]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang II' }
+        gap_regel:
+          bei_werten: ['nein']
+          prioritaet: mittel
+          annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang II' }
+          hinweis: { de: 'Benutzerinformationspflichten sind nicht vollständig integriert.' }
+        review_status: pending
