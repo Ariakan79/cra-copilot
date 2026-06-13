@@ -1,0 +1,6 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "metadata": { "timestamp": "2026-06-13T08:00:00Z", "tools": [{ "name": "eigenbau" }] },
+  "components": [{ "type": "library", "name": "mystery-lib" }]
+}

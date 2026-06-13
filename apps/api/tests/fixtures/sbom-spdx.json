@@ -1,0 +1,21 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2026-06-13T09:00:00Z",
+    "creators": ["Tool: trivy"]
+  },
+  "packages": [
+    {
+      "name": "requests",
+      "versionInfo": "2.25.0",
+      "supplier": "Organization: PSF",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/requests@2.25.0"
+        }
+      ]
+    }
+  ]
+}

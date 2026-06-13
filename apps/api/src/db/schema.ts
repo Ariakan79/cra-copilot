@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm';
-import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 /**
  * Drizzle-Schema (ADR-013). Alle Tabellen tragen `mandant_id` (ADR-014: schon
@@ -119,7 +128,8 @@ export const sbomStream = pgTable(
 
 /**
  * Workshop-Abschluss (ADR-019): zwei getrennte Stati. Phase 2 kann nur
- * `workshop_durchgefuehrt` setzen; `onboarding_abgeschlossen` setzt das Portal.
+ * `workshop_durchgefuehrt` setzen; `onboarding_abgeschlossen` setzt das Portal
+ * (ADR-021: bei erster profilkonformer Lieferung — als Ereignis, kein Phone-home).
  */
 export const workshop = pgTable('workshop', {
   produktId: uuid('produkt_id')
@@ -131,3 +141,126 @@ export const workshop = pgTable('workshop', {
   workshopDurchgefuehrtAm: timestamp('workshop_durchgefuehrt_am', { withTimezone: true }),
   onboardingAbgeschlossenAm: timestamp('onboarding_abgeschlossen_am', { withTimezone: true }),
 });
+
+// ===================================================================== Portal
+
+/** UI-Anmeldung des Kundenteams (ADR-025): self-hosted, ein Mandant pro Instanz. */
+export const portalUser = pgTable('portal_user', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  mandantId: uuid('mandant_id')
+    .notNull()
+    .references(() => mandant.id),
+  benutzername: text('benutzername').notNull().unique(),
+  passwortHash: text('passwort_hash').notNull(),
+  erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Ingestion-Token je Produkt für die CI (ADR-025): nur als Hash gespeichert. */
+export const ingestionToken = pgTable(
+  'ingestion_token',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    produktId: uuid('produkt_id')
+      .notNull()
+      .references(() => produkt.id),
+    tokenHash: text('token_hash').notNull(),
+    bezeichnung: text('bezeichnung'),
+    erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow(),
+    widerrufenAm: timestamp('widerrufen_am', { withTimezone: true }),
+  },
+  (t) => [index('ingestion_token_hash_idx').on(t.tokenHash)],
+);
+
+/**
+ * SBOM-Lieferung (ADR-024): append-only je Eingang. Roh-SBOM bleibt erhalten,
+ * die Lieferhistorie ist Compliance-Nachweis (Trigger erzwingt Unveränderlichkeit).
+ */
+export const sbomLieferung = pgTable(
+  'sbom_lieferung',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    produktId: uuid('produkt_id')
+      .notNull()
+      .references(() => produkt.id),
+    streamName: text('stream_name').notNull(),
+    format: text('format').notNull(),
+    formatVersion: text('format_version'),
+    kanal: text('kanal').notNull(),
+    trigger: text('trigger'),
+    roh: jsonb('roh').notNull(),
+    profilKonform: boolean('profil_konform').notNull(),
+    validierung: jsonb('validierung').$type<{ fehler: string[] }>(),
+    eingegangenAm: timestamp('eingegangen_am', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('sbom_lieferung_scope_idx').on(t.produktId, t.streamName)],
+);
+
+/**
+ * Komponenten aus der jüngsten profilkonformen Lieferung je Stream (ADR-024).
+ * Wird bei neuer Lieferung ersetzt (SBOM-Erneuerung ist ereignisgetrieben, ADR-028).
+ */
+export const komponente = pgTable(
+  'komponente',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    produktId: uuid('produkt_id')
+      .notNull()
+      .references(() => produkt.id),
+    streamName: text('stream_name').notNull(),
+    lieferungId: uuid('lieferung_id')
+      .notNull()
+      .references(() => sbomLieferung.id),
+    purl: text('purl'),
+    name: text('name').notNull(),
+    version: text('version'),
+    lieferant: text('lieferant'),
+  },
+  (t) => [index('komponente_scope_idx').on(t.produktId, t.streamName)],
+);
+
+export const FINDING_STATI = [
+  'neu',
+  'in_pruefung',
+  'bestaetigt',
+  'nicht_relevant',
+  'behoben',
+] as const;
+export type FindingStatus = (typeof FINDING_STATI)[number];
+
+/**
+ * Finding (ADR-027): Treffer aus dem OSV-Abgleich gegen die aktuellen
+ * Komponenten. Kontinuierlich neu bewertet (ADR-028); Triage trägt einen
+ * menschlichen Urheber (kein LLM-Urteil, Spec-Nicht-Ziel).
+ */
+export const finding = pgTable(
+  'finding',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    produktId: uuid('produkt_id')
+      .notNull()
+      .references(() => produkt.id),
+    komponentePurl: text('komponente_purl'),
+    komponenteName: text('komponente_name'),
+    schwachstelleId: text('schwachstelle_id').notNull(),
+    schweregrad: text('schweregrad'),
+    quelle: text('quelle').notNull().default('osv'),
+    triageStatus: text('triage_status').$type<FindingStatus>().notNull().default('neu'),
+    exploitabilityHinweis: text('exploitability_hinweis'),
+    behobenDurchDaten: boolean('behoben_durch_daten').notNull().default(false),
+    ersteSichtung: timestamp('erste_sichtung', { withTimezone: true }).notNull().defaultNow(),
+    letzteSichtung: timestamp('letzte_sichtung', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('finding_scope_unique').on(t.produktId, t.schwachstelleId, t.komponentePurl)],
+);
