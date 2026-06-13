@@ -725,7 +725,7 @@ eingereichte Inhalt unveränderlich archiviert).
 
 ## ADR-031 — Meldevorgang-Datenmodell
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Neue Tabellen (mandant-/produktgebunden):
 - `meldevorgang` — `art: schwachstelle | vorfall`, `quelle_finding_id` (NULL bei
@@ -748,7 +748,7 @@ trägt — das passt nicht in ein Statusfeld.
 
 ## ADR-032 — Fristenberechnung & Eskalation als abgeleiteter Zustand
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:**
 - **Fristen abgeleitet, nicht gespeichert** (analog Ampeln ADR-019/D3):
@@ -772,7 +772,7 @@ von der Wahrheit ab. Ableiten ist konsistent mit dem Ampel-/Gap-Prinzip.
 
 ## ADR-033 — Meldungsinhalt & Fristen als versionierte Daten
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Die Feldvorlagen je Meldestufe und Meldungstyp (welche Angaben
 die Behörde erwartet) und die Fristwerte (24h/72h/14d/1M) liegen als versionierte
@@ -789,7 +789,7 @@ weil** es Grundprinzip 5 verletzt; die Meldevorgaben der einheitlichen Plattform
 
 ## ADR-034 — Trennung Finding-Triage ↔ Meldepflicht; menschlicher Urheber
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Der Triage-Status `bestaetigt` eines Findings (ADR-027) bedeutet
 „im Produktkontext relevant" — **nicht** „meldepflichtig". Ein Meldevorgang

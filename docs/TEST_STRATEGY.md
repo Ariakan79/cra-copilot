@@ -277,3 +277,54 @@ Plus: ein Test verifiziert, dass **kein** Request an ein osv.dev-Origin geht
 Der `integration`-Job deckt das Portal mit ab (Docker vorhanden). Der OSV-Sync
 selbst (Netzzugriff) läuft **nicht** in CI/Tests — Tests nutzen das Fixture; der
 Sync hat einen eigenen, manuell/skriptgetriebenen Smoke außerhalb der Pipeline.
+
+---
+
+## 9. Phase 4 — Meldeworkflow (akzeptiert 2026-06-13)
+
+Leitgedanke unverändert. Schwerpunkt: Eröffnung, Fristenberechnung,
+Einreichungs-Audit. Zeitbezogene Tests nutzen eine **fixierte „jetzt"-Zeit**
+(deterministisch, kein Echtzeit-Warten).
+
+### 9.1 Eröffnung eines Meldevorgangs (Vitest + Testcontainers-Postgres)
+
+- R1 Aus Finding: ein als „aktiv ausgenutzt" eingestuftes Finding eröffnet einen
+  Vorgang `art=schwachstelle` mit `quelle_finding_id`; ohne diese Einstufung
+  entsteht **kein** Vorgang (ADR-034 — `bestaetigt` allein reicht nicht).
+- R2 Freie Vorfallmeldung: Vorgang `art=vorfall` ohne Finding lässt sich eröffnen.
+- R3 Triage-Trennung: ein Finding kann `bestaetigt` sein, ohne dass ein
+  Meldevorgang existiert.
+
+### 9.2 Fristenberechnung & Überfälligkeit (deterministisch)
+
+- R4 Frühwarnung = eröffnet + 24 h, Meldung = eröffnet + 72 h.
+- R5 Abschluss (Schwachstelle) = `korrekturmassnahme_ab` + 14 Tage; (Vorfall) =
+  Einreichung der Meldung + 1 Monat.
+- R6 Überfällig = Frist < jetzt und Stufe nicht eingereicht — reine Funktion aus
+  (Vorgang, jetzt); eingereichte Stufe ist nie überfällig.
+- R7 Fristwerte stammen aus den versionierten Meldungsdaten (ADR-033), nicht aus
+  Code-Konstanten (ein Test prüft die Herkunft).
+
+### 9.3 Einreichung & Audit (Append-only)
+
+- R8 Stufe einreichen setzt `eingereicht_am/von/inhalt`; danach ist die Stufe
+  unveränderlich (DB-Trigger — UPDATE/DELETE schlägt fehl, analog Evidenz/Lieferung).
+- R9 Entwurfserzeugung: je Stufe/Typ wird ein strukturierter Entwurf aus den
+  versionierten Feldvorlagen + Vorgangsdaten erzeugt (Pflichtfelder vorhanden).
+
+### 9.4 Eskalation
+
+- R10 Überfällige Stufe liefert die Eskalationskontakte aus der Block-4-Evidenz
+  (`s_meldung_csirt_zustaendig` u. a.), nicht aus portal-eigenen Feldern.
+
+### 9.5 Portal-E2E (Playwright, Ergänzung)
+
+Im bestehenden Portal-E2E: Finding als „aktiv ausgenutzt" einstufen → Meldevorgang
+erscheint mit 24h/72h-Fristen → Frühwarnung-Entwurf öffnen → als eingereicht
+markieren → Stufe ist gesperrt. Plus weiterhin „kein automatischer Outbound an
+osv.dev/ENISA" (Datenlokalität, ADR-021/030).
+
+### 9.6 CI
+
+Im bestehenden `integration`-Job mitgedeckt; keine neuen externen Abhängigkeiten
+(kein Echt-Versand an Behörden in Tests).
