@@ -1,0 +1,304 @@
+/* Aufnahme-Cockpit — internes Werkzeug, dichteres Layout als der Wizard. */
+:root {
+  --tinte: #1b2733;
+  --leise: #5a6b7b;
+  --flaeche: #eef1f4;
+  --karte: #fff;
+  --akzent: #14532d;
+  --akzent-hell: #e7f3ec;
+  --linie: #d3dae1;
+  --rot: #b91c1c;
+  --gelb: #b45309;
+  --gruen: #15803d;
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--flaeche);
+  color: var(--tinte);
+  line-height: 1.5;
+}
+.kopf {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: var(--karte);
+  border-bottom: 1px solid var(--linie);
+}
+.lokal {
+  font-size: 0.8rem;
+  color: var(--akzent);
+}
+.fehler {
+  background: #fef2f2;
+  color: var(--rot);
+  border: 1px solid var(--rot);
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+.karte {
+  max-width: 46rem;
+  margin: 1rem auto;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+label {
+  display: block;
+  margin: 0.6rem 0;
+  font-size: 0.92rem;
+}
+input {
+  display: block;
+  width: 100%;
+  margin-top: 0.2rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--linie);
+  border-radius: 6px;
+  font: inherit;
+}
+fieldset {
+  border: 1px solid var(--linie);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+legend {
+  padding: 0 0.4rem;
+  color: var(--leise);
+  font-size: 0.85rem;
+}
+button,
+.knopf-link {
+  font: inherit;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-block;
+}
+.primaer {
+  background: var(--akzent);
+  color: #fff;
+}
+.primaer:disabled {
+  background: var(--leise);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.sekundaer {
+  background: transparent;
+  border-color: var(--linie);
+  color: var(--tinte);
+}
+.klein {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+.voll {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 16rem 1fr 16rem;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: start;
+}
+.bloecke {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: sticky;
+  top: 1rem;
+}
+.block-tab {
+  text-align: left;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+.block-tab.aktiv {
+  border-color: var(--akzent);
+  background: var(--akzent-hell);
+}
+.ampelpunkt {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.ampelpunkt.vollstaendig,
+.ampel.vollstaendig {
+  background: var(--gruen);
+}
+.ampelpunkt.mit_luecken,
+.ampel.mit_luecken {
+  background: var(--gelb);
+}
+.ampelpunkt.nicht_bearbeitet {
+  background: var(--linie);
+}
+.inhalt,
+.seitenleiste {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: 10px;
+  padding: 1.2rem;
+}
+.ziel {
+  color: var(--leise);
+  font-size: 0.92rem;
+  margin-top: 0;
+}
+.feld {
+  border-top: 1px solid var(--linie);
+  padding: 0.9rem 0;
+}
+.feld-frage {
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+}
+.pflicht {
+  color: var(--rot);
+  margin-left: 0.15rem;
+}
+.feld-hint {
+  color: var(--leise);
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem;
+}
+.optionen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.chip {
+  background: var(--flaeche);
+  border: 1px solid var(--linie);
+  font-size: 0.88rem;
+}
+.chip.aktiv {
+  background: var(--akzent);
+  color: #fff;
+  border-color: var(--akzent);
+}
+.textzeile {
+  display: flex;
+  gap: 0.5rem;
+}
+.textzeile input {
+  margin-top: 0;
+}
+.luecken {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.luecke {
+  background: transparent;
+  border: 1px dashed var(--leise);
+  color: var(--leise);
+  font-size: 0.82rem;
+  padding: 0.25rem 0.6rem;
+}
+.luecke.aktiv {
+  background: var(--gelb);
+  color: #fff;
+  border-style: solid;
+}
+.gespeichert {
+  font-size: 0.85rem;
+  color: var(--gruen);
+  margin: 0.4rem 0 0;
+}
+.block-navi {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+.seitenleiste h2 {
+  font-size: 1rem;
+  margin-top: 0;
+}
+.gap-liste,
+.gaps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+.gap-liste li,
+.gaps li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--linie);
+}
+.prio {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  color: #fff;
+  margin-right: 0.3rem;
+}
+.prio.kritisch {
+  background: #7f1d1d;
+}
+.prio.hoch {
+  background: var(--rot);
+}
+.prio.mittel {
+  background: var(--gelb);
+}
+.prio.niedrig {
+  background: var(--leise);
+}
+.ok {
+  color: var(--gruen);
+  font-size: 0.85rem;
+}
+.ampel-tabelle {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+.ampel-tabelle td {
+  border: 1px solid var(--linie);
+  padding: 0.35rem 0.6rem;
+}
+.ampel {
+  color: #fff;
+  text-align: center;
+}
+.bericht h2 {
+  font-size: 1.05rem;
+  margin-top: 1.5rem;
+}
+.abschluss {
+  color: var(--gruen);
+}
+
+@media print {
+  .kopf,
+  .nicht-drucken {
+    display: none !important;
+  }
+  .karte {
+    border: none;
+    margin: 0;
+  }
+}

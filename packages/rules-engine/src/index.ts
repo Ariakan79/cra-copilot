@@ -1,4 +1,4 @@
-import regelwerkJson from './regelwerk.gen.json';
+import regelwerkJson from './regelwerk.gen.json' with { type: 'json' };
 import { RegelwerkSchema, type Regelwerk } from './schema';
 
 /**
