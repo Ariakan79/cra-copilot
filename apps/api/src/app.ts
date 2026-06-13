@@ -17,6 +17,7 @@ import {
 import { hashPasswort, neuesToken, produktFuerToken, pruefePasswort } from './portal/auth';
 import { ingest } from './portal/ingestion';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
+import { heartbeat } from './portal/heartbeat';
 import {
   alleAktuellenWerte,
   setzeEvidenz,
@@ -342,6 +343,11 @@ export function buildApp(db: DB): FastifyInstance {
   app.get('/produkte/:id/komponenten', async (req) => {
     const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
     return db.select().from(komponente).where(eq(komponente.produktId, id));
+  });
+
+  app.get('/produkte/:id/heartbeat', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    return heartbeat(db, id);
   });
 
   app.get('/produkte/:id/findings', async (req) => {
