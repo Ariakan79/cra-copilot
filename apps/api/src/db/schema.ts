@@ -249,6 +249,60 @@ export const osvAdvisory = pgTable(
   (t) => [index('osv_paket_idx').on(t.ecosystem, t.paket)],
 );
 
+export const MELDE_ARTEN = ['schwachstelle', 'vorfall'] as const;
+export const MELDE_STATI = ['offen', 'gemeldet', 'abgeschlossen', 'eingestellt'] as const;
+export const MELDE_STUFEN = ['fruehwarnung', 'meldung', 'abschluss'] as const;
+export type MeldeArt = (typeof MELDE_ARTEN)[number];
+export type MeldeStatus = (typeof MELDE_STATI)[number];
+export type MeldeStufe = (typeof MELDE_STUFEN)[number];
+
+/**
+ * Meldevorgang (ADR-031): aus einem als aktiv-ausgenutzt eingestuften Finding
+ * oder als freie Vorfallmeldung. Die Eröffnung ist die menschliche
+ * Meldeentscheidung (ADR-034), `begruendung` + `eroeffnet_von` halten den Urheber.
+ */
+export const meldevorgang = pgTable(
+  'meldevorgang',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    produktId: uuid('produkt_id')
+      .notNull()
+      .references(() => produkt.id),
+    art: text('art').$type<MeldeArt>().notNull(),
+    quelleFindingId: uuid('quelle_finding_id').references(() => finding.id),
+    titel: text('titel').notNull(),
+    status: text('status').$type<MeldeStatus>().notNull().default('offen'),
+    begruendung: text('begruendung'),
+    korrekturmassnahmeAb: timestamp('korrekturmassnahme_ab', { withTimezone: true }),
+    eroeffnetVon: text('eroeffnet_von').notNull(),
+    eroeffnetAm: timestamp('eroeffnet_am', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('meldevorgang_produkt_idx').on(t.produktId)],
+);
+
+/**
+ * Meldestufe (ADR-031): bis zu drei je Vorgang. Ab gesetzter `eingereicht_am`
+ * unveränderlich (Trigger) — der Nachweis, was wann gemeldet wurde, ist beweisfest.
+ */
+export const meldungStufe = pgTable(
+  'meldung_stufe',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    vorgangId: uuid('vorgang_id')
+      .notNull()
+      .references(() => meldevorgang.id),
+    stufe: text('stufe').$type<MeldeStufe>().notNull(),
+    inhalt: jsonb('inhalt').$type<Record<string, string>>(),
+    eingereichtAm: timestamp('eingereicht_am', { withTimezone: true }),
+    eingereichtVon: text('eingereicht_von'),
+    kanal: text('kanal'),
+  },
+  (t) => [uniqueIndex('meldung_stufe_unique').on(t.vorgangId, t.stufe)],
+);
+
 export const FINDING_STATI = [
   'neu',
   'in_pruefung',

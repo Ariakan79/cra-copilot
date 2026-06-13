@@ -30,6 +30,34 @@ export interface Finding {
   exploitabilityHinweis: string | null;
 }
 
+export interface Meldevorgang {
+  id: string;
+  art: 'schwachstelle' | 'vorfall';
+  titel: string;
+  status: string;
+  eroeffnetVon: string;
+  eroeffnetAm: string;
+}
+export interface StufenFrist {
+  stufe: 'fruehwarnung' | 'meldung' | 'abschluss';
+  fristBis: string | null;
+  ueberfaellig: boolean;
+  eingereichtAm: string | null;
+}
+export interface EntwurfFeld {
+  id: string;
+  label: string;
+  pflicht: boolean;
+  wert: string;
+}
+export interface Entwurf {
+  stufe: string;
+  art: string;
+  titel: string;
+  hinweis: string | null;
+  felder: EntwurfFeld[];
+}
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
   return res.json() as Promise<T>;
@@ -67,5 +95,36 @@ export const api = {
   },
   async tokenErstellen(produktId: string, bezeichnung: string): Promise<{ token: string }> {
     return json(await post(`/produkte/${produktId}/ingestion-tokens`, { bezeichnung }));
+  },
+  async meldenAusFinding(
+    findingId: string,
+    titel: string,
+    begruendung: string,
+    eroeffnetVon: string,
+  ): Promise<{ id: string }> {
+    return json(
+      await post(`/findings/${findingId}/meldevorgang`, { titel, begruendung, eroeffnetVon }),
+    );
+  },
+  async meldevorgaenge(produktId: string): Promise<Meldevorgang[]> {
+    return json(await fetch(`/api/produkte/${produktId}/meldevorgaenge`));
+  },
+  async fristen(vorgangId: string): Promise<StufenFrist[]> {
+    return json(await fetch(`/api/meldevorgaenge/${vorgangId}/fristen`));
+  },
+  async entwurf(vorgangId: string, stufe: string): Promise<Entwurf> {
+    return json(await fetch(`/api/meldevorgaenge/${vorgangId}/entwurf/${stufe}`));
+  },
+  async einreichen(
+    vorgangId: string,
+    stufe: string,
+    inhalt: Record<string, string>,
+    eingereichtVon: string,
+  ): Promise<void> {
+    const res = await post(`/meldevorgaenge/${vorgangId}/einreichen/${stufe}`, {
+      inhalt,
+      eingereichtVon,
+    });
+    if (!res.ok) throw new Error(await res.text());
   },
 };

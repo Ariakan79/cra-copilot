@@ -8,6 +8,7 @@ import {
   ingestionToken,
   komponente,
   mandant,
+  meldevorgang,
   portalUser,
   produkt,
   sbomLieferung,
@@ -18,6 +19,17 @@ import { hashPasswort, neuesToken, produktFuerToken, pruefePasswort } from './po
 import { ingest } from './portal/ingestion';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import { heartbeat } from './portal/heartbeat';
+import {
+  entwurf,
+  eroeffneAusFinding,
+  eroeffneFrei,
+  eskalationskontakte,
+  reicheEin,
+  setzeKorrekturmassnahme,
+  speichereEntwurf,
+  stufenFristen,
+  vorgaengeFuerProdukt,
+} from './portal/meldung';
 import {
   alleAktuellenWerte,
   setzeEvidenz,
@@ -236,6 +248,93 @@ export function buildApp(db: DB): FastifyInstance {
 
   // Konstante als API-Hinweis: Override entfernen.
   app.get('/konstanten', async () => ({ zurueckAufDefault: ZURUECK_AUF_DEFAULT }));
+
+  // ============================================================ Meldeworkflow
+
+  const Stufe = z.enum(['fruehwarnung', 'meldung', 'abschluss']);
+
+  // Meldevorgang aus Finding eröffnen = menschliche „aktiv ausgenutzt"-Einstufung.
+  app.post('/findings/:findingId/meldevorgang', async (req, reply) => {
+    const { findingId } = z.object({ findingId: z.string().uuid() }).parse(req.params);
+    const body = z
+      .object({
+        titel: z.string().min(1),
+        begruendung: z.string().min(1),
+        eroeffnetVon: z.string().min(1),
+      })
+      .parse(req.body);
+    const id = await eroeffneAusFinding(db, { findingId, ...body });
+    return reply.status(201).send({ id });
+  });
+
+  // Freie Vorfallmeldung (ohne Finding).
+  app.post('/produkte/:id/meldevorgaenge', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const mandantId = await mandantVon(db, id);
+    if (mandantId === undefined) return reply.status(404).send({ fehler: 'Produkt unbekannt' });
+    const body = z
+      .object({
+        art: z.enum(['schwachstelle', 'vorfall']),
+        titel: z.string().min(1),
+        begruendung: z.string().optional(),
+        eroeffnetVon: z.string().min(1),
+      })
+      .parse(req.body);
+    const vorgangId = await eroeffneFrei(db, { produktId: id, ...body });
+    return reply.status(201).send({ id: vorgangId });
+  });
+
+  app.get('/produkte/:id/meldevorgaenge', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    return vorgaengeFuerProdukt(db, id);
+  });
+
+  app.get('/meldevorgaenge/:id/fristen', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    return stufenFristen(db, id);
+  });
+
+  app.get('/meldevorgaenge/:id/eskalation', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const [v] = await db
+      .select({ mandantId: meldevorgang.mandantId, produktId: meldevorgang.produktId })
+      .from(meldevorgang)
+      .where(eq(meldevorgang.id, id));
+    if (v === undefined) return reply.status(404).send({ fehler: 'Vorgang unbekannt' });
+    return eskalationskontakte(db, v.mandantId, v.produktId);
+  });
+
+  app.get('/meldevorgaenge/:id/entwurf/:stufe', async (req) => {
+    const { id, stufe } = z.object({ id: z.string().uuid(), stufe: Stufe }).parse(req.params);
+    return entwurf(db, id, stufe);
+  });
+
+  app.put('/meldevorgaenge/:id/entwurf/:stufe', async (req, reply) => {
+    const { id, stufe } = z.object({ id: z.string().uuid(), stufe: Stufe }).parse(req.params);
+    const body = z.object({ inhalt: z.record(z.string(), z.string()) }).parse(req.body);
+    await speichereEntwurf(db, id, stufe, body.inhalt);
+    return reply.status(204).send();
+  });
+
+  app.post('/meldevorgaenge/:id/einreichen/:stufe', async (req, reply) => {
+    const { id, stufe } = z.object({ id: z.string().uuid(), stufe: Stufe }).parse(req.params);
+    const body = z
+      .object({
+        inhalt: z.record(z.string(), z.string()),
+        eingereichtVon: z.string().min(1),
+        kanal: z.string().optional(),
+      })
+      .parse(req.body);
+    await reicheEin(db, id, stufe, body);
+    return reply.status(204).send();
+  });
+
+  app.patch('/meldevorgaenge/:id', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const body = z.object({ korrekturmassnahmeAb: z.string() }).parse(req.body);
+    await setzeKorrekturmassnahme(db, id, new Date(body.korrekturmassnahmeAb));
+    return reply.status(204).send();
+  });
 
   // ================================================================= Portal
 

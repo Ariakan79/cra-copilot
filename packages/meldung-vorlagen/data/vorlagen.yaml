@@ -1,0 +1,101 @@
+# Meldung-Vorlagen CRA Art. 14 — Fristen und Feldvorlagen je Stufe/Typ.
+#
+# ADR-033: versionierte Daten, damit juristische Korrekturen (Fristen, Feldnamen
+# der Art-16-Plattform) ohne Logikänderung nachziehen. Alle Einträge
+# review_status: pending — fachliche/juristische Freigabe durch den Director.
+#
+# Fristen am Verordnungstext geprüft (Art. 14), stehen dennoch unter Review.
+
+meldung_version: '0.1.0-draft'
+stand: '2026-06-13'
+
+empfaenger:
+  de: >-
+    Zuständiges CSIRT des Mitgliedstaats (als Koordinator benannt) und ENISA,
+    über die einheitliche Meldeplattform (Art. 16).
+
+# --- Fristen ----------------------------------------------------------------
+fristen:
+  # Aktiv ausgenutzte Schwachstelle
+  - { stufe: fruehwarnung, art: schwachstelle, bezug: eroeffnet_am, stunden: 24, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. a' }, review_status: pending }
+  - { stufe: meldung, art: schwachstelle, bezug: eroeffnet_am, stunden: 72, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' }, review_status: pending }
+  - { stufe: abschluss, art: schwachstelle, bezug: korrekturmassnahme_ab, tage: 14, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. c' }, review_status: pending }
+  # Schwerwiegender Sicherheitsvorfall
+  - { stufe: fruehwarnung, art: vorfall, bezug: eroeffnet_am, stunden: 24, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' }, review_status: pending }
+  - { stufe: meldung, art: vorfall, bezug: eroeffnet_am, stunden: 72, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. b' }, review_status: pending }
+  - { stufe: abschluss, art: vorfall, bezug: meldung_eingereicht_am, tage: 30, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' }, review_status: pending }
+
+# --- Feldvorlagen je Stufe/Typ ----------------------------------------------
+vorlagen:
+  - stufe: fruehwarnung
+    art: schwachstelle
+    titel: { de: 'Frühwarnung — aktiv ausgenutzte Schwachstelle' }
+    hinweis: { de: 'Binnen 24 Stunden ab Kenntnis. Knappe Erstinformation, Details folgen in der 72h-Meldung.' }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
+      - { id: schwachstelle, label: { de: 'Schwachstellenkennung (CVE/OSV) bzw. Beschreibung' } }
+      - { id: ausnutzung_bekannt, label: { de: 'Hinweise auf aktive Ausnutzung' } }
+      - { id: erste_einschaetzung, label: { de: 'Erste Einschätzung der Auswirkung' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. a' }
+    review_status: pending
+
+  - stufe: meldung
+    art: schwachstelle
+    titel: { de: 'Schwachstellenmeldung' }
+    hinweis: { de: 'Binnen 72 Stunden. Ergänzt die Frühwarnung um Details und Korrekturstatus.' }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
+      - { id: schwachstelle, label: { de: 'Schwachstellenkennung und technische Beschreibung' } }
+      - { id: ausnutzungsmethode, label: { de: 'Bekannte Ausnutzungsmethode' } }
+      - { id: betroffene_nutzer, label: { de: 'Geschätzter Umfang betroffener Nutzer/Geräte' } }
+      - { id: korrekturmassnahme, label: { de: 'Geplante/verfügbare Korrektur- oder Eindämmungsmaßnahmen' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' }
+    review_status: pending
+
+  - stufe: abschluss
+    art: schwachstelle
+    titel: { de: 'Abschlussbericht — Schwachstelle' }
+    hinweis: { de: 'Spätestens 14 Tage nach Verfügbarkeit der Korrekturmaßnahme.' }
+    felder:
+      - { id: schwachstelle, label: { de: 'Schwachstellenkennung' } }
+      - { id: behebung, label: { de: 'Durchgeführte Behebung (Patch/Version)' } }
+      - { id: wirksamkeit, label: { de: 'Wirksamkeit und Verteilungsgrad der Maßnahme' } }
+      - { id: lessons_learned, label: { de: 'Ursachen und abgeleitete Maßnahmen' }, pflicht: false }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. c' }
+    review_status: pending
+
+  - stufe: fruehwarnung
+    art: vorfall
+    titel: { de: 'Frühwarnung — schwerwiegender Sicherheitsvorfall' }
+    hinweis: { de: 'Binnen 24 Stunden ab Kenntnis.' }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
+      - { id: vorfall, label: { de: 'Kurzbeschreibung des Vorfalls' } }
+      - { id: auswirkung, label: { de: 'Erste Einschätzung der Auswirkung (Verfügbarkeit/Integrität/Vertraulichkeit)' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' }
+    review_status: pending
+
+  - stufe: meldung
+    art: vorfall
+    titel: { de: 'Vorfallmeldung' }
+    hinweis: { de: 'Binnen 72 Stunden.' }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
+      - { id: vorfall, label: { de: 'Beschreibung des Vorfalls und Hergang' } }
+      - { id: bedrohungsanalyse, label: { de: 'Bedrohungsanalyse / mutmaßliche Ursache' } }
+      - { id: auswirkung, label: { de: 'Auswirkung auf Schutzziele und Betroffene' } }
+      - { id: sofortmassnahmen, label: { de: 'Ergriffene Sofortmaßnahmen' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. b' }
+    review_status: pending
+
+  - stufe: abschluss
+    art: vorfall
+    titel: { de: 'Abschlussbericht — Vorfall' }
+    hinweis: { de: 'Innerhalb eines Monats nach Übermittlung der Vorfallmeldung.' }
+    felder:
+      - { id: vorfall, label: { de: 'Vorfallbezug' } }
+      - { id: ursache, label: { de: 'Festgestellte Ursache (Root-Cause)' } }
+      - { id: massnahmen, label: { de: 'Behebungs- und Härtungsmaßnahmen' } }
+      - { id: schweregrad_final, label: { de: 'Abschließende Schweregradeinordnung' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' }
+    review_status: pending

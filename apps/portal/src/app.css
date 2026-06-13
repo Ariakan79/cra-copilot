@@ -230,3 +230,55 @@ td {
   border-radius: 4px;
   word-break: break-all;
 }
+.melden {
+  border: 1px solid var(--rot);
+  color: var(--rot);
+  background: #fff;
+}
+.vorgaenge {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.vorgaenge li {
+  border-top: 1px solid var(--linie);
+  padding: 0.5rem 0;
+}
+.vorgaenge li:first-child {
+  border-top: none;
+}
+.stufen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.3rem;
+}
+.stufe {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.entwurf {
+  border: 1px solid var(--akzent);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 0.8rem;
+  background: #f8fbf9;
+}
+.entwurf h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+.entwurf label {
+  display: block;
+  margin: 0.4rem 0;
+  font-size: 0.85rem;
+}
+.entwurf input {
+  margin-top: 0.15rem;
+}
+.pflicht {
+  color: var(--rot);
+  margin-left: 0.1rem;
+}

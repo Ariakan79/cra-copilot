@@ -41,6 +41,9 @@ importers:
       '@cra-copilot/aufnahme-katalog':
         specifier: workspace:*
         version: link:../../packages/aufnahme-katalog
+      '@cra-copilot/meldung-vorlagen':
+        specifier: workspace:*
+        version: link:../../packages/meldung-vorlagen
       '@cra-copilot/rules-engine':
         specifier: workspace:*
         version: link:../../packages/rules-engine
@@ -185,6 +188,31 @@ importers:
         version: 7.3.5(@types/node@22.19.21)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/aufnahme-katalog:
+    dependencies:
+      zod:
+        specifier: ^4.1.0
+        version: 4.4.3
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^22.19.21
+        version: 22.19.21
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.2.0
+      tsx:
+        specifier: ^4.20.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.0
+        version: 3.2.6(@types/node@22.19.21)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/meldung-vorlagen:
     dependencies:
       zod:
         specifier: ^4.1.0
