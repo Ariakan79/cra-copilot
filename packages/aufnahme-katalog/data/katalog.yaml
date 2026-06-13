@@ -117,7 +117,10 @@ bloecke:
         optionen:
           - { wert: hardware, text: { de: 'Hardware-Anteil' } }
           - { wert: lokale_software, text: { de: 'Lokale Software' } }
-          - { wert: entfernte_datenverarbeitung, text: { de: 'Erforderliche entfernte Datenverarbeitung' } }
+          - {
+              wert: entfernte_datenverarbeitung,
+              text: { de: 'Erforderliche entfernte Datenverarbeitung' },
+            }
           - { wert: companion_app, text: { de: 'Companion-App' } }
           - { wert: bibliotheken, text: { de: 'Mitgelieferte Bibliotheken' } }
         konsumenten: [sbom_profil, technische_doku_annex_vii, betroffenheitsmatrix]
@@ -201,7 +204,8 @@ bloecke:
   - id: block_3_risikokontext
     nummer: 3
     titel: { de: 'Einsatzumgebung & Risikokontext' }
-    ziel: { de: 'Bestimmungsgemäße Verwendung und Bedrohungskontext — Fundament der Risikobewertung.' }
+    ziel:
+      { de: 'Bestimmungsgemäße Verwendung und Bedrohungskontext — Fundament der Risikobewertung.' }
     ebene: produkt
     felder:
       - id: r_bestimmungsgemaesse_verwendung
@@ -290,14 +294,18 @@ bloecke:
           bei_werten: [teilweise, nicht_erfuellt]
           prioritaet: kritisch
           annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil I Nr. 2 lit. c' }
-          hinweis: { de: 'Sicherer Update-Mechanismus ist nicht vollständig umgesetzt — hohe Priorität.' }
+          hinweis:
+            { de: 'Sicherer Update-Mechanismus ist nicht vollständig umgesetzt — hohe Priorität.' }
         review_status: pending
 
   # ============================================================ Block 4
   - id: block_4_schwachstellenmanagement
     nummer: 4
     titel: { de: 'Schwachstellenmanagement-Prozess' }
-    ziel: { de: 'Den gelebten (oder fehlenden) Prozess erfassen — hier entstehen die meisten Hausaufgaben.' }
+    ziel:
+      {
+        de: 'Den gelebten (oder fehlenden) Prozess erfassen — hier entstehen die meisten Hausaufgaben.',
+      }
     ebene: mandant_mit_override
     felder:
       - id: s_cvd_policy_vorhanden
@@ -337,7 +345,8 @@ bloecke:
         review_status: pending
       - id: s_sicherheitsupdates_kostenlos_getrennt
         typ: ja_nein
-        frage: { de: 'Sind Sicherheitsupdates kostenlos und getrennt von Funktionsupdates möglich?' }
+        frage:
+          { de: 'Sind Sicherheitsupdates kostenlos und getrennt von Funktionsupdates möglich?' }
         ebene: mandant_mit_override
         konsumenten: [technische_doku_annex_vii, support_zeitraum_erklaerung]
         annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 8' }
@@ -345,7 +354,8 @@ bloecke:
           bei_werten: ['nein']
           prioritaet: hoch
           annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang I Teil II Nr. 8' }
-          hinweis: { de: 'Sicherheitsupdates sind nicht kostenlos/getrennt — CRA-Pflicht verletzt.' }
+          hinweis:
+            { de: 'Sicherheitsupdates sind nicht kostenlos/getrennt — CRA-Pflicht verletzt.' }
         review_status: pending
       - id: s_meldung_csirt_zustaendig
         typ: text
@@ -364,7 +374,8 @@ bloecke:
           bei_werten: ['nein']
           prioritaet: mittel
           annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2' }
-          hinweis: { de: '24h-Frühwarnung ist nicht realistisch sichergestellt — Eskalationsweg klären.' }
+          hinweis:
+            { de: '24h-Frühwarnung ist nicht realistisch sichergestellt — Eskalationsweg klären.' }
         review_status: pending
 
   # ============================================================ Block 5
@@ -412,7 +423,8 @@ bloecke:
   - id: block_6_lieferkette
     nummer: 6
     titel: { de: 'Lieferkette & Komponenten' }
-    ziel: { de: 'Sorgfaltspflichten und Build-Realität erfassen — Vorbereitung für das SBOM-Profil.' }
+    ziel:
+      { de: 'Sorgfaltspflichten und Build-Realität erfassen — Vorbereitung für das SBOM-Profil.' }
     ebene: mandant_mit_override
     felder:
       - id: l_komponentenherkunft
@@ -433,7 +445,10 @@ bloecke:
         review_status: pending
       - id: l_due_diligence
         typ: text
-        frage: { de: 'Due-Diligence-Praxis bei Drittkomponenten (Auswahlkriterien, Sicherheitszusagen)?' }
+        frage:
+          {
+            de: 'Due-Diligence-Praxis bei Drittkomponenten (Auswahlkriterien, Sicherheitszusagen)?',
+          }
         ebene: mandant_mit_override
         konsumenten: [risikobewertung, technische_doku_annex_vii]
         review_status: pending
@@ -522,7 +537,10 @@ bloecke:
         review_status: pending
       - id: d_ce_prozess_definiert
         typ: ja_nein
-        frage: { de: 'Ist der CE-Kennzeichnungsprozess definiert (wer zeichnet die Konformitätserklärung)?' }
+        frage:
+          {
+            de: 'Ist der CE-Kennzeichnungsprozess definiert (wer zeichnet die Konformitätserklärung)?',
+          }
         ebene: produkt
         konsumenten: [konformitaetserklaerung]
         gap_regel:
@@ -533,7 +551,10 @@ bloecke:
         review_status: pending
       - id: d_benutzerinfo_integriert
         typ: ja_nein
-        frage: { de: 'Sind kundensichtbare Angaben (Kontaktstelle, Support-Zeitraum, Update-Anleitung) integriert?' }
+        frage:
+          {
+            de: 'Sind kundensichtbare Angaben (Kontaktstelle, Support-Zeitraum, Update-Anleitung) integriert?',
+          }
         ebene: produkt
         konsumenten: [technische_doku_annex_vii, support_zeitraum_erklaerung]
         annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang II' }

@@ -1,10 +1,28 @@
 # Aufnahme-Leitfaden — Spezifikation für das Cockpit-Modul
 
+> **Änderungsvermerk 2026-06-13 (Phase-2-Architektur, ADR-017/018/019):** Drei
+> mit dem Director abgestimmte Abweichungen von der ursprünglichen Fassung sind
+> im Cockpit umgesetzt und unten an den betroffenen Stellen mit
+> **[Abw. ADR-0xx]** markiert:
+> - **Block 4 & 6 (ADR-017):** Organisationsweite Felder (CVD-Prozess,
+>   Build-Umgebung, Due-Diligence) werden auf Mandantenebene als Default erfasst
+>   und pro Produkt überschreibbar — nicht je Produkt dupliziert.
+> - **Block 7 (ADR-018):** Pro Produkt **mehrere SBOM-Streams** (z. B. Firmware,
+>   Cloud-Backend, Companion-App); `pflichtfelder` werden aus `konformitaetsziel`
+>   abgeleitet statt im Profil redundant gelistet.
+> - **Abschluss (ADR-019):** Zwei getrennte Stati — `workshop_durchgefuehrt`
+>   (Cockpit, alle Blöcke bearbeitet) und `onboarding_abgeschlossen` (Portal,
+>   erste profilkonforme SBOM-Lieferung). Gaps haben einen Lebenszyklus
+>   (offen → in_arbeit → erledigt → verifiziert); unbearbeitete Gaps verschwinden
+>   bei Datenkorrektur automatisch.
+
 **Zweck:** Strukturiertes Interview pro Produkt, geführt im Workshop. Jede Antwort wird
 als Evidenzknoten persistiert (Quelle: "Kundenaussage Aufnahmegespräch", Datum, Person,
 Gesprächsleiter). Output: vollständiger Stammdatensatz + SBOM-Profil + Gap-Liste +
-Hausaufgabenkatalog. Der Workshop ist abgeschlossen, wenn die erste profilkonforme
-SBOM-Lieferung im Portal eingegangen ist.
+Hausaufgabenkatalog. Der Workshop **im Cockpit** ist abgeschlossen, wenn alle Blöcke
+bearbeitet sind (`workshop_durchgefuehrt`); das **Onboarding** gilt als abgeschlossen,
+wenn die erste profilkonforme SBOM-Lieferung im Portal eingegangen ist
+(`onboarding_abgeschlossen`, Phase 3). [Abw. ADR-019]
 
 **Grundprinzipien für die Cockpit-Implementierung:**
 
@@ -114,7 +132,7 @@ Portals (Einsatzumgebung steuert Exploitability-Vorschläge).
 
 ---
 
-## Block 4 — Schwachstellenmanagement-Prozess *(Annex I Teil II)*
+## Block 4 — Schwachstellenmanagement-Prozess *(Annex I Teil II)* — [Abw. ADR-017: Mandantenebene mit Produkt-Override]
 
 **Ziel:** Den gelebten (oder fehlenden) Prozess erfassen. Hier entstehen die meisten
 Hausaufgaben.
@@ -153,7 +171,7 @@ Portal-Konfiguration (Monitoring endet nicht vor Support-Ende → Abo-Laufzeit-A
 
 ---
 
-## Block 6 — Lieferkette & Komponenten
+## Block 6 — Lieferkette & Komponenten — [Abw. ADR-017: Build-Umgebung/Due-Diligence auf Mandantenebene]
 
 **Ziel:** Sorgfaltspflichten gegenüber Zulieferern und die Build-Realität erfassen —
 Vorbereitung für das SBOM-Profil.
@@ -172,26 +190,26 @@ technische Doku.
 
 ---
 
-## Block 7 — SBOM-Profil *(maschinenlesbarer Output, JSON/YAML)*
+## Block 7 — SBOM-Profil *(maschinenlesbarer Output, JSON/YAML)* — [Abw. ADR-018: mehrere Streams pro Produkt, Pflichtfelder abgeleitet]
 
 **Ziel:** Der technische Handshake zwischen Workshop und Portal. Pro Produkt ein
-Profil, gegen das die Ingestion validiert.
+Profil mit **einem oder mehreren SBOM-Streams** (z. B. Firmware, Cloud-Backend,
+Companion-App), gegen das die Ingestion validiert.
 
-**Profilfelder:**
+**Profilfelder** *(ADR-018: `pflichtfelder` werden aus `konformitaetsziel`
+abgeleitet — versionierte Stammdaten je Zielniveau — und nicht mehr redundant im
+Profil gelistet; `erzeugung`/`lieferung` sind pro Stream):*
 ```yaml
 produkt_id: ...
-format: cyclonedx | spdx          # inkl. Versionsangabe
-konformitaetsziel: bsi_tr_03183_2 # Zielniveau; Abweichungen unten begründet
+konformitaetsziel: bsi_tr_03183_2 # Zielniveau; leitet die Pflichtfelder ab
 mindesttiefe: vollstaendig_transitiv | top_level_plus_known_critical
-pflichtfelder: [lieferant, name, version, eindeutige_id, abhaengigkeitsbeziehung, ersteller, zeitstempel]
-erzeugung:
-  tool: syft | trivy | cdxgen | eigenbau
-  ci_job: <referenz>
-  verantwortlich: <person/rolle>
-lieferung:
-  kanal: ci_webhook | api_token | manueller_upload
-  trigger: [release, hotfix, dependency_change]
-  max_age_heartbeat_tage: 90      # Bestätigung oder Neulieferung, sonst Eskalation
+streams:                          # [Abw. ADR-018] mehrere Erzeugungspfade
+  - name: Firmware
+    format: cyclonedx | spdx        # inkl. Versionsangabe
+    tool: syft | trivy | cdxgen | eigenbau
+    ci_job: <referenz>
+    kanal: ci_webhook | api_token | manueller_upload
+    max_age_heartbeat_tage: 90      # Bestätigung oder Neulieferung, sonst Eskalation
 abweichungen:
   - feld: ...
     begruendung: ...

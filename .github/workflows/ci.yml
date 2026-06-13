@@ -6,35 +6,54 @@ on:
   pull_request:
 
 jobs:
-  ci:
+  # Engine, Katalog, Wizard: kein Docker nötig, schneller Lauf.
+  einheit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
-
       - name: Install
         run: pnpm install --frozen-lockfile
-
       - name: Lint
         run: pnpm run lint
-
       - name: Typecheck
         run: pnpm run typecheck
-
-      - name: Test (Unit, Golden Cases, Properties, Datenvalidierung)
-        run: pnpm run test
-
-      - name: Build
-        run: pnpm run build
-
+      - name: Test (rules-engine, aufnahme-katalog)
+        run: |
+          pnpm --filter @cra-copilot/rules-engine run test
+          pnpm --filter @cra-copilot/aufnahme-katalog run test
+      - name: Build (rules-engine, wizard)
+        run: |
+          pnpm --filter @cra-copilot/rules-engine run build
+          pnpm --filter @cra-copilot/wizard run build
       - name: Playwright-Browser installieren
         run: pnpm --filter @cra-copilot/wizard exec playwright install --with-deps chromium
+      - name: Wizard-E2E
+        run: pnpm --filter @cra-copilot/wizard run e2e
 
-      - name: E2E (Playwright)
-        run: pnpm run e2e
+  # API & Cockpit: brauchen Docker (Testcontainers/Postgres) — eigener Job.
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck (api, cockpit)
+        run: |
+          pnpm --filter @cra-copilot/api run typecheck
+          pnpm --filter @cra-copilot/cockpit run typecheck
+      - name: API-Tests (Testcontainers-Postgres)
+        run: pnpm --filter @cra-copilot/api run test
+      - name: Playwright-Browser installieren
+        run: pnpm --filter @cra-copilot/cockpit exec playwright install --with-deps chromium
+      - name: Cockpit-E2E (echte API + Postgres)
+        run: pnpm --filter @cra-copilot/cockpit run e2e
