@@ -17,20 +17,65 @@ empfaenger:
 # --- Fristen ----------------------------------------------------------------
 fristen:
   # Aktiv ausgenutzte Schwachstelle
-  - { stufe: fruehwarnung, art: schwachstelle, bezug: eroeffnet_am, stunden: 24, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. a' }, review_status: pending }
-  - { stufe: meldung, art: schwachstelle, bezug: eroeffnet_am, stunden: 72, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' }, review_status: pending }
-  - { stufe: abschluss, art: schwachstelle, bezug: korrekturmassnahme_ab, tage: 14, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. c' }, review_status: pending }
+  - {
+      stufe: fruehwarnung,
+      art: schwachstelle,
+      bezug: eroeffnet_am,
+      stunden: 24,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. a' },
+      review_status: pending,
+    }
+  - {
+      stufe: meldung,
+      art: schwachstelle,
+      bezug: eroeffnet_am,
+      stunden: 72,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' },
+      review_status: pending,
+    }
+  - {
+      stufe: abschluss,
+      art: schwachstelle,
+      bezug: korrekturmassnahme_ab,
+      tage: 14,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. c' },
+      review_status: pending,
+    }
   # Schwerwiegender Sicherheitsvorfall
-  - { stufe: fruehwarnung, art: vorfall, bezug: eroeffnet_am, stunden: 24, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' }, review_status: pending }
-  - { stufe: meldung, art: vorfall, bezug: eroeffnet_am, stunden: 72, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. b' }, review_status: pending }
-  - { stufe: abschluss, art: vorfall, bezug: meldung_eingereicht_am, tage: 30, referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' }, review_status: pending }
+  - {
+      stufe: fruehwarnung,
+      art: vorfall,
+      bezug: eroeffnet_am,
+      stunden: 24,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' },
+      review_status: pending,
+    }
+  - {
+      stufe: meldung,
+      art: vorfall,
+      bezug: eroeffnet_am,
+      stunden: 72,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. b' },
+      review_status: pending,
+    }
+  - {
+      stufe: abschluss,
+      art: vorfall,
+      bezug: meldung_eingereicht_am,
+      tage: 30,
+      referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' },
+      review_status: pending,
+    }
 
 # --- Feldvorlagen je Stufe/Typ ----------------------------------------------
 vorlagen:
   - stufe: fruehwarnung
     art: schwachstelle
     titel: { de: 'Frühwarnung — aktiv ausgenutzte Schwachstelle' }
-    hinweis: { de: 'Binnen 24 Stunden ab Kenntnis. Knappe Erstinformation, Details folgen in der 72h-Meldung.' }
+    hinweis:
+      {
+        de: 'Binnen 24 Stunden ab Kenntnis. Knappe Erstinformation, Details folgen in der 72h-Meldung.',
+      }
     felder:
       - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
       - { id: schwachstelle, label: { de: 'Schwachstellenkennung (CVE/OSV) bzw. Beschreibung' } }
@@ -48,7 +93,10 @@ vorlagen:
       - { id: schwachstelle, label: { de: 'Schwachstellenkennung und technische Beschreibung' } }
       - { id: ausnutzungsmethode, label: { de: 'Bekannte Ausnutzungsmethode' } }
       - { id: betroffene_nutzer, label: { de: 'Geschätzter Umfang betroffener Nutzer/Geräte' } }
-      - { id: korrekturmassnahme, label: { de: 'Geplante/verfügbare Korrektur- oder Eindämmungsmaßnahmen' } }
+      - {
+          id: korrekturmassnahme,
+          label: { de: 'Geplante/verfügbare Korrektur- oder Eindämmungsmaßnahmen' },
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' }
     review_status: pending
 
@@ -71,7 +119,11 @@ vorlagen:
     felder:
       - { id: produkt, label: { de: 'Betroffenes Produkt (Name, Version)' } }
       - { id: vorfall, label: { de: 'Kurzbeschreibung des Vorfalls' } }
-      - { id: auswirkung, label: { de: 'Erste Einschätzung der Auswirkung (Verfügbarkeit/Integrität/Vertraulichkeit)' } }
+      - {
+          id: auswirkung,
+          label:
+            { de: 'Erste Einschätzung der Auswirkung (Verfügbarkeit/Integrität/Vertraulichkeit)' },
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' }
     review_status: pending
 

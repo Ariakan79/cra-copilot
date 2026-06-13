@@ -85,7 +85,10 @@ test('Block 2: Engine-Vorschlag erscheint und lässt sich übernehmen', async ({
 
   // Block 2: Vorschlag muss wichtig_klasse_1 empfehlen.
   await page.locator('.block-tab', { hasText: '2.' }).click();
-  await expect(page.getByTestId('vorschlag-kategorie')).toHaveAttribute('data-wert', 'wichtig_klasse_1');
+  await expect(page.getByTestId('vorschlag-kategorie')).toHaveAttribute(
+    'data-wert',
+    'wichtig_klasse_1',
+  );
   await page.getByTestId('vorschlag-uebernehmen').click();
   // Nach Übernahme ist k_kategorie als Evidenz gesetzt (Chip aktiv).
   await expect(
