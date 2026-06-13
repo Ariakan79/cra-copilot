@@ -1,4 +1,4 @@
-import katalogJson from './katalog.gen.json';
+import katalogJson from './katalog.gen.json' with { type: 'json' };
 import { KatalogSchema, type Katalog } from './schema';
 
 /**

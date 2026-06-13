@@ -5,7 +5,7 @@ import {
   type Ampel,
   type FeldWert,
 } from '@cra-copilot/aufnahme-katalog';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, notInArray } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import { GAP_STATI, gap, type GapStatus } from '../db/schema';
 import { alleAktuellenWerte, ValidierungsFehler } from './evidenz';
@@ -30,21 +30,29 @@ export async function synchronisiereGaps(
   produktId: string,
 ): Promise<void> {
   const werte = await alleAktuellenWerte(db, mandantId, produktId);
+  const ausloesend: string[] = [];
   for (const block of katalog.bloecke) {
     for (const feld of block.felder) {
       const befund = gapFuerFeld(feld, werte[feld.id]);
       if (befund === null) continue;
+      ausloesend.push(feld.id);
       await db
         .insert(gap)
-        .values({
-          mandantId,
-          produktId,
-          feldId: feld.id,
-          prioritaet: befund.prioritaet,
-        })
+        .values({ mandantId, produktId, feldId: feld.id, prioritaet: befund.prioritaet })
         .onConflictDoNothing({ target: [gap.mandantId, gap.produktId, gap.feldId] });
     }
   }
+
+  // Datenkorrektur: noch unbearbeitete (status 'offen') Gaps, die nicht mehr
+  // auslösen, sind durch die neue Evidenz erledigt und verschwinden. Bereits
+  // bearbeitete Gaps (in_arbeit/erledigt/verifiziert) bleiben zur Nachvollzieh-
+  // barkeit erhalten (Existenz abgeleitet, Bearbeitung ist Zustand — ADR-019).
+  const offenWeg = and(
+    eq(gap.produktId, produktId),
+    eq(gap.status, 'offen'),
+    ausloesend.length > 0 ? notInArray(gap.feldId, ausloesend) : undefined,
+  );
+  await db.delete(gap).where(offenWeg);
 }
 
 export async function setzeGapStatus(db: DB, gapId: string, neu: GapStatus): Promise<void> {
