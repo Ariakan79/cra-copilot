@@ -22,10 +22,11 @@ jobs:
         run: pnpm run lint
       - name: Typecheck
         run: pnpm run typecheck
-      - name: Test (rules-engine, aufnahme-katalog)
+      - name: Test (rules-engine, aufnahme-katalog, meldung-vorlagen)
         run: |
           pnpm --filter @cra-copilot/rules-engine run test
           pnpm --filter @cra-copilot/aufnahme-katalog run test
+          pnpm --filter @cra-copilot/meldung-vorlagen run test
       - name: Build (rules-engine, wizard)
         run: |
           pnpm --filter @cra-copilot/rules-engine run build

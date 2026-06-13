@@ -38,7 +38,12 @@ vor statt still anzunehmen.
   (ADR-022: Matching offline, keine Komponentenliste verlässt das System),
   kontinuierliche Findings (ADR-027/028), Heartbeat (Lieferdisziplin, ADR-026),
   einfaches Login + Ingestion-Tokens (ADR-025). Teilt API/Domänenmodell (ADR-023).
-  Meldeworkflow an ENISA/CSIRT ist Phase 4.
+- `packages/meldung-vorlagen`: Art-14-Fristen + Feldvorlagen als versionierte
+  Daten (ADR-033, Muster wie Regelwerk/Katalog). **Meldeworkflow** (Phase 4,
+  ADR-029–034): Meldevorgang aus Finding (menschliche „aktiv-ausgenutzt"-
+  Einstufung, ADR-034) oder frei; Stufen 24h/72h/Abschluss mit abgeleiteten
+  Fristen (ADR-032); Entwurf zum **manuellen** Absenden über ENISA/CSIRT
+  (ADR-030, kein Auto-Outbound); eingereichte Stufen unveränderlich.
 - Regulatorische Referenzen sind **Daten, nicht Code** (ADR-003); Sprache Deutsch,
   i18n-Struktur ohne i18n-Lib (ADR-004, ADR-011).
 - Bei Einfachheit vs. Erweiterbarkeit gewinnt Einfachheit, solange ADR-001..005
@@ -83,9 +88,9 @@ CI (`.github/workflows/ci.yml`) hat zwei Jobs: `einheit` (ohne Docker) und
 - Conventional Commits, kleine Commits pro logischer Einheit.
 - **Commit nur bei grünem Teststand.** Nach jedem Arbeitspaket: Tests, Commit,
   kurzes Summary an den Director.
-- Datendaten-Änderungen: Regelwerk → Git-Tag `rules-v0.x` + Changelog;
-  Aufnahme-Katalog → Git-Tag `katalog-v0.x` + Changelog. Tag-Gate ist je
-  **0 `review_status: pending`** (Director-Freigabe vollständig).
+- Datendaten-Änderungen: Regelwerk → `rules-v0.x`; Aufnahme-Katalog →
+  `katalog-v0.x`; Meldung-Vorlagen → `meldung-v0.x` (je + Changelog). Tag-Gate
+  ist je **0 `review_status: pending`** (Director-Freigabe vollständig).
 - DB-Migrationen liegen als nummerierte SQL in `apps/api/drizzle/` (inkl.
   Custom-Trigger); der schlanke Migrator in `src/db/migrate.ts` führt sie der
   Reihe nach aus. Neue Migration = neue `NNNN_*.sql`, nie bestehende ändern.
