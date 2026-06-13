@@ -6,7 +6,12 @@
   "exports": {
     "./app": "./src/app.ts",
     "./db/client": "./src/db/client.ts",
-    "./db/migrate": "./src/db/migrate.ts"
+    "./db/migrate": "./src/db/migrate.ts",
+    "./db/schema": "./src/db/schema.ts",
+    "./portal/auth": "./src/portal/auth.ts",
+    "./portal/ingestion": "./src/portal/ingestion.ts",
+    "./portal/osv-spiegel": "./src/portal/osv-spiegel.ts",
+    "./portal/findings": "./src/portal/findings.ts"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",

@@ -87,6 +87,11 @@ export function buildApp(db: DB): FastifyInstance {
     return reply.status(201).send(zeile);
   });
 
+  app.get('/mandanten/:id/produkte', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    return db.select().from(produkt).where(eq(produkt.mandantId, id));
+  });
+
   // Evidenz setzen (append-only; Supersession in der Domänenschicht).
   app.post('/produkte/:id/evidenz', async (req, reply) => {
     const { id } = z.object({ id: z.string().uuid() }).parse(req.params);

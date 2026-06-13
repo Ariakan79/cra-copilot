@@ -1,0 +1,232 @@
+:root {
+  --tinte: #1b2733;
+  --leise: #5a6b7b;
+  --flaeche: #eef1f4;
+  --karte: #fff;
+  --akzent: #14532d;
+  --linie: #d3dae1;
+  --rot: #b91c1c;
+  --gelb: #b45309;
+  --gruen: #15803d;
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--flaeche);
+  color: var(--tinte);
+  line-height: 1.5;
+}
+.kopf {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: var(--karte);
+  border-bottom: 1px solid var(--linie);
+}
+.lokal {
+  font-size: 0.8rem;
+  color: var(--akzent);
+}
+.fehler {
+  background: #fef2f2;
+  color: var(--rot);
+  border: 1px solid var(--rot);
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+.karte {
+  max-width: 44rem;
+  margin: 1rem auto;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+.schmal {
+  max-width: 22rem;
+}
+label {
+  display: block;
+  margin: 0.6rem 0;
+  font-size: 0.92rem;
+}
+input {
+  display: block;
+  width: 100%;
+  margin-top: 0.2rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--linie);
+  border-radius: 6px;
+  font: inherit;
+}
+button {
+  font: inherit;
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.primaer {
+  background: var(--akzent);
+  color: #fff;
+}
+.primaer:disabled {
+  background: var(--leise);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.sekundaer {
+  background: transparent;
+  border-color: var(--linie);
+  color: var(--tinte);
+}
+.klein {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: start;
+}
+.produkte {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.produkt-tab {
+  text-align: left;
+  background: var(--karte);
+  border: 1px solid var(--linie);
+}
+.produkt-tab.aktiv {
+  border-color: var(--akzent);
+  background: #e7f3ec;
+}
+.inhalt {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.block {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+.block h2 {
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+td {
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--linie);
+}
+.ampel {
+  display: inline-block;
+  padding: 0 0.5rem;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.82rem;
+}
+.ampel.aktuell {
+  background: var(--gruen);
+}
+.ampel.ueberfaellig {
+  background: var(--rot);
+}
+.ampel.keine_lieferung {
+  background: var(--leise);
+}
+.leise {
+  color: var(--leise);
+  font-size: 0.85rem;
+}
+.findings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.findings li {
+  border-top: 1px solid var(--linie);
+  padding: 0.5rem 0;
+}
+.findings li:first-child {
+  border-top: none;
+}
+.finding-kopf {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.schwere {
+  background: var(--rot);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.triage-status {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--leise);
+}
+.hinweis {
+  font-size: 0.82rem;
+  color: var(--gelb);
+  margin: 0.25rem 0;
+}
+.triage-knoepfe {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+.triage-knoepfe button {
+  background: transparent;
+  border: 1px solid var(--linie);
+}
+.lieferungen {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.lieferungen li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--linie);
+}
+.konform {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 0 0.4rem;
+  font-size: 0.78rem;
+  color: #fff;
+  margin-right: 0.3rem;
+}
+.konform.ja {
+  background: var(--gruen);
+}
+.konform.nein {
+  background: var(--gelb);
+}
+.token code {
+  background: #f4f6f8;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  word-break: break-all;
+}
