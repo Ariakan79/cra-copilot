@@ -227,6 +227,28 @@ export const komponente = pgTable(
   (t) => [index('komponente_scope_idx').on(t.produktId, t.streamName)],
 );
 
+/**
+ * Lokaler OSV-Spiegel (ADR-022): periodisch aus den öffentlichen OSV-Exporten
+ * gefüllt; das Matching läuft offline gegen diese Tabelle (keine Komponenten-
+ * liste verlässt das System). Denormalisiert: eine Zeile je betroffenem
+ * Paket-Versionsbereich.
+ */
+export const osvAdvisory = pgTable(
+  'osv_advisory',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    osvId: text('osv_id').notNull(),
+    ecosystem: text('ecosystem').notNull(),
+    paket: text('paket').notNull(),
+    eingefuehrt: text('eingefuehrt').notNull().default('0'),
+    behoben: text('behoben'),
+    schweregrad: text('schweregrad'),
+    zusammenfassung: text('zusammenfassung'),
+    zurueckgezogen: boolean('zurueckgezogen').notNull().default(false),
+  },
+  (t) => [index('osv_paket_idx').on(t.ecosystem, t.paket)],
+);
+
 export const FINDING_STATI = [
   'neu',
   'in_pruefung',

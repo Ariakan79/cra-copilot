@@ -16,6 +16,7 @@ import {
 } from './db/schema';
 import { hashPasswort, neuesToken, produktFuerToken, pruefePasswort } from './portal/auth';
 import { ingest } from './portal/ingestion';
+import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import {
   alleAktuellenWerte,
   setzeEvidenz,
@@ -282,13 +283,17 @@ export function buildApp(db: DB): FastifyInstance {
         sbom: z.unknown(),
       })
       .parse(req.body);
-    const ergebnis = await ingest(db, {
-      produktId,
-      streamName: body.streamName,
-      kanal: 'api_token',
-      trigger: body.trigger,
-      roh: body.sbom,
-    });
+    const ergebnis = await ingest(
+      db,
+      {
+        produktId,
+        streamName: body.streamName,
+        kanal: 'api_token',
+        trigger: body.trigger,
+        roh: body.sbom,
+      },
+      bewerteFindings,
+    );
     return reply.status(ergebnis.profilKonform ? 201 : 422).send(ergebnis);
   });
 
@@ -300,13 +305,17 @@ export function buildApp(db: DB): FastifyInstance {
     const body = z
       .object({ streamName: z.string().min(1), trigger: z.string().optional(), sbom: z.unknown() })
       .parse(req.body);
-    const ergebnis = await ingest(db, {
-      produktId: id,
-      streamName: body.streamName,
-      kanal: 'manueller_upload',
-      trigger: body.trigger,
-      roh: body.sbom,
-    });
+    const ergebnis = await ingest(
+      db,
+      {
+        produktId: id,
+        streamName: body.streamName,
+        kanal: 'manueller_upload',
+        trigger: body.trigger,
+        roh: body.sbom,
+      },
+      bewerteFindings,
+    );
     return reply.status(ergebnis.profilKonform ? 201 : 422).send(ergebnis);
   });
 
@@ -341,6 +350,26 @@ export function buildApp(db: DB): FastifyInstance {
       .select()
       .from(finding)
       .where(and(eq(finding.produktId, id), eq(finding.behobenDurchDaten, false)));
+  });
+
+  // Triage eines Findings (ADR-027): nur erlaubte Übergänge.
+  app.patch('/findings/:findingId', async (req, reply) => {
+    const { findingId } = z.object({ findingId: z.string().uuid() }).parse(req.params);
+    const body = z
+      .object({ status: z.enum(['neu', 'in_pruefung', 'bestaetigt', 'nicht_relevant', 'behoben']) })
+      .parse(req.body);
+    await setzeFindingTriage(db, findingId, body.status);
+    return reply.status(204).send();
+  });
+
+  // Neubewertung anstoßen (z. B. nach OSV-Sync) — kontinuierlich gegen das
+  // unveränderte SBOM (ADR-028).
+  app.post('/produkte/:id/neubewertung', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const mandantId = await mandantVon(db, id);
+    if (mandantId === undefined) return reply.status(404).send({ fehler: 'Produkt unbekannt' });
+    await bewerteFindings(db, mandantId, id);
+    return reply.status(204).send();
   });
 
   // Einfaches UI-Login (ADR-025). Self-hosted: ein Mandant pro Instanz.
