@@ -18,6 +18,7 @@ import {
   setzeGapStatus,
   synchronisiereGaps,
 } from './domain/gaps';
+import { klassifizierungsvorschlag } from './domain/klassifizierung';
 import { baueSbomProfil, sbomProfilAlsYaml } from './domain/sbom-profil';
 import { markiereWorkshopDurchgefuehrt, workshopStatus } from './domain/workshop';
 
@@ -110,6 +111,14 @@ export function buildApp(db: DB): FastifyInstance {
     const mandantId = await mandantVon(db, id);
     if (mandantId === undefined) return reply.status(404).send({ fehler: 'Produkt unbekannt' });
     return alleAktuellenWerte(db, mandantId, id);
+  });
+
+  // Klassifizierungs-Vorschlag der Regel-Engine aus den Block-1-Daten (Block 2).
+  app.get('/produkte/:id/klassifizierungsvorschlag', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const mandantId = await mandantVon(db, id);
+    if (mandantId === undefined) return reply.status(404).send({ fehler: 'Produkt unbekannt' });
+    return klassifizierungsvorschlag(db, mandantId, id);
   });
 
   app.get('/produkte/:id/blockstatus', async (req, reply) => {

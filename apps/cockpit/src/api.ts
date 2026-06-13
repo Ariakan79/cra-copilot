@@ -24,6 +24,16 @@ export interface Gap {
   frist: string | null;
 }
 
+export interface Klassifizierungsvorschlag {
+  vorschlag:
+    | { geltungsbereich: 'in_scope'; kategorie?: string; sonderregime?: string }
+    | { geltungsbereich: 'ausserhalb' | 'ausgenommen' }
+    | null;
+  begruendungspfad: { regel_id: string; titel: string; begruendung: string }[];
+  annahmen: string[];
+  fehlende_eingaben: string[];
+}
+
 export interface SbomProfil {
   produkt_id: string;
   konformitaetsziel: string | null;
@@ -77,6 +87,9 @@ export const api = {
   },
   async blockstatus(produktId: string): Promise<BlockStatus[]> {
     return json(await fetch(`/api/produkte/${produktId}/blockstatus`));
+  },
+  async klassifizierungsvorschlag(produktId: string): Promise<Klassifizierungsvorschlag> {
+    return json(await fetch(`/api/produkte/${produktId}/klassifizierungsvorschlag`));
   },
   async gaps(produktId: string): Promise<{ produkt: Gap[]; mandant: Gap[] }> {
     return json(await fetch(`/api/produkte/${produktId}/gaps`));

@@ -291,6 +291,36 @@ button,
 .abschluss {
   color: var(--gruen);
 }
+.vorschlag {
+  background: var(--akzent-hell);
+  border: 1px solid var(--akzent);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+}
+.vorschlag h2 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+.empfehlung {
+  margin: 0.2rem 0;
+}
+.vorschlag .pfad {
+  font-size: 0.85rem;
+  margin: 0.4rem 0;
+  padding-left: 1.1rem;
+}
+.vorschlag .annahmen {
+  font-size: 0.82rem;
+  color: var(--leise);
+}
+.leise {
+  color: var(--leise);
+  font-size: 0.85rem;
+}
+.hinweis {
+  margin-bottom: 0;
+}
 
 @media print {
   .kopf,
