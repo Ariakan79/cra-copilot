@@ -214,3 +214,66 @@ Bericht-Druckansicht rendert. Gegen echte API + Testcontainers-Postgres.
 
 Bestehende Pipeline + ein Job mit Docker-in-CI (GitHub Actions unterstützt
 Testcontainers nativ). Engine-/Wizard-Jobs bleiben unverändert schnell.
+
+---
+
+## 8. Phase 3 — Portal (Ingestion & Monitoring, akzeptiert 2026-06-13)
+
+Leitgedanke unverändert: Domänenlogik trägt das Testgewicht. Neu ist
+externer-Daten-Abgleich (OSV) — dafür wird ein **lokales OSV-Fixture**
+verwendet, nie das Live-osv.dev (ADR-022: datenlokal; im Test zusätzlich
+deterministisch und offline).
+
+### 8.1 Ingestion & Profil-Validierung (Vitest + Testcontainers-Postgres)
+
+- **Golden-Lieferungen** als Fixtures: echte CycloneDX- und SPDX-SBOMs (klein,
+  je 3–5 Komponenten) — director-/reviewbar wie die Golden Cases.
+- Validierung gegen das Block-7-Profil: Format/Version passt, abgeleitete
+  Pflichtfelder vorhanden, Mindesttiefe plausibel ⇒ `profil_konform`.
+- Invarianten:
+  - I1 **Lieferungen append-only:** mehrere Uploads → alle Zeilen bleiben; die
+    Komponenten spiegeln die *jüngste profilkonforme* Lieferung.
+  - I2 Nicht-konforme Lieferung wird gespeichert, ändert aber die Komponenten
+    nicht und erzeugt eine Warnung.
+  - I3 Komponenten-Extraktion: purl/name/version je Stream korrekt; mehrere
+    Streams (Firmware + Cloud) bleiben getrennt.
+  - I4 Ingestion-Token: falsches/fehlendes Token ⇒ 401; Token autorisiert nur
+    sein eigenes Produkt (kein Cross-Produkt-Upload).
+
+### 8.2 OSV-Matching & Findings (Vitest, lokales OSV-Fixture)
+
+- **OSV-Fixture**: eine Handvoll Advisories als lokale JSON (purl-Ranges), die
+  einen Teil der Golden-Komponenten treffen.
+- M1 Match: betroffene Komponente (purl + Versionsbereich) ⇒ Finding mit
+  Schweregrad und Quelle `osv`.
+- M2 **Kontinuierliche Neubewertung gegen unverändertes SBOM** (ADR-028): neues
+  Advisory im Spiegel ⇒ neues Finding ohne neue Lieferung.
+- M3 Rückzug/Behebung: Advisory entfällt oder Komponente verschwindet ⇒ Finding
+  `behoben_durch_daten` (offene, unbearbeitete Findings verschwinden; bearbeitete
+  bleiben — analog Gap-Logik ADR-019/027).
+- M4 Triage-Übergänge `neu → in_pruefung → bestaetigt|nicht_relevant → behoben`;
+  unzulässige Übergänge abgelehnt.
+- M5 Exploitability-Hinweis: bei `r_einsatzumgebung = isoliert` schlägt die
+  Heuristik „eingeschränkt exploitierbar" vor, bei `internet_exponiert`
+  „erhöht" — **als Vorschlag**, ohne automatische Bewertung (Spec-Nicht-Ziel).
+
+### 8.3 Heartbeat (Vitest)
+
+- H1 Lieferung jünger als `max_age_heartbeat_tage` ⇒ Status `aktuell`.
+- H2 Älter ⇒ `ueberfaellig` (mit fixierter „jetzt"-Zeit, deterministisch).
+- H3 Heartbeat ignoriert die CVE-Lage (neue Findings ohne neue Lieferung ändern
+  den Heartbeat nicht — ADR-026/028-Trennung).
+
+### 8.4 Portal-E2E (Playwright, Smoke)
+
+Gegen echte API + Testcontainers-Postgres + OSV-Fixture, via global-setup wie
+beim Cockpit: Login → SBOM per Token hochladen → Lieferung als konform sehen →
+Findings-Liste erscheint → ein Finding triagieren → Heartbeat-Ampel prüfen.
+Plus: ein Test verifiziert, dass **kein** Request an ein osv.dev-Origin geht
+(Datenlokalität als ausführbare Zusicherung, analog ADR-002 beim Wizard).
+
+### 8.5 CI
+
+Der `integration`-Job deckt das Portal mit ab (Docker vorhanden). Der OSV-Sync
+selbst (Netzzugriff) läuft **nicht** in CI/Tests — Tests nutzen das Fixture; der
+Sync hat einen eigenen, manuell/skriptgetriebenen Smoke außerhalb der Pipeline.
