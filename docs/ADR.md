@@ -292,8 +292,7 @@ als Daten gepflegt (ADR-016), damit Phase 3 keine Nacherfassung braucht.
 
 ## ADR-013 — Backend: Fastify + PostgreSQL + Drizzle ORM
 
-**Status:** Stack & DB akzeptiert (Director 2026-06-12); Framework/ORM-Wahl
-vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** `apps/api` als Node/TS-Backend im Monorepo mit **Fastify**;
 Persistenz **PostgreSQL** mit **Drizzle ORM** (Schema in TS, SQL-Migrationen
@@ -334,7 +333,7 @@ dasselbe Datenschutzargument wie beim Wizard, eine Ebene höher.
 
 ## ADR-015 — Evidenzknoten: append-only mit Supersession
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Der Evidenzknoten ist das zentrale Datenobjekt (Spec,
 Grundprinzip 1). Schema:
@@ -364,7 +363,7 @@ mit normalem SQL.
 
 ## ADR-016 — Aufnahme-Katalog als versionierte Daten (`packages/aufnahme-katalog`)
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
 
 **Entscheidung:** Die Blöcke 0–8 (Felder, Typen, Enums, Erläuterungen,
 Annex-Referenzen, Gap-Regeln) liegen als versionierte YAML-Daten in einem
@@ -385,7 +384,7 @@ dieser Stammdaten (Spec, Cockpit-Verhalten Block 3).
 
 ## ADR-017 — Mandanten-Defaults mit Produkt-Override (Block 0, 4, 6)
 
-**Status:** vorgeschlagen — zur Freigabe · **⚠ Spec-Abweichung**
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung**
 
 **Entscheidung:** Felder, die beim typischen Kunden organisationsweit gelten
 (Block 4 Schwachstellenmanagement-Prozess, Block 6 Build-Umgebung/Due-Diligence,
@@ -405,7 +404,7 @@ abdeckt, ohne den Normalfall zu verdreifachen.
 
 ## ADR-018 — SBOM-Profil: mehrere Streams pro Produkt, Pflichtfelder abgeleitet
 
-**Status:** vorgeschlagen — zur Freigabe · **⚠ Spec-Abweichung**
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung**
 
 **Entscheidung:** Das SBOM-Profil (Block 7) enthält eine **Liste von
 SBOM-Streams** pro Produkt — Firmware, Cloud-Backend (entfernte
@@ -426,7 +425,7 @@ zählt — sie als Kunstprodukt abzuspalten widerspräche der eigenen Methodik.
 
 ## ADR-019 — Gap-Lebenszyklus und getrennte Abschluss-Stati
 
-**Status:** vorgeschlagen — zur Freigabe · **⚠ Spec-Abweichung (Teil 2)**
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung (Teil 2)**
 
 **Entscheidung:**
 

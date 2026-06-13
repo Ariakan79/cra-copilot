@@ -155,7 +155,7 @@ strukturell ab; ein Zahlen-Gate käme erst, wenn Engine-Code ohne Datenbezug wä
 
 ---
 
-## 7. Phase 2 — Cockpit & API (Ergänzung, Status: zur Freigabe)
+## 7. Phase 2 — Cockpit & API (Ergänzung, akzeptiert 2026-06-13)
 
 Der Leitgedanke bleibt: Domänenlogik trägt das Testgewicht, UI bekommt Smoke.
 Neu ist die Persistenzschicht — dort testen wir gegen **echtes PostgreSQL**, nie
