@@ -97,7 +97,7 @@ describe('Blockstatus-Ampel (D3)', () => {
 });
 
 describe('Review-Status', () => {
-  it('alle Katalogfelder sind noch ungereviewt (pending) — Tag-Gate', () => {
-    expect(offeneReviews(katalog).length).toBe(alleFelder(katalog).length);
+  it('alle Katalogfelder sind fachlich freigegeben — Tag-Gate für katalog-v0.1', () => {
+    expect(offeneReviews(katalog)).toEqual([]);
   });
 });
