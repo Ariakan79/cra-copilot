@@ -61,6 +61,38 @@ test('Zahl-Feld (Support-Zeitraum, Block 5) lässt sich ohne Fehler erfassen', a
   await expect(page.getByTestId('fehler')).toHaveCount(0);
 });
 
+test('Block 2: Engine-Vorschlag erscheint und lässt sich übernehmen', async ({ page }) => {
+  await aufnahmeStarten(page);
+  // Block 0: Rolle Hersteller erfassen (Mandantenebene).
+  const rollen = page.locator('[data-feld-id="m_rollen"]');
+  await rollen.getByRole('button', { name: 'Hersteller', exact: true }).click();
+  await rollen.getByRole('button', { name: 'Auswahl speichern' }).click();
+
+  // Block 1: Produktumfang, Inverkehrbringen, Ausnahmebereich, Produktgruppe.
+  await page.locator('.block-tab', { hasText: '1.' }).click();
+  const umfang = page.locator('[data-feld-id="p_produktumfang"]');
+  await umfang.getByRole('button', { name: 'Lokale Software', exact: true }).click();
+  await umfang.getByRole('button', { name: 'Auswahl speichern' }).click();
+  const ivk = page.locator('[data-feld-id="p_inverkehrbringen"]');
+  await ivk.getByRole('button', { name: 'Bereits am Markt', exact: true }).click();
+  const ausn = page.locator('[data-feld-id="p_ausnahmebereich"]');
+  await ausn.getByRole('button', { name: 'Keiner', exact: true }).click();
+  const oss = page.locator('[data-feld-id="p_oss_konstellation"]');
+  await oss.getByRole('button', { name: 'Rein kommerziell', exact: true }).click();
+  const typ = page.locator('[data-feld-id="p_produkttyp"]');
+  await typ.getByRole('button', { name: 'Passwort-Manager', exact: true }).click();
+  await typ.getByRole('button', { name: 'Auswahl speichern' }).click();
+
+  // Block 2: Vorschlag muss wichtig_klasse_1 empfehlen.
+  await page.locator('.block-tab', { hasText: '2.' }).click();
+  await expect(page.getByTestId('vorschlag-kategorie')).toHaveAttribute('data-wert', 'wichtig_klasse_1');
+  await page.getByTestId('vorschlag-uebernehmen').click();
+  // Nach Übernahme ist k_kategorie als Evidenz gesetzt (Chip aktiv).
+  await expect(
+    page.locator('[data-feld-id="k_kategorie"] [data-testid="gespeichert"]'),
+  ).toContainText('wichtig_klasse_1');
+});
+
 test('SBOM-Profil-Download liefert YAML', async ({ page }) => {
   await aufnahmeStarten(page);
   const href = await page.getByTestId('sbom-download').getAttribute('href');

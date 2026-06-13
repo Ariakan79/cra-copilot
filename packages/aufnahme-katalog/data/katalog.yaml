@@ -152,6 +152,62 @@ bloecke:
           - { wert: oss_beitrag, text: { de: 'Reiner OSS-Beitrag' } }
         konsumenten: [betroffenheitsmatrix]
         review_status: pending
+      - id: p_ausnahmebereich
+        typ: einfachauswahl
+        frage: { de: 'Fällt das Produkt in einen ausgenommenen/sektoralen Bereich?' }
+        erlaeuterung:
+          de: 'Speist die automatische Klassifizierung (Block 2). Eigenes Regime → CRA ggf. nicht anwendbar.'
+        ebene: produkt
+        optionen:
+          - { wert: keiner, text: { de: 'Keiner' } }
+          - { wert: medizinprodukt, text: { de: 'Medizinprodukt / IVD' } }
+          - { wert: kfz, text: { de: 'Fahrzeug mit Typgenehmigung' } }
+          - { wert: luftfahrt, text: { de: 'Zivile Luftfahrt' } }
+          - { wert: schiffsausruestung, text: { de: 'Schiffsausrüstung' } }
+          - { wert: verteidigung, text: { de: 'Nur Verteidigung / nationale Sicherheit' } }
+          - { wert: ersatzteil, text: { de: 'Ersatzteil für identische Komponente' } }
+        konsumenten: [betroffenheitsmatrix, konformitaetserklaerung]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 2' }
+        review_status: pending
+      - id: p_produkttyp
+        typ: mehrfachauswahl
+        frage:
+          { de: 'Entspricht das Produkt einer oder mehreren CRA-Produktgruppen (Anhang III/IV)?' }
+        erlaeuterung:
+          de: >-
+            Entscheidende Eingabe für die automatische Klassifizierung (Block 2).
+            Alle zutreffenden Gruppen wählen; die Einstufung folgt der strengsten.
+        ebene: produkt
+        optionen:
+          - { wert: passwortmanager, text: { de: 'Passwort-Manager' } }
+          - { wert: identity_management, text: { de: 'Identitäts-/Zugriffsverwaltung' } }
+          - { wert: browser, text: { de: 'Browser' } }
+          - { wert: antivirus, text: { de: 'Virenschutz / Endpoint-Schutz' } }
+          - { wert: vpn, text: { de: 'VPN' } }
+          - { wert: netzwerkmanagement, text: { de: 'Netzwerkmanagement' } }
+          - { wert: siem, text: { de: 'SIEM' } }
+          - { wert: boot_manager, text: { de: 'Boot-Manager' } }
+          - { wert: remote_access, text: { de: 'Fernzugriff/Fernwartung' } }
+          - { wert: mdm, text: { de: 'Mobile-Device-Management' } }
+          - { wert: netzwerk_schnittstelle, text: { de: 'Netzwerkschnittstelle' } }
+          - { wert: chip_sicherheit, text: { de: 'Chip mit Sicherheitsfunktion' } }
+          - { wert: firewall_ids_ips, text: { de: 'Firewall / IDS / IPS' } }
+          - { wert: router_modem_switch, text: { de: 'Router / Modem / Switch' } }
+          - { wert: smarthome_sicherheit, text: { de: 'Smart-Home mit Sicherheitsfunktion' } }
+          - { wert: sprachassistent, text: { de: 'Sprachassistent' } }
+          - { wert: spielzeug_vernetzt, text: { de: 'Vernetztes Spielzeug' } }
+          - { wert: wearable_gesundheit, text: { de: 'Gesundheits-/Kinder-Wearable' } }
+          - { wert: betriebssystem, text: { de: 'Betriebssystem' } }
+          - { wert: hypervisor_container, text: { de: 'Hypervisor / Container-Runtime' } }
+          - { wert: pki, text: { de: 'PKI / Zertifikatsausstellung' } }
+          - { wert: mcu_manipulationssicher, text: { de: 'Manipulationssicherer Mikrocontroller' } }
+          - { wert: smart_meter_gateway, text: { de: 'Smart-Meter-Gateway' } }
+          - { wert: smartcard_secure_element, text: { de: 'Smartcard / Secure Element' } }
+          - { wert: hsm_security_box, text: { de: 'Hardware-Sicherheitsmodul (Security Box)' } }
+          - { wert: keine_davon, text: { de: 'Keine davon' } }
+        konsumenten: [betroffenheitsmatrix, konformitaetserklaerung]
+        annex_referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Anhang III/IV' }
+        review_status: pending
 
   # ============================================================ Block 2
   - id: block_2_klassifizierung

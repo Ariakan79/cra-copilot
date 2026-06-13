@@ -3,6 +3,7 @@
   import { api, type BlockStatus, type Gap, type Quelle, type SbomProfil } from './api';
   import Bericht from './lib/Bericht.svelte';
   import FeldEingabe from './lib/FeldEingabe.svelte';
+  import Klassifizierungsvorschlag from './lib/Klassifizierungsvorschlag.svelte';
 
   type Phase = 'setup' | 'interview' | 'bericht';
   let phase = $state<Phase>('setup');
@@ -23,6 +24,8 @@
   let profil = $state<SbomProfil | null>(null);
   let abschluss = $state<string | null>(null);
   let fehler = $state<string | null>(null);
+  // Erhöht sich bei jeder Evidenzänderung → triggert Neuladen des Engine-Vorschlags.
+  let evidenzVersion = $state(0);
 
   const quelle = $derived<Quelle>({
     art: 'kundenaussage_aufnahmegespraech',
@@ -61,6 +64,12 @@
       api.blockstatus(produktId),
       api.gaps(produktId).then((g) => g.produkt.concat(g.mandant)),
     ]);
+    evidenzVersion += 1;
+  }
+
+  async function vorschlagUebernehmen(kategorie: string, begruendung: string) {
+    await speichern('k_kategorie', 'produkt', kategorie);
+    await speichern('k_kategorie_begruendung', 'produkt', begruendung);
   }
 
   async function speichern(feldId: string, ebene: string, wert: string | string[]) {
@@ -145,6 +154,13 @@
     <main class="inhalt">
       <h1>{aktiverBlock.nummer}. {aktiverBlock.titel.de}</h1>
       <p class="ziel">{aktiverBlock.ziel.de}</p>
+      {#if aktiverBlockNr === 2}
+        <Klassifizierungsvorschlag
+          {produktId}
+          version={evidenzVersion}
+          onUebernehmen={vorschlagUebernehmen}
+        />
+      {/if}
       {#each aktiverBlock.felder as feld (feld.id)}
         <FeldEingabe
           {feld}
