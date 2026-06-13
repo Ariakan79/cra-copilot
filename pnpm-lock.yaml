@@ -41,6 +41,9 @@ importers:
       '@cra-copilot/aufnahme-katalog':
         specifier: workspace:*
         version: link:../../packages/aufnahme-katalog
+      '@cra-copilot/meldung-vorlagen':
+        specifier: workspace:*
+        version: link:../../packages/meldung-vorlagen
       '@cra-copilot/rules-engine':
         specifier: workspace:*
         version: link:../../packages/rules-engine
