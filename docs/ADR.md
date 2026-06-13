@@ -262,3 +262,188 @@ Struktur (Katalog + sprachfähige Datenfelder) ist das Migrationsfundament.
 - **Annex-III/IV-Heuristik-Tiefe**: Inhaltliche Festlegung der
   Selbstauskunfts-Fragen erfolgt beim Befüllen der Regeldaten, mit
   `review_status: pending` zur fachlichen Freigabe.
+
+---
+
+# Phase 2 — Cockpit (Aufnahme-Werkzeug)
+
+Fachliche Wahrheitsquelle: `docs/AUFNAHME_LEITFADEN_SPEC.md`. Vier der folgenden
+ADRs weichen bewusst von der Spec ab und sind mit **⚠ Spec-Abweichung** markiert —
+mit der Freigabe gilt die entsprechende Spec-Anpassung als beauftragt.
+
+---
+
+## ADR-012 — Phase-2-Zuschnitt: Erfassung komplett, Generierung später
+
+**Status:** akzeptiert (Director-Entscheidung 2026-06-12)
+
+**Entscheidung:** Phase 2 liefert das Cockpit als vollständiges Erfassungswerkzeug:
+Blöcke 0–8 als geführtes Interview, Evidenzknoten-Persistenz, Blockstatus-Ampeln,
+Gap-Liste, SBOM-Profil-Export (YAML), Ergebnisbericht als Druckansicht (analog
+Wizard, kein PDF-Service). **Nicht in Phase 2:** Generierung von Dokument-
+Erstentwürfen (CVD-Policy, Support-Zeitraum-Erklärung) und alles Portal-seitige
+(Ingestion, Monitoring, Meldeworkflow) — Phase 3.
+
+**Konsequenz:** Die Abschluss-Artefakte 1–2 der Spec entstehen in Phase 2,
+Artefakte 3–4 in Phase 3. Downstream-Mapping der Felder wird trotzdem ab sofort
+als Daten gepflegt (ADR-016), damit Phase 3 keine Nacherfassung braucht.
+
+---
+
+## ADR-013 — Backend: Fastify + PostgreSQL + Drizzle ORM
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** `apps/api` als Node/TS-Backend im Monorepo mit **Fastify**;
+Persistenz **PostgreSQL** mit **Drizzle ORM** (Schema in TS, SQL-Migrationen
+versioniert im Repo, `drizzle-zod` liefert die zod-Schemas der API-Verträge).
+Die Regel-Engine wird als Workspace-Paket konsumiert — dieselbe Engine wie im
+Wizard, nur in Bewertungstiefe (ADR-001, kein Methodik-Leak über eine
+Zweitimplementierung).
+
+**Gegenposition A — Express:** größtes Ökosystem. **Verworfen, weil** Fastify
+TS-first ist und Schema-Validierung nativ integriert — wir validieren ohnehin
+alles mit zod; Express bräuchte dafür Middleware-Eigenbau.
+
+**Gegenposition B — NestJS:** vorgegebene Struktur, DI, skaliert personell.
+**Verworfen, weil** ein internes Single-User-Werkzeug (ADR-014) keine
+DI-Container und Dekorator-Magie rechtfertigt — „Einfachheit gewinnt".
+
+**Gegenposition C — Prisma statt Drizzle:** reifere Migrations-Story, beste DX.
+**Verworfen, weil** Prisma eine eigene Schema-DSL und Codegen-Engine mitbringt;
+Drizzle bleibt bei TS + SQL (lesbar im Review), ist leichter und integriert
+direkt mit zod. Risiko (jüngeres Projekt) akzeptiert, da das Datenmodell
+schlank ist.
+
+---
+
+## ADR-014 — Betrieb Phase 2: lokal, Single-User, keine Auth
+
+**Status:** akzeptiert (Director-Entscheidung 2026-06-12)
+
+**Entscheidung:** Cockpit + API laufen auf dem Rechner des Gesprächsleiters
+(localhost), PostgreSQL via `docker compose up` (eine `compose.yaml` im Repo).
+Keine Authentifizierung in Phase 2; die API bindet ausschließlich an 127.0.0.1.
+**Aber:** Das Datenmodell ist von Tag 1 mandantengetrennt (alle Tabellen tragen
+`mandant_id`), damit der spätere Serverbetrieb (Portal, Phase 3) keine
+Datenmigration erzwingt. Mandantendaten verlassen den Rechner nicht —
+dasselbe Datenschutzargument wie beim Wizard, eine Ebene höher.
+
+---
+
+## ADR-015 — Evidenzknoten: append-only mit Supersession
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Der Evidenzknoten ist das zentrale Datenobjekt (Spec,
+Grundprinzip 1). Schema:
+
+- `id`, `mandant_id`, optional `produkt_id` (org-weite Knoten: ADR-017)
+- `feld_id` — Referenz auf ein Katalogfeld (ADR-016)
+- `wert` — strukturiert (JSON, gegen das Feldschema des Katalogs validiert);
+  Freitext nur als ergänzendes `anmerkung`-Feld, nie als primäres Datum
+- `quelle` — `{ art: kundenaussage_aufnahmegespraech | dokument | zertifikat |
+  systempruefung, person, datum, gespraechsleiter }`
+- `ersetzt_id` — Supersession-Kette: **Knoten werden nie geändert oder
+  gelöscht**; eine Korrektur erzeugt einen neuen Knoten, der auf den ersetzten
+  verweist. Aktueller Stand = Knoten ohne Nachfolger. „Unbekannt" und
+  „existiert nicht" sind gültige, getrennte Wertausprägungen (Grundprinzip 2).
+
+**Gegenposition A — mutable Zeilen + History-Tabelle:** einfacher zu queryen.
+**Verworfen, weil** ein Compliance-Werkzeug eine beweisbare, lückenlose
+Historie braucht — wer hat wann was auf welcher Grundlage gesagt. Genau das
+verkaufen wir.
+
+**Gegenposition B — volles Event-Sourcing:** maximale Auditierbarkeit.
+**Verworfen, weil** Projektion/Replay-Infrastruktur für ein Erfassungswerkzeug
+Overkill ist; append-only Knoten mit Supersession liefern dieselbe Garantie
+mit normalem SQL.
+
+---
+
+## ADR-016 — Aufnahme-Katalog als versionierte Daten (`packages/aufnahme-katalog`)
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13)
+
+**Entscheidung:** Die Blöcke 0–8 (Felder, Typen, Enums, Erläuterungen,
+Annex-Referenzen, Gap-Regeln) liegen als versionierte YAML-Daten in einem
+eigenen Paket — gleiches Muster wie das Regelwerk: zod-Validierung,
+Strukturprüfung, `review_status`, `katalog-vX.Y`-Tags, Changelog. Jedes
+Output-Feld deklariert seine **Downstream-Konsumenten** (Annex-VII-Doku,
+Risikobewertung, CVD-Policy, Konformitätserklärung, SBOM-Profil); die
+Strukturprüfung schlägt fehl, wenn ein Feld keinen Konsumenten hat —
+„Felder ohne Konsument fliegen raus" (Spec, Grundprinzip 3) wird damit ein
+ausführbarer Test. Die Annex-I-Teil-I-Anforderungsliste (Block 3) ist Teil
+dieser Stammdaten (Spec, Cockpit-Verhalten Block 3).
+
+**Gegenposition — Blöcke im Code / in der DB:** Code verletzt Grundprinzip 5
+(Referenzen sind Daten); DB-Pflege verliert den Git-Review-Workflow mit
+`review_status`, der sich beim Regelwerk bewährt hat. **Verworfen.**
+
+---
+
+## ADR-017 — Mandanten-Defaults mit Produkt-Override (Block 0, 4, 6)
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung**
+
+**Entscheidung:** Felder, die beim typischen Kunden organisationsweit gelten
+(Block 4 Schwachstellenmanagement-Prozess, Block 6 Build-Umgebung/Due-Diligence,
+Block 0 ohnehin), werden auf Mandantenebene erfasst und gelten als Default für
+alle Produkte; pro Produkt sind Overrides möglich (eigener Evidenzknoten mit
+`produkt_id`). Der Katalog markiert pro Feld die Ebene:
+`ebene: mandant | produkt | mandant_mit_override`.
+
+**Warum Abweichung:** Die Spec führt Block 4/6 pro Produkt. Wörtlich umgesetzt
+erfasst der Gesprächsleiter beim dritten Produkt denselben CVD-Prozess dreimal,
+und bei einer Prozessänderung divergieren die Kopien. **Gegenposition — Spec
+wörtlich (pro Produkt):** maximale Genauigkeit bei wirklich abweichenden
+Produktlinien. **Verworfen**, weil der Override-Mechanismus genau diesen Fall
+abdeckt, ohne den Normalfall zu verdreifachen.
+
+---
+
+## ADR-018 — SBOM-Profil: mehrere Streams pro Produkt, Pflichtfelder abgeleitet
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung**
+
+**Entscheidung:** Das SBOM-Profil (Block 7) enthält eine **Liste von
+SBOM-Streams** pro Produkt — Firmware, Cloud-Backend (entfernte
+Datenverarbeitung!) und Companion-App sind getrennte Erzeugungspfade mit je
+eigenem Format, Tool, CI-Job, Kanal und Heartbeat. Die `pflichtfelder` werden
+**aus `konformitaetsziel` abgeleitet** (versionierte Stammdaten je Zielniveau,
+z. B. BSI TR-03183-2) statt im Profil redundant gelistet; Abweichungen laufen
+weiter über den `abweichungen`-Mechanismus der Spec.
+
+**Warum Abweichung:** Das Spec-Profil ist 1:1 (`produkt_id` → ein Tool, ein
+Kanal) und listet Pflichtfelder zusätzlich zum Zielniveau — redundant und beim
+ersten IoT-Kunden (Gerät + Cloud + App) strukturell zu eng. **Gegenposition —
+ein Profil pro Produkt, Varianten als eigene Produkte:** verworfen, weil
+Block 1 die entfernte Datenverarbeitung ausdrücklich zum *selben* Produkt
+zählt — sie als Kunstprodukt abzuspalten widerspräche der eigenen Methodik.
+
+---
+
+## ADR-019 — Gap-Lebenszyklus und getrennte Abschluss-Stati
+
+**Status:** akzeptiert (Freigabe Director 2026-06-13) · **⚠ Spec-Abweichung (Teil 2)**
+
+**Entscheidung:**
+
+1. **Gap-Lebenszyklus:** Jede Lücke trägt einheitlich Priorität (abgeleitet aus
+   Schadenspotenzial, überschreibbar mit Begründung), Verantwortlichen, Frist
+   und Status `offen → in_arbeit → erledigt → verifiziert` (verifiziert nur
+   durch den Gesprächsleiter). Blockstatus-Ampeln sind **abgeleiteter Zustand**
+   aus Evidenzknoten + offenen Gaps (analog ADR-007: nie separat gespeichert,
+   keine Inkonsistenz möglich).
+2. **Abschluss-Stati getrennt:** `workshop_durchgefuehrt` (alle Blöcke
+   bearbeitet, Bericht generierbar — auch mit Lücken, Spec Grundprinzip 4)
+   und `onboarding_abgeschlossen` (erste profilkonforme SBOM-Lieferung im
+   Portal). Phase 2 kann nur Ersteres setzen; Letzteres setzt das Portal in
+   Phase 3. Geschäftsregeln (Abo-Beginn) hängen am zweiten Status.
+
+**Warum Abweichung (Teil 2):** Die Spec definiert den Workshop als
+abgeschlossen erst mit der SBOM-Lieferung — das koppelt den Projekterfolg des
+Workshops an eine Kunden-Hausaufgabe von Wochen. **Gegenposition — Spec
+wörtlich:** ein einziger, harter Abschlussbegriff. **Verworfen**, weil zwei
+ehrliche Stati genau abbilden, was passiert ist, und der Abo-Trigger erhalten
+bleibt.
