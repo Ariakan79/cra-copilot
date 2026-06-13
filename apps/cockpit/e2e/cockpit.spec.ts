@@ -51,6 +51,16 @@ test('Korrektur einer Antwort schließt den zugehörigen Gap', async ({ page }) 
   await expect(page.getByTestId('gap-liste')).not.toContainText('s_cvd_policy_vorhanden');
 });
 
+test('Zahl-Feld (Support-Zeitraum, Block 5) lässt sich ohne Fehler erfassen', async ({ page }) => {
+  await aufnahmeStarten(page);
+  await page.locator('.block-tab', { hasText: '5.' }).click();
+  const jahre = page.locator('[data-feld-id="sup_zeitraum_jahre"]');
+  await jahre.locator('input').fill('7');
+  await jahre.getByRole('button', { name: 'Speichern' }).click();
+  await expect(jahre.getByTestId('gespeichert')).toContainText('7');
+  await expect(page.getByTestId('fehler')).toHaveCount(0);
+});
+
 test('SBOM-Profil-Download liefert YAML', async ({ page }) => {
   await aufnahmeStarten(page);
   const href = await page.getByTestId('sbom-download').getAttribute('href');

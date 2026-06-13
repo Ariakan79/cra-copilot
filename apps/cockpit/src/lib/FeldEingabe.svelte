@@ -18,18 +18,18 @@
   const istMehrfach = $derived(feld.typ === 'mehrfachauswahl');
   const aktuell = $derived(Array.isArray(wert) ? wert : wert === undefined ? [] : [wert]);
 
-  let entwurf = $state<string>('');
-  let mehrfachAuswahl = $state<string[]>([]);
-
-  $effect(() => {
-    // Beim Feldwechsel den Entwurf mit dem gespeicherten Wert vorbelegen.
-    entwurf = typeof wert === 'string' && !istLuecke(wert) ? wert : '';
-    mehrfachAuswahl = Array.isArray(wert) ? [...wert] : [];
-  });
-
   function istLuecke(w: string | undefined): boolean {
     return w === LUECKE_UNBEKANNT || w === LUECKE_EXISTIERT_NICHT;
   }
+
+  // Einmalige Vorbelegung aus dem gespeicherten Wert: App.svelte mountet die
+  // Komponente pro Feld neu ({#each … (feld.id)}), daher kein $effect-Sync —
+  // der würde via bind:value den Tipp-Wert zurücksetzen.
+  // svelte-ignore state_referenced_locally
+  let entwurf = $state<string>(typeof wert === 'string' && !istLuecke(wert) ? wert : '');
+  // svelte-ignore state_referenced_locally
+  let mehrfachAuswahl = $state<string[]>(Array.isArray(wert) ? [...wert] : []);
+  const entwurfText = $derived(entwurf.trim());
 
   function umschalten(optWert: string) {
     mehrfachAuswahl = mehrfachAuswahl.includes(optWert)
@@ -85,18 +85,19 @@
   {:else}
     <div class="textzeile">
       <input
-        type={feld.typ === 'zahl' ? 'number' : feld.typ === 'datum' ? 'date' : 'text'}
+        type={feld.typ === 'datum' ? 'date' : 'text'}
+        inputmode={feld.typ === 'zahl' ? 'numeric' : undefined}
         bind:value={entwurf}
         placeholder="Antwort…"
         onkeydown={(e) => {
-          if (e.key === 'Enter' && entwurf.trim() !== '') onSpeichern(entwurf.trim());
+          if (e.key === 'Enter' && entwurfText !== '') onSpeichern(entwurfText);
         }}
       />
       <button
         type="button"
         class="primaer klein"
-        disabled={entwurf.trim() === ''}
-        onclick={() => onSpeichern(entwurf.trim())}>Speichern</button
+        disabled={entwurfText === ''}
+        onclick={() => onSpeichern(entwurfText)}>Speichern</button
       >
     </div>
   {/if}
