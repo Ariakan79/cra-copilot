@@ -282,3 +282,19 @@ td {
   color: var(--rot);
   margin-left: 0.1rem;
 }
+.anker {
+  font-size: 0.82rem;
+  background: var(--akzent-hell, #e7f3ec);
+  border: 1px solid var(--akzent);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  margin: 0.6rem 0;
+}
+.anker code {
+  display: block;
+  word-break: break-all;
+  margin: 0.2rem 0;
+  background: #fff;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}

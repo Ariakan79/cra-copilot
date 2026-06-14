@@ -67,6 +67,9 @@ test('Meldeworkflow: Finding einstufen → Meldevorgang mit Fristen → Frühwar
   await page.getByTestId(`entwurf-${vid}-fruehwarnung`).click();
   const entwurf = page.getByTestId('entwurf');
   await expect(entwurf).toBeVisible();
+  // Option 1: Integritäts-Anker (Kopf-Hash) ist Teil des Melde-Entwurfs.
+  await expect(page.getByTestId('anker')).toContainText('Integritäts-Anker');
+  await expect(page.getByTestId('anker').locator('code')).toHaveText(/[0-9a-f]{64}/);
   // erstes Pflichtfeld füllen
   await entwurf.locator('input').first().fill('Smart-Lock Pro');
   await page.getByTestId('einreichen').click();

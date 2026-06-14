@@ -8,7 +8,7 @@ import { and, eq } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import { finding, meldevorgang, meldungStufe, produkt, type MeldeArt } from '../db/schema';
 import { aktuellerWert, ValidierungsFehler } from '../domain/evidenz';
-import { protokolliere } from './audit';
+import { protokolliere, pruefeIntegritaet } from './audit';
 
 /**
  * Meldevorgang-Domäne (CRA Art. 14, ADR-029–034). Die Eröffnung ist die
@@ -142,7 +142,12 @@ export interface Entwurf {
   titel: string;
   hinweis: string | null;
   felder: EntwurfFeld[];
+  /** Integritäts-Anker: Kopf-Hash der Nachweis-Kette zum Zeitpunkt der Erstellung (ADR-035). */
+  integritaet: { kopfHash: string | null; intakt: boolean; geprueft: number };
 }
+
+/** Feld-ID, unter der der Ketten-Kopf-Hash in den Melde-Entwurf eingebettet wird. */
+export const ANKER_FELD = 'kettenkopf_hash';
 
 /** Baut den strukturierten Melde-Entwurf aus der Vorlage + ggf. bereits erfasstem Inhalt. */
 export async function entwurf(db: DB, vorgangId: string, stufe: Stufe): Promise<Entwurf> {
@@ -155,17 +160,32 @@ export async function entwurf(db: DB, vorgangId: string, stufe: Stufe): Promise<
     .from(meldungStufe)
     .where(and(eq(meldungStufe.vorgangId, vorgangId), eq(meldungStufe.stufe, stufe)));
   const inhalt = (row?.inhalt ?? {}) as Record<string, string>;
+  const integritaet = await pruefeIntegritaet(db);
+  const felder: EntwurfFeld[] = vorlage.felder.map((f) => ({
+    id: f.id,
+    label: f.label.de,
+    pflicht: f.pflicht,
+    wert: inhalt[f.id] ?? '',
+  }));
+  // Integritäts-Anker einbetten: der aktuelle Kopf-Hash der Nachweis-Kette geht
+  // damit in die Behördenmeldung ein und wird so extern (zeit-)bezeugt (Option 1).
+  felder.push({
+    id: ANKER_FELD,
+    label: 'Integritäts-Anker — Kopf-Hash der Nachweis-Kette (SHA-256)',
+    pflicht: false,
+    wert: inhalt[ANKER_FELD] ?? integritaet.kopfHash ?? '(noch keine Kette)',
+  });
   return {
     stufe,
     art: v.art as Meldungsart,
     titel: vorlage.titel.de,
     hinweis: vorlage.hinweis?.de ?? null,
-    felder: vorlage.felder.map((f) => ({
-      id: f.id,
-      label: f.label.de,
-      pflicht: f.pflicht,
-      wert: inhalt[f.id] ?? '',
-    })),
+    felder,
+    integritaet: {
+      kopfHash: integritaet.kopfHash,
+      intakt: integritaet.intakt,
+      geprueft: integritaet.geprueft,
+    },
   };
 }
 

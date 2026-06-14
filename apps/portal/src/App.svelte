@@ -270,6 +270,17 @@
                 <input bind:value={feld.wert} data-testid={`feld-${feld.id}`} /></label
               >
             {/each}
+            <div class="anker" data-testid="anker">
+              <strong>Integritäts-Anker</strong> — Kopf-Hash der Nachweis-Kette ({aktiverEntwurf
+                .entwurf.integritaet.intakt
+                ? 'Kette intakt'
+                : '⚠ Kette gebrochen'},
+              {aktiverEntwurf.entwurf.integritaet.geprueft} Einträge):
+              <code>{aktiverEntwurf.entwurf.integritaet.kopfHash ?? '—'}</code>
+              <span class="leise"
+                >Geht mit der Meldung an die Behörde und wird so extern zeitlich bezeugt.</span
+              >
+            </div>
             <p class="leise">
               Entwurf zum Einreichen über das offizielle ENISA/CSIRT-Portal. Nach dem Einreichen ist
               die Stufe als Nachweis gesperrt.
