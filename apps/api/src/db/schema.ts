@@ -160,6 +160,26 @@ export const auditKette = pgTable('audit_kette', {
 });
 
 /**
+ * Behörden-Anschreiben (ADR-036): freiwilliges BSI-Erstanschreiben
+ * (Meldebereitschaft). Nach Versand unveränderlich (Trigger), verkettet
+ * (ADR-035); einzig die `eingangsbestaetigung` ist genau einmal nachtragbar —
+ * sie ist der eigentliche externe Anker. `kopf_hash` = Ketten-Kopf zum Versand.
+ */
+export const behoerdenAnschreiben = pgTable('behoerden_anschreiben', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  mandantId: uuid('mandant_id')
+    .notNull()
+    .references(() => mandant.id),
+  art: text('art').notNull().default('meldebereitschaft'),
+  inhalt: jsonb('inhalt').$type<Record<string, string>>().notNull(),
+  kopfHash: text('kopf_hash'),
+  versendetAm: timestamp('versendet_am', { withTimezone: true }),
+  versendetVon: text('versendet_von'),
+  eingangsbestaetigung: text('eingangsbestaetigung'),
+  bestaetigtAm: timestamp('bestaetigt_am', { withTimezone: true }),
+});
+
+/**
  * security.txt-Publikation (ADR-037): der zum Veröffentlichungszeitpunkt
  * bereitgestellte Inhalt als unveränderliche, verkettbare Zeile (ADR-035).
  * Der Live-Endpunkt bleibt abgeleitet; jede Publikation hinterlässt einen Beleg.

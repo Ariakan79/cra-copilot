@@ -23,6 +23,11 @@ import {
   generiereSecurityTxt,
   veroeffentlicheSecurityTxt,
 } from './portal/security-txt';
+import {
+  erfasseEingangsbestaetigung,
+  erstanschreibenEntwurf,
+  versendeErstanschreiben,
+} from './portal/erstanschreiben';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import { heartbeat } from './portal/heartbeat';
 import { nutzerEntwurf, versendeNutzerbenachrichtigung } from './portal/nutzer-benachrichtigung';
@@ -278,6 +283,29 @@ export function buildApp(db: DB): FastifyInstance {
     const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
     const sec = await veroeffentlicheSecurityTxt(db, id);
     return reply.status(201).send(sec);
+  });
+
+  // Freiwilliges BSI-Erstanschreiben (Meldebereitschaft, ADR-036).
+  app.get('/mandanten/:id/erstanschreiben-entwurf', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const { produktId } = z.object({ produktId: z.string().uuid().optional() }).parse(req.query);
+    return erstanschreibenEntwurf(db, id, produktId);
+  });
+
+  app.post('/mandanten/:id/erstanschreiben/versenden', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const body = z
+      .object({ versendetVon: z.string().min(1), produktId: z.string().uuid().optional() })
+      .parse(req.body);
+    const r = await versendeErstanschreiben(db, id, body.versendetVon, body.produktId);
+    return reply.status(201).send(r);
+  });
+
+  app.patch('/erstanschreiben/:id/eingangsbestaetigung', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const body = z.object({ aktenzeichen: z.string().min(1) }).parse(req.body);
+    await erfasseEingangsbestaetigung(db, id, body.aktenzeichen);
+    return reply.status(204).send();
   });
 
   // ============================================================ Meldeworkflow
