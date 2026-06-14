@@ -17,6 +17,7 @@ import {
 } from './db/schema';
 import { hashPasswort, neuesToken, produktFuerToken, pruefePasswort } from './portal/auth';
 import { ingest } from './portal/ingestion';
+import { pruefeIntegritaet } from './portal/audit';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import { heartbeat } from './portal/heartbeat';
 import {
@@ -248,6 +249,9 @@ export function buildApp(db: DB): FastifyInstance {
 
   // Konstante als API-Hinweis: Override entfernen.
   app.get('/konstanten', async () => ({ zurueckAufDefault: ZURUECK_AUF_DEFAULT }));
+
+  // Integritätsnachweis der Hash-Kette (ADR-035).
+  app.get('/integritaet', async () => pruefeIntegritaet(db));
 
   // ============================================================ Meldeworkflow
 

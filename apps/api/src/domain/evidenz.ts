@@ -2,6 +2,7 @@ import { feldNach, katalog, type Ebene, type FeldWert } from '@cra-copilot/aufna
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import { evidenzKnoten, type Quelle } from '../db/schema';
+import { protokolliere } from '../portal/audit';
 
 /** Sentinel-Wert: Override entfernen und auf den Mandanten-Default zurückfallen (D5). */
 export const ZURUECK_AUF_DEFAULT = '__zurueck_auf_default__';
@@ -55,6 +56,7 @@ export async function setzeEvidenz(db: DB, eingabe: NeueEvidenz): Promise<string
       ersetztId: vorhanden ?? null,
     })
     .returning({ id: evidenzKnoten.id });
+  await protokolliere(db, 'evidenz_knoten', zeile!.id);
   return zeile!.id;
 }
 
