@@ -334,6 +334,28 @@ export const meldungStufe = pgTable(
   (t) => [uniqueIndex('meldung_stufe_unique').on(t.vorgangId, t.stufe)],
 );
 
+/**
+ * Nutzerbenachrichtigung (Art. 14 Abs. 8, ADR-037): eigenes Artefakt am
+ * Meldevorgang (anderer Empfänger als die Behörde). Ab `versendet_am`
+ * unveränderlich (Trigger) und verkettet (ADR-035).
+ */
+export const nutzerBenachrichtigung = pgTable(
+  'nutzer_benachrichtigung',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    vorgangId: uuid('vorgang_id')
+      .notNull()
+      .references(() => meldevorgang.id),
+    mandantId: uuid('mandant_id')
+      .notNull()
+      .references(() => mandant.id),
+    inhalt: jsonb('inhalt').$type<Record<string, string>>(),
+    versendetAm: timestamp('versendet_am', { withTimezone: true }),
+    versendetVon: text('versendet_von'),
+  },
+  (t) => [index('nutzer_benachrichtigung_vorgang_idx').on(t.vorgangId)],
+);
+
 export const FINDING_STATI = [
   'neu',
   'in_pruefung',

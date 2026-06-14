@@ -25,6 +25,7 @@ import {
 } from './portal/security-txt';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import { heartbeat } from './portal/heartbeat';
+import { nutzerEntwurf, versendeNutzerbenachrichtigung } from './portal/nutzer-benachrichtigung';
 import {
   entwurf,
   eroeffneAusFinding,
@@ -363,6 +364,21 @@ export function buildApp(db: DB): FastifyInstance {
     const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
     const body = z.object({ korrekturmassnahmeAb: z.string() }).parse(req.body);
     await setzeKorrekturmassnahme(db, id, new Date(body.korrekturmassnahmeAb));
+    return reply.status(204).send();
+  });
+
+  // Nutzerbenachrichtigung (Art. 14 Abs. 8, ADR-037).
+  app.get('/meldevorgaenge/:id/nutzer-entwurf', async (req) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    return nutzerEntwurf(db, id);
+  });
+
+  app.post('/meldevorgaenge/:id/nutzer-benachrichtigung/versenden', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const body = z
+      .object({ inhalt: z.record(z.string(), z.string()), versendetVon: z.string().min(1) })
+      .parse(req.body);
+    await versendeNutzerbenachrichtigung(db, id, body);
     return reply.status(204).send();
   });
 

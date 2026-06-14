@@ -22,15 +22,19 @@ export function pruefeStruktur(daten: MeldungVorlagen): string[] {
     }
   }
 
-  const feldIds = new Set<string>();
   for (const v of daten.vorlagen) {
     const lokal = new Set<string>();
     for (const feld of v.felder) {
       if (lokal.has(feld.id))
         fehler.push(`Vorlage ${v.art}/${v.stufe}: doppeltes Feld ${feld.id}.`);
       lokal.add(feld.id);
-      feldIds.add(feld.id);
     }
+  }
+
+  // Je Meldungsart genau eine Nutzer-Vorlage (Art. 14 Abs. 8).
+  for (const art of ['schwachstelle', 'vorfall'] as const) {
+    const n = daten.nutzer_vorlagen.filter((v) => v.art === art);
+    if (n.length !== 1) fehler.push(`Nutzer-Vorlage fehlt/doppelt: ${art} (${n.length}).`);
   }
 
   return fehler;
@@ -42,5 +46,7 @@ export function offeneReviews(daten: MeldungVorlagen): string[] {
     if (f.review_status === 'pending') offen.push(`frist:${f.art}/${f.stufe}`);
   for (const v of daten.vorlagen)
     if (v.review_status === 'pending') offen.push(`vorlage:${v.art}/${v.stufe}`);
+  for (const v of daten.nutzer_vorlagen)
+    if (v.review_status === 'pending') offen.push(`nutzer:${v.art}`);
   return offen;
 }

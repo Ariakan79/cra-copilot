@@ -5,6 +5,7 @@ import {
   auditKette,
   evidenzKnoten,
   meldungStufe,
+  nutzerBenachrichtigung,
   sbomLieferung,
   securityTxtPublikation,
 } from '../db/schema';
@@ -23,7 +24,8 @@ export type Entitaet =
   | 'evidenz_knoten'
   | 'sbom_lieferung'
   | 'meldung_stufe'
-  | 'security_txt_publikation';
+  | 'security_txt_publikation'
+  | 'nutzer_benachrichtigung';
 
 /** Stabile Schlüsselsortierung → deterministische Serialisierung. */
 function kanonisch(wert: unknown): string {
@@ -108,6 +110,15 @@ const DEFS: Record<Entitaet, EntitaetsDef> = {
     laden: async (db, id) =>
       (await db.select().from(securityTxtPublikation).where(eq(securityTxtPublikation.id, id)))[0],
     payload: (r) => ({ mandantId: r['mandantId'], inhalt: r['inhalt'] }),
+  },
+  nutzer_benachrichtigung: {
+    laden: async (db, id) =>
+      (await db.select().from(nutzerBenachrichtigung).where(eq(nutzerBenachrichtigung.id, id)))[0],
+    payload: (r) => ({
+      vorgangId: r['vorgangId'],
+      inhalt: r['inhalt'],
+      versendetVon: r['versendetVon'],
+    }),
   },
 };
 

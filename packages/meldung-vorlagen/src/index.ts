@@ -5,6 +5,7 @@ import {
   type MeldungVorlagen,
   type Stufe,
   type Meldungsart,
+  type NutzerVorlage,
   type Vorlage,
 } from './schema';
 
@@ -17,6 +18,10 @@ export function fristFuer(art: Meldungsart, stufe: Stufe): Frist | undefined {
 
 export function vorlageFuer(art: Meldungsart, stufe: Stufe): Vorlage | undefined {
   return meldungVorlagen.vorlagen.find((v) => v.art === art && v.stufe === stufe);
+}
+
+export function nutzerVorlageFuer(art: Meldungsart): NutzerVorlage | undefined {
+  return meldungVorlagen.nutzer_vorlagen.find((v) => v.art === art);
 }
 
 export * from './schema';
