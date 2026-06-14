@@ -810,7 +810,7 @@ Entscheidung.
 
 ## ADR-035 — Hash-Verkettung der unveränderlichen Datensätze
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-14)
 
 **Kontext:** Die DB-Trigger (ADR-015/024/031) verhindern Ändern/Löschen über den
 normalen Zugriffsweg, schützen aber nicht gegen einen privilegierten Insider, der

@@ -331,7 +331,7 @@ Im bestehenden `integration`-Job mitgedeckt; keine neuen externen Abhängigkeite
 
 ---
 
-## 10. Querschnitt — Hash-Verkettung (ADR-035, Status: zur Freigabe)
+## 10. Querschnitt — Hash-Verkettung (ADR-035, akzeptiert 2026-06-14)
 
 Gegen echtes PostgreSQL (Testcontainers):
 
