@@ -59,6 +59,15 @@ export interface Entwurf {
   integritaet: { kopfHash: string | null; intakt: boolean; geprueft: number };
 }
 
+export interface NutzerEntwurf {
+  vorgangId: string;
+  art: string;
+  titel: string;
+  hinweis: string | null;
+  versendet: boolean;
+  felder: EntwurfFeld[];
+}
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
   return res.json() as Promise<T>;
@@ -125,6 +134,61 @@ export const api = {
     const res = await post(`/meldevorgaenge/${vorgangId}/einreichen/${stufe}`, {
       inhalt,
       eingereichtVon,
+    });
+    if (!res.ok) throw new Error(await res.text());
+  },
+
+  // --- Integrität / Nachweise -------------------------------------------------
+  async integritaet(): Promise<{ intakt: boolean; geprueft: number; kopfHash: string | null }> {
+    return json(await fetch('/api/integritaet'));
+  },
+  async securityTxtAktuell(mandantId: string): Promise<string> {
+    const res = await fetch(`/api/mandanten/${mandantId}/security.txt`);
+    return res.text();
+  },
+  async securityTxtVeroeffentlichen(mandantId: string): Promise<{ vorhanden: boolean }> {
+    return json(await post(`/mandanten/${mandantId}/security-txt/veroeffentlichen`, {}));
+  },
+
+  // --- Erstanschreiben (Meldebereitschaft) -----------------------------------
+  async erstanschreibenEntwurf(
+    mandantId: string,
+    produktId: string,
+  ): Promise<{ mandantName: string; kopfHash: string | null; text: string }> {
+    return json(
+      await fetch(`/api/mandanten/${mandantId}/erstanschreiben-entwurf?produktId=${produktId}`),
+    );
+  },
+  async erstanschreibenVersenden(
+    mandantId: string,
+    versendetVon: string,
+    produktId: string,
+  ): Promise<{ id: string; kopfHash: string | null }> {
+    return json(
+      await post(`/mandanten/${mandantId}/erstanschreiben/versenden`, { versendetVon, produktId }),
+    );
+  },
+  async eingangsbestaetigung(anschreibenId: string, aktenzeichen: string): Promise<void> {
+    const res = await fetch(`/api/erstanschreiben/${anschreibenId}/eingangsbestaetigung`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ aktenzeichen }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+  },
+
+  // --- Nutzerbenachrichtigung -------------------------------------------------
+  async nutzerEntwurf(vorgangId: string): Promise<NutzerEntwurf> {
+    return json(await fetch(`/api/meldevorgaenge/${vorgangId}/nutzer-entwurf`));
+  },
+  async nutzerVersenden(
+    vorgangId: string,
+    inhalt: Record<string, string>,
+    versendetVon: string,
+  ): Promise<void> {
+    const res = await post(`/meldevorgaenge/${vorgangId}/nutzer-benachrichtigung/versenden`, {
+      inhalt,
+      versendetVon,
     });
     if (!res.ok) throw new Error(await res.text());
   },

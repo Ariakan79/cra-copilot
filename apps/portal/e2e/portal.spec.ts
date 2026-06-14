@@ -78,6 +78,51 @@ test('Meldeworkflow: Finding einstufen → Meldevorgang mit Fristen → Frühwar
   await expect(page.getByTestId(`eingereicht-${vid}-fruehwarnung`)).toBeVisible();
 });
 
+test('Organisation: Integritäts-Status, security.txt veröffentlichen, Erstanschreiben', async ({
+  page,
+}) => {
+  await anmelden(page);
+  // Integritäts-Status sichtbar.
+  await expect(page.getByTestId('integritaet')).toContainText('intakt');
+  // security.txt veröffentlichen (verketten).
+  await page.getByTestId('sec-veroeffentlichen').click();
+  await expect(page.getByTestId('sec-ok')).toBeVisible();
+  // Erstanschreiben-Entwurf erzeugen → Kopf-Hash im Text → versenden → Eingangsbestätigung.
+  await page.getByTestId('erst-erzeugen').click();
+  await expect(page.getByTestId('erst-text')).toContainText('Art. 14');
+  await page.getByTestId('erst-versenden').click();
+  await expect(page.getByTestId('erst-versendet')).toBeVisible();
+  await page.getByTestId('erst-az').fill('BSI-AZ-2026-0007');
+  await page.getByTestId('erst-bestaetigen').click();
+  await expect(page.getByTestId('erst-bestaetigt')).toBeVisible();
+});
+
+test('Nutzerbenachrichtigung: Entwurf öffnen und versenden', async ({ page }) => {
+  await anmelden(page);
+  // Erst einen Meldevorgang anlegen (Finding als aktiv ausgenutzt).
+  await page
+    .getByTestId('findings')
+    .getByRole('button', { name: 'aktiv ausgenutzt', exact: false })
+    .first()
+    .click();
+  await page.getByTestId(`nutzerinfo-${await firstVorgangId(page)}`).click();
+  const ne = page.getByTestId('nutzer-entwurf');
+  await expect(ne).toBeVisible();
+  await ne.locator('input').first().fill('Smart-Lock Pro 2.0');
+  await page.getByTestId('nutzer-versenden').click();
+  // Nach Versand ist das Formular geschlossen.
+  await expect(ne).toBeHidden();
+});
+
+async function firstVorgangId(page: import('@playwright/test').Page): Promise<string> {
+  const testid = await page
+    .getByTestId('meldevorgaenge')
+    .locator('[data-testid^="nutzerinfo-"]')
+    .first()
+    .getAttribute('data-testid');
+  return testid!.replace('nutzerinfo-', '');
+}
+
 test('Datenlokalität: kein Request an osv.dev', async ({ page }) => {
   const fremde: string[] = [];
   page.on('request', (r) => {

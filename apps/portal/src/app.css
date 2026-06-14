@@ -298,3 +298,21 @@ td {
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
 }
+.sectxt {
+  background: #f4f6f8;
+  border: 1px solid var(--linie);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0.4rem 0;
+}
+code.kopf {
+  word-break: break-all;
+  font-size: 0.78rem;
+}
+.block h3 {
+  font-size: 0.92rem;
+  margin: 1rem 0 0.3rem;
+}
