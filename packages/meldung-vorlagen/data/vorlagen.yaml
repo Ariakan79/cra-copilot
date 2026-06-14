@@ -183,3 +183,34 @@ vorlagen:
         }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' }
     review_status: pending
+
+# --- Nutzerbenachrichtigung (Art. 14 Abs. 8) je Meldungsart -----------------
+nutzer_vorlagen:
+  - art: schwachstelle
+    titel: { de: 'Nutzerinformation — Sicherheitslücke in Ihrem Produkt' }
+    hinweis:
+      {
+        de: 'An betroffene Nutzer/Kunden, sobald erforderlich. Verständlich, ohne Ausnutzungsdetails, die Angreifern helfen.',
+      }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt und Versionen' } }
+      - { id: sachverhalt, label: { de: 'Was ist betroffen (verständliche Beschreibung)' } }
+      - { id: risiko, label: { de: 'Mögliche Auswirkung für Nutzer' } }
+      - { id: massnahmen, label: { de: 'Verfügbare Abhilfe (Update/Workaround)' } }
+      - {
+          id: handlungsempfehlung,
+          label: { de: 'Empfohlene Nutzeraktion (z. B. „jetzt aktualisieren")' },
+        }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 8' }
+    review_status: pending
+  - art: vorfall
+    titel: { de: 'Nutzerinformation — Sicherheitsvorfall' }
+    hinweis: { de: 'An betroffene Nutzer/Kunden über den Vorfall und ergriffene Maßnahmen.' }
+    felder:
+      - { id: produkt, label: { de: 'Betroffenes Produkt und Versionen' } }
+      - { id: sachverhalt, label: { de: 'Beschreibung des Vorfalls (verständlich)' } }
+      - { id: risiko, label: { de: 'Mögliche Auswirkung für Nutzer' } }
+      - { id: massnahmen, label: { de: 'Ergriffene/empfohlene Maßnahmen' } }
+      - { id: handlungsempfehlung, label: { de: 'Empfohlene Nutzeraktion' } }
+    referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 8' }
+    review_status: pending

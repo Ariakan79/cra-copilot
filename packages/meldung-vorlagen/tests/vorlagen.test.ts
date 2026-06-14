@@ -36,7 +36,9 @@ describe('Meldung-Vorlagen', () => {
 
   it('alle Einträge sind noch ungereviewt (pending) — Tag-Gate', () => {
     expect(offeneReviews(meldungVorlagen).length).toBe(
-      meldungVorlagen.fristen.length + meldungVorlagen.vorlagen.length,
+      meldungVorlagen.fristen.length +
+        meldungVorlagen.vorlagen.length +
+        meldungVorlagen.nutzer_vorlagen.length,
     );
   });
 });

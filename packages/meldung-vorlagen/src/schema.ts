@@ -47,12 +47,23 @@ export const VorlageSchema = z.object({
   review_status: ReviewStatusSchema,
 });
 
+/** Vorlage für die Nutzerbenachrichtigung (Art. 14 Abs. 8) — je Meldungsart, ohne Stufe. */
+export const NutzerVorlageSchema = z.object({
+  art: MeldungsartSchema,
+  titel: LokalTextSchema,
+  hinweis: LokalTextSchema.optional(),
+  felder: z.array(FeldSchema).min(1),
+  referenz: ReferenzSchema,
+  review_status: ReviewStatusSchema,
+});
+
 export const MeldungVorlagenSchema = z.object({
   meldung_version: z.string().min(1),
   stand: z.string().min(1),
   empfaenger: LokalTextSchema,
   fristen: z.array(FristSchema).min(1),
   vorlagen: z.array(VorlageSchema).min(1),
+  nutzer_vorlagen: z.array(NutzerVorlageSchema).min(1),
 });
 
 export type LokalText = z.infer<typeof LokalTextSchema>;
@@ -64,4 +75,5 @@ export type FristBezug = z.infer<typeof FristBezugSchema>;
 export type Frist = z.infer<typeof FristSchema>;
 export type Feld = z.infer<typeof FeldSchema>;
 export type Vorlage = z.infer<typeof VorlageSchema>;
+export type NutzerVorlage = z.infer<typeof NutzerVorlageSchema>;
 export type MeldungVorlagen = z.infer<typeof MeldungVorlagenSchema>;
