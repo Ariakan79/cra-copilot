@@ -3,6 +3,7 @@ import { asc, eq } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import {
   auditKette,
+  behoerdenAnschreiben,
   evidenzKnoten,
   meldungStufe,
   nutzerBenachrichtigung,
@@ -25,7 +26,8 @@ export type Entitaet =
   | 'sbom_lieferung'
   | 'meldung_stufe'
   | 'security_txt_publikation'
-  | 'nutzer_benachrichtigung';
+  | 'nutzer_benachrichtigung'
+  | 'behoerden_anschreiben';
 
 /** Stabile Schlüsselsortierung → deterministische Serialisierung. */
 function kanonisch(wert: unknown): string {
@@ -117,6 +119,19 @@ const DEFS: Record<Entitaet, EntitaetsDef> = {
     payload: (r) => ({
       vorgangId: r['vorgangId'],
       inhalt: r['inhalt'],
+      versendetVon: r['versendetVon'],
+    }),
+  },
+  behoerden_anschreiben: {
+    laden: async (db, id) =>
+      (await db.select().from(behoerdenAnschreiben).where(eq(behoerdenAnschreiben.id, id)))[0],
+    // Ohne eingangsbestaetigung/bestaetigtAm — die werden später nachgetragen und
+    // dürfen den payload_hash nicht nachträglich brechen.
+    payload: (r) => ({
+      mandantId: r['mandantId'],
+      art: r['art'],
+      inhalt: r['inhalt'],
+      kopfHash: r['kopfHash'],
       versendetVon: r['versendetVon'],
     }),
   },
