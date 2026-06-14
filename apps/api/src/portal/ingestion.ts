@@ -2,6 +2,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import { komponente, produkt, sbomLieferung, workshop } from '../db/schema';
 import { ValidierungsFehler } from '../domain/evidenz';
+import { protokolliere } from './audit';
 import { pruefeGegenProfil } from './profil';
 import { parseSbom } from './sbom-parse';
 
@@ -60,6 +61,7 @@ export async function ingest(
     })
     .returning({ id: sbomLieferung.id });
   const lieferungId = lieferung!.id;
+  await protokolliere(db, 'sbom_lieferung', lieferungId);
 
   if (!pruefung.konform) {
     // Nicht-konforme Lieferung ändert die Komponenten nicht (I2).

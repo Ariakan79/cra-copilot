@@ -8,6 +8,7 @@ import { and, eq } from 'drizzle-orm';
 import type { DB } from '../db/client';
 import { finding, meldevorgang, meldungStufe, produkt, type MeldeArt } from '../db/schema';
 import { aktuellerWert, ValidierungsFehler } from '../domain/evidenz';
+import { protokolliere } from './audit';
 
 /**
  * Meldevorgang-Domäne (CRA Art. 14, ADR-029–034). Die Eröffnung ist die
@@ -204,11 +205,19 @@ export async function reicheEin(
     eingereichtVon: daten.eingereichtVon,
     kanal: daten.kanal ?? 'manuell_enisa_csirt',
   };
+  let stufeId: string;
   if (row === undefined) {
-    await db.insert(meldungStufe).values({ vorgangId, stufe, ...werte });
+    const [neu] = await db
+      .insert(meldungStufe)
+      .values({ vorgangId, stufe, ...werte })
+      .returning({ id: meldungStufe.id });
+    stufeId = neu!.id;
   } else {
     await db.update(meldungStufe).set(werte).where(eq(meldungStufe.id, row.id));
+    stufeId = row.id;
   }
+  // Eingereichte Stufe in die Hash-Kette aufnehmen (ADR-035).
+  await protokolliere(db, 'meldung_stufe', stufeId);
   // Vorgangsstatus fortschreiben.
   if (stufe === 'meldung') {
     await db.update(meldevorgang).set({ status: 'gemeldet' }).where(eq(meldevorgang.id, vorgangId));

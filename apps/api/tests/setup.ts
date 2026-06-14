@@ -26,7 +26,12 @@ export async function starteTestDB(): Promise<TestDB> {
     container,
     // TRUNCATE umgeht den BEFORE-DELETE-Trigger (D2) — Reset bleibt möglich.
     reset: async () => {
-      await sql`truncate workshop, sbom_stream, gap, evidenz_knoten, produkt, mandant cascade`;
+      // Alle Tabellen explizit — audit_kette und osv_advisory haben keinen
+      // Fremdschlüssel, würden also von CASCADE nicht erfasst.
+      await sql`truncate
+        audit_kette, meldung_stufe, meldevorgang, finding, komponente, sbom_lieferung,
+        ingestion_token, portal_user, osv_advisory, workshop, sbom_stream, gap,
+        evidenz_knoten, produkt, mandant cascade`;
     },
     stop: async () => {
       await sql.end();

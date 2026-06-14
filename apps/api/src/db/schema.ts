@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  bigint,
   boolean,
   index,
   jsonb,
@@ -140,6 +141,22 @@ export const workshop = pgTable('workshop', {
     .references(() => mandant.id),
   workshopDurchgefuehrtAm: timestamp('workshop_durchgefuehrt_am', { withTimezone: true }),
   onboardingAbgeschlossenAm: timestamp('onboarding_abgeschlossen_am', { withTimezone: true }),
+});
+
+/**
+ * Hash-Kette (ADR-035): tamper-evidenter Nachweis über die append-only
+ * Datensätze. `payload_hash` kommt aus der App (kanonische JSON der
+ * Geschäftsfelder); `seq`, `vorgaenger_hash` und `hash` vergibt ein
+ * BEFORE-INSERT-Trigger atomar. Selbst unveränderlich.
+ */
+export const auditKette = pgTable('audit_kette', {
+  seq: bigint('seq', { mode: 'number' }).primaryKey(),
+  entity: text('entity').notNull(),
+  entityId: uuid('entity_id').notNull(),
+  payloadHash: text('payload_hash').notNull(),
+  vorgaengerHash: text('vorgaenger_hash').notNull(),
+  hash: text('hash').notNull(),
+  erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ===================================================================== Portal
