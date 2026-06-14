@@ -15,3 +15,8 @@ Erstbefüllung der Art-14-Fristen und Feldvorlagen; **alle Einträge
   (Schwachstelle/Vorfall) mit Art.-Referenzen.
 - Auflage meldung-v0.2: Abgleich mit den konkreten Feldvorgaben der
   einheitlichen Meldeplattform (Art. 16), sobald veröffentlicht.
+- Ergänzte Felder (nach Abgleich cra-ready.de/Art-14-Checkliste, alle pending):
+  Frühwarnung „böswillige Handlung?", Meldung „IoC", Abschluss „CVSS /
+  betroffene Versionen / Update-Status" (CVSS im Entwurf aus dem Finding
+  vorbefüllt). Offen für v0.2-Review: Bezug der Vorfall-Abschlussfrist
+  („nach Erstmeldung" vs. „nach 72h-Meldung").
