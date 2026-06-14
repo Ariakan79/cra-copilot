@@ -164,6 +164,17 @@ export async function alleAktuellenWerte(
   return ergebnis;
 }
 
+/** Aktueller Wert eines Feldes auf Mandantenebene (produkt_id NULL), z. B. für security.txt. */
+export async function aktuellerMandantWert(
+  db: DB,
+  mandantId: string,
+  feldId: string,
+): Promise<FeldWert | undefined> {
+  const knoten = await ladeAktuellen(db, mandantId, null, feldId);
+  if (knoten === undefined || knoten.wert === ZURUECK_AUF_DEFAULT) return undefined;
+  return knoten.wert;
+}
+
 function pruefeScope(ebene: Ebene, produktId: string | null): void {
   if (ebene === 'mandant' && produktId !== null) {
     throw new ValidierungsFehler('Mandantenfeld darf keine produkt_id tragen.');
