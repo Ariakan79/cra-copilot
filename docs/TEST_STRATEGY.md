@@ -349,3 +349,20 @@ Gegen echtes PostgreSQL (Testcontainers):
   Eintrag 1 verifizierbar.
 - K6 **`audit_kette` selbst unveränderlich:** UPDATE/DELETE auf einen
   Ketteneintrag schlägt fehl (Trigger).
+
+---
+
+## 11. Pflicht-Artefakte & Erstanschreiben (ADR-036/037, akzeptiert 2026-06-14)
+
+Gegen echtes PostgreSQL (Testcontainers) bzw. als reine Generierungstests:
+
+- S1 **security.txt**: aus Block-4-Kontakt generiert, RFC-9116-plausibel
+  (`Contact:`-Zeile, `Expires:`); ohne erfassten Kontakt → expliziter Hinweis.
+- S1b **security.txt-Publikation verkettet**: Veröffentlichen schreibt den exakten
+  Inhalt als Ketteneintrag; erneute Publikation mit geändertem Inhalt erzeugt
+  einen zweiten, verketteten Eintrag; `pruefeIntegritaet` erfasst beide.
+- S2 **Nutzerbenachrichtigung**: Entwurf je Meldevorgang aus Vorlage; Versand
+  wird unveränderlich festgehalten und in die Hash-Kette aufgenommen.
+- S3 **Erstanschreiben (Meldebereitschaft)**: Entwurf enthält den aktuellen
+  Ketten-Kopf-Hash + Meldekontakte; „versendet" erzeugt einen Ketteneintrag;
+  `eingangsbestaetigung` ist nachtragbar (und der Eintrag bleibt unveränderlich).
