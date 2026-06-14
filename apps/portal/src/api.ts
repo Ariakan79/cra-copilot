@@ -56,6 +56,7 @@ export interface Entwurf {
   titel: string;
   hinweis: string | null;
   felder: EntwurfFeld[];
+  integritaet: { kopfHash: string | null; intakt: boolean; geprueft: number };
 }
 
 async function json<T>(res: Response): Promise<T> {

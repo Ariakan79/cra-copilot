@@ -193,7 +193,44 @@ describe('R8: Einreichung & Unveränderlichkeit', () => {
     const e = await entwurf(t.db, id, 'meldung');
     expect(e.art).toBe('schwachstelle');
     expect(e.felder.some((f) => f.pflicht)).toBe(true);
-    expect(e.felder.every((f) => f.wert === '')).toBe(true);
+    // Geschäftsfelder sind leer; nur der Anker ist vorbelegt.
+    expect(e.felder.filter((f) => f.id !== 'kettenkopf_hash').every((f) => f.wert === '')).toBe(
+      true,
+    );
+  });
+});
+
+describe('Option 1: Integritäts-Anker im Melde-Entwurf', () => {
+  it('Entwurf enthält den aktuellen Kopf-Hash der Nachweis-Kette', async () => {
+    const { findingId } = await produktMitFinding();
+    const id = await eroeffneAusFinding(t.db, {
+      findingId,
+      titel: 'X',
+      begruendung: 'y',
+      eroeffnetVon: 'A',
+    });
+    const e = await entwurf(t.db, id, 'fruehwarnung');
+    expect(e.integritaet.intakt).toBe(true);
+    expect(e.integritaet.kopfHash).toMatch(/^[0-9a-f]{64}$/); // SHA-256 hex
+    const anker = e.felder.find((f) => f.id === 'kettenkopf_hash');
+    expect(anker?.wert).toBe(e.integritaet.kopfHash);
+  });
+
+  it('eingereichte Meldung trägt den Anker dauerhaft im unveränderlichen Inhalt', async () => {
+    const { findingId } = await produktMitFinding();
+    const id = await eroeffneAusFinding(t.db, {
+      findingId,
+      titel: 'X',
+      begruendung: 'y',
+      eroeffnetVon: 'A',
+    });
+    const e = await entwurf(t.db, id, 'fruehwarnung');
+    const inhalt = Object.fromEntries(e.felder.map((f) => [f.id, f.wert]));
+    await reicheEin(t.db, id, 'fruehwarnung', { inhalt, eingereichtVon: 'CISO' });
+    const [stufe] = await t.db.select().from(meldungStufe).where(eq(meldungStufe.vorgangId, id));
+    expect((stufe!.inhalt as Record<string, string>)['kettenkopf_hash']).toBe(
+      e.integritaet.kopfHash,
+    );
   });
 });
 
