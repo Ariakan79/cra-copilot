@@ -159,6 +159,20 @@ export const auditKette = pgTable('audit_kette', {
   erstelltAm: timestamp('erstellt_am', { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * security.txt-Publikation (ADR-037): der zum Veröffentlichungszeitpunkt
+ * bereitgestellte Inhalt als unveränderliche, verkettbare Zeile (ADR-035).
+ * Der Live-Endpunkt bleibt abgeleitet; jede Publikation hinterlässt einen Beleg.
+ */
+export const securityTxtPublikation = pgTable('security_txt_publikation', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  mandantId: uuid('mandant_id')
+    .notNull()
+    .references(() => mandant.id),
+  inhalt: text('inhalt').notNull(),
+  veroeffentlichtAm: timestamp('veroeffentlicht_am', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // ===================================================================== Portal
 
 /** UI-Anmeldung des Kundenteams (ADR-025): self-hosted, ein Mandant pro Instanz. */

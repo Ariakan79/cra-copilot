@@ -1,7 +1,13 @@
 import { createHash } from 'node:crypto';
 import { asc, eq } from 'drizzle-orm';
 import type { DB } from '../db/client';
-import { auditKette, evidenzKnoten, meldungStufe, sbomLieferung } from '../db/schema';
+import {
+  auditKette,
+  evidenzKnoten,
+  meldungStufe,
+  sbomLieferung,
+  securityTxtPublikation,
+} from '../db/schema';
 
 /**
  * Hash-Kette (ADR-035): Manipulationsevidenz über die append-only Datensätze.
@@ -13,7 +19,11 @@ import { auditKette, evidenzKnoten, meldungStufe, sbomLieferung } from '../db/sc
  * Unveränderlichkeit der Zeile ohnehin gebunden.
  */
 
-export type Entitaet = 'evidenz_knoten' | 'sbom_lieferung' | 'meldung_stufe';
+export type Entitaet =
+  | 'evidenz_knoten'
+  | 'sbom_lieferung'
+  | 'meldung_stufe'
+  | 'security_txt_publikation';
 
 /** Stabile Schlüsselsortierung → deterministische Serialisierung. */
 function kanonisch(wert: unknown): string {
@@ -93,6 +103,11 @@ const DEFS: Record<Entitaet, EntitaetsDef> = {
       eingereichtVon: r['eingereichtVon'],
       kanal: r['kanal'],
     }),
+  },
+  security_txt_publikation: {
+    laden: async (db, id) =>
+      (await db.select().from(securityTxtPublikation).where(eq(securityTxtPublikation.id, id)))[0],
+    payload: (r) => ({ mandantId: r['mandantId'], inhalt: r['inhalt'] }),
   },
 };
 

@@ -18,6 +18,11 @@ import {
 import { hashPasswort, neuesToken, produktFuerToken, pruefePasswort } from './portal/auth';
 import { ingest } from './portal/ingestion';
 import { pruefeIntegritaet } from './portal/audit';
+import {
+  einzigerMandant,
+  generiereSecurityTxt,
+  veroeffentlicheSecurityTxt,
+} from './portal/security-txt';
 import { bewerteFindings, setzeFindingTriage } from './portal/findings';
 import { heartbeat } from './portal/heartbeat';
 import {
@@ -252,6 +257,27 @@ export function buildApp(db: DB): FastifyInstance {
 
   // Integritätsnachweis der Hash-Kette (ADR-035).
   app.get('/integritaet', async () => pruefeIntegritaet(db));
+
+  // security.txt (Art. 13 Abs. 6, ADR-037): abgeleiteter Live-Inhalt …
+  app.get('/mandanten/:id/security.txt', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const sec = await generiereSecurityTxt(db, id);
+    return reply.header('content-type', 'text/plain; charset=utf-8').send(sec.inhalt);
+  });
+
+  app.get('/.well-known/security.txt', async (_req, reply) => {
+    const mandantId = await einzigerMandant(db);
+    if (mandantId === undefined) return reply.status(404).send('# Kein Mandant\n');
+    const sec = await generiereSecurityTxt(db, mandantId);
+    return reply.header('content-type', 'text/plain; charset=utf-8').send(sec.inhalt);
+  });
+
+  // … und Publikation als verketteter Beleg (ADR-035/037).
+  app.post('/mandanten/:id/security-txt/veroeffentlichen', async (req, reply) => {
+    const { id } = z.object({ id: z.string().uuid() }).parse(req.params);
+    const sec = await veroeffentlicheSecurityTxt(db, id);
+    return reply.status(201).send(sec);
+  });
 
   // ============================================================ Meldeworkflow
 
