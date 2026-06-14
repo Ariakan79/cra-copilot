@@ -864,3 +864,76 @@ funktioniert auch ohne und macht jede *partielle/gezielte* Manipulation sichtbar
 **Tests (TEST_STRATEGY §10):** Kette wächst je Append; Verifikation meldet
 „intakt"; simulierte Manipulation (Trigger temporär aus, Zeile ändern) wird als
 Bruch erkannt; gelöschtes/umsortiertes Kettenglied wird erkannt; Genesis korrekt.
+
+---
+
+## ADR-036 — Freiwilliges BSI-Erstanschreiben (Meldebereitschaft) mit Ketten-Anchoring
+
+**Status:** vorgeschlagen — zur Freigabe
+
+**Kontext:** Der CRA kennt **keinen** verpflichtenden Erst-/Baseline-Report an
+die Behörde; Art-14-Meldungen sind ereignisgetrieben. Der Director möchte
+dennoch ein **freiwilliges Erstanschreiben** an das BSI, das (a) die formale
+Meldebereitschaft nach Art. 14 signalisiert und (b) den aktuellen **Kopf-Hash
+der Nachweis-Kette** als ersten externen Anker hinterlegt — die behördliche
+Eingangsbestätigung wird damit zum zeitgestempelten Zeugen.
+
+**Entscheidung:** Ein generiertes **Meldebereitschafts-Anschreiben** (Dokument-
+Entwurf zum manuellen Versand, konsistent mit ADR-030):
+- Inhalt: Mandanten-/Produktidentität, benannte Meldekontakte (aus Block-4-
+  Evidenz, ADR-032), Erklärung der Art-14-Reaktionsfähigkeit, **Kopf-Hash der
+  Kette** + Verifikationshinweis.
+- **Dediziertes, unveränderliches & verkettetes Datenobjekt**
+  `behoerden_anschreiben` (art: `meldebereitschaft`): bei „versendet" wird es
+  zur Hash-Kette hinzugefügt (ADR-035); Feld `eingangsbestaetigung` nimmt die
+  behördliche Quittung/Aktenzeichen auf — **das** ist der eigentliche externe
+  Anker.
+
+**Gegenposition — als `meldevorgang` modellieren:** spart eine Tabelle.
+**Verworfen, weil** ein Meldevorgang Vorfall-/Schwachstellensemantik (Stufen,
+Fristen, Auslöser) trägt; ein Bereitschafts-Anschreiben hat davon nichts.
+
+**Restgrenze/Ehrlichkeit (dokumentiert):** Das Anschreiben ist **freiwillig,
+keine CRA-Pflicht**. Sein Anker-Wert hängt davon ab, dass das BSI es mit Datum
+**bestätigt/archiviert** — ohne Eingangsbestätigung bleibt es ein
+selbst­erstellter Nachweis. Die Annahme „die Stelle nimmt es wohlwollend an"
+ist nicht garantiert; das Feld `eingangsbestaetigung` macht den tatsächlichen
+Anker explizit nachweisbar.
+
+---
+
+## ADR-037 — Pflicht-Artefakte: security.txt (Art. 13 Abs. 6) & Nutzerbenachrichtigung (Art. 14 Abs. 8)
+
+**Status:** vorgeschlagen — zur Freigabe
+
+**Kontext:** Die Art-14-Checkliste deckt zwei Pflichten auf, die das Werkzeug
+bisher nur *erfasst*, aber nicht *erzeugt*: die Bereitstellung eines
+Meldekontakts via `security.txt` (Art. 13 Abs. 6) und die Information
+betroffener **Nutzer** über Vorfall und Abhilfemaßnahmen (Art. 14 Abs. 8).
+
+**Entscheidung — security.txt:**
+- Generierung nach RFC 9116 **aus der Block-4-Evidenz** (`s_cvd_kontaktstelle`
+  → `Contact:`; optional `Expires`, `Preferred-Languages`, `Policy`/`CSAF`).
+  Einzige Quelle ist die erfasste Evidenz (keine Doppelpflege).
+- Self-hosted: das Portal **serviert** `/.well-known/security.txt` und bietet
+  den Inhalt zum Download (falls auf separatem Webspace gehostet).
+
+**Entscheidung — Nutzerbenachrichtigung:**
+- Eigenes Artefakt **am Meldevorgang** (nicht als vierte Meldestufe — anderer
+  Empfänger, keine Behördenfrist). Vorlage in `meldung-vorlagen`
+  (`zielgruppe: nutzer`): betroffene Produkte/Versionen, Art des Vorfalls,
+  Abhilfe-/Eindämmungsmaßnahmen, empfohlene Nutzeraktionen.
+- Generierter Entwurf zum manuellen Versand über die Herstellerkanäle; bei
+  „versendet" als unveränderliches, verkettetes Ereignis festgehalten (ADR-035).
+
+**Gegenposition — security.txt-Inhalt separat im Portal konfigurieren:**
+**Verworfen** (Grundprinzip: Evidenz ist die Quelle; Doppelpflege vermeiden).
+**Gegenposition — Nutzerbenachrichtigung als 4. Meldestufe:** **verworfen**
+(Behördenstufen haben Fristen/Empfänger CSIRT; die Nutzerinfo nicht).
+
+**Test (TEST_STRATEGY §11):** security.txt enthält den erfassten Kontakt und ist
+RFC-9116-plausibel (Contact-Zeile, Expires); fehlt der Kontakt → klarer Hinweis
+statt leerer Datei. Nutzerbenachrichtigungs-Entwurf wird je Vorgang erzeugt,
+Versand ist unveränderlich/verkettet. Erstanschreiben (ADR-036): Entwurf trägt
+den aktuellen Kopf-Hash; „versendet" erzeugt einen Ketteneintrag; Eingangs-
+bestätigung nachtragbar.
