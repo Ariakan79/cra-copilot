@@ -161,11 +161,22 @@ export async function entwurf(db: DB, vorgangId: string, stufe: Stufe): Promise<
     .where(and(eq(meldungStufe.vorgangId, vorgangId), eq(meldungStufe.stufe, stufe)));
   const inhalt = (row?.inhalt ?? {}) as Record<string, string>;
   const integritaet = await pruefeIntegritaet(db);
+
+  // CVSS aus dem verknüpften Finding vorbefüllen (Abschlussbericht), falls vorhanden.
+  let cvssVorbelegung = '';
+  if (v.quelleFindingId !== null) {
+    const [f] = await db
+      .select({ schweregrad: finding.schweregrad })
+      .from(finding)
+      .where(eq(finding.id, v.quelleFindingId));
+    cvssVorbelegung = f?.schweregrad ?? '';
+  }
+
   const felder: EntwurfFeld[] = vorlage.felder.map((f) => ({
     id: f.id,
     label: f.label.de,
     pflicht: f.pflicht,
-    wert: inhalt[f.id] ?? '',
+    wert: inhalt[f.id] ?? (f.id === 'cvss' ? cvssVorbelegung : ''),
   }));
   // Integritäts-Anker einbetten: der aktuelle Kopf-Hash der Nachweis-Kette geht
   // damit in die Behördenmeldung ein und wird so extern (zeit-)bezeugt (Option 1).

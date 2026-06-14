@@ -81,6 +81,11 @@ vorlagen:
       - { id: schwachstelle, label: { de: 'Schwachstellenkennung (CVE/OSV) bzw. Beschreibung' } }
       - { id: ausnutzung_bekannt, label: { de: 'Hinweise auf aktive Ausnutzung' } }
       - { id: erste_einschaetzung, label: { de: 'Erste Einschätzung der Auswirkung' } }
+      - {
+          id: boeswillige_handlung,
+          label: { de: 'Hinweis: deutet auf rechtswidrige/böswillige Handlung hin?' },
+          pflicht: false,
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. a' }
     review_status: pending
 
@@ -97,6 +102,11 @@ vorlagen:
           id: korrekturmassnahme,
           label: { de: 'Geplante/verfügbare Korrektur- oder Eindämmungsmaßnahmen' },
         }
+      - {
+          id: ioc,
+          label: { de: 'Indikatoren für Kompromittierung (IoC), falls verfügbar' },
+          pflicht: false,
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. b' }
     review_status: pending
 
@@ -106,7 +116,10 @@ vorlagen:
     hinweis: { de: 'Spätestens 14 Tage nach Verfügbarkeit der Korrekturmaßnahme.' }
     felder:
       - { id: schwachstelle, label: { de: 'Schwachstellenkennung' } }
+      - { id: cvss, label: { de: 'CVSS-Score (falls verfügbar)' }, pflicht: false }
+      - { id: betroffene_versionen, label: { de: 'Betroffene Produktversionen' } }
       - { id: behebung, label: { de: 'Durchgeführte Behebung (Patch/Version)' } }
+      - { id: update_status, label: { de: 'Status des Sicherheitsupdates (verfügbar/verteilt)' } }
       - { id: wirksamkeit, label: { de: 'Wirksamkeit und Verteilungsgrad der Maßnahme' } }
       - { id: lessons_learned, label: { de: 'Ursachen und abgeleitete Maßnahmen' }, pflicht: false }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 2 lit. c' }
@@ -124,6 +137,11 @@ vorlagen:
           label:
             { de: 'Erste Einschätzung der Auswirkung (Verfügbarkeit/Integrität/Vertraulichkeit)' },
         }
+      - {
+          id: boeswillige_handlung,
+          label: { de: 'Hinweis: deutet auf rechtswidrige/böswillige Handlung hin?' },
+          pflicht: false,
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. a' }
     review_status: pending
 
@@ -137,6 +155,11 @@ vorlagen:
       - { id: bedrohungsanalyse, label: { de: 'Bedrohungsanalyse / mutmaßliche Ursache' } }
       - { id: auswirkung, label: { de: 'Auswirkung auf Schutzziele und Betroffene' } }
       - { id: sofortmassnahmen, label: { de: 'Ergriffene Sofortmaßnahmen' } }
+      - {
+          id: ioc,
+          label: { de: 'Indikatoren für Kompromittierung (IoC), falls verfügbar' },
+          pflicht: false,
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. b' }
     review_status: pending
 
@@ -148,6 +171,15 @@ vorlagen:
       - { id: vorfall, label: { de: 'Vorfallbezug' } }
       - { id: ursache, label: { de: 'Festgestellte Ursache (Root-Cause)' } }
       - { id: massnahmen, label: { de: 'Behebungs- und Härtungsmaßnahmen' } }
-      - { id: schweregrad_final, label: { de: 'Abschließende Schweregradeinordnung' } }
+      - { id: betroffene_versionen, label: { de: 'Betroffene Produktversionen' }, pflicht: false }
+      - {
+          id: update_status,
+          label: { de: 'Status des Sicherheitsupdates (verfügbar/verteilt)' },
+          pflicht: false,
+        }
+      - {
+          id: schweregrad_final,
+          label: { de: 'Abschließende Schweregradeinordnung (CVSS falls verfügbar)' },
+        }
     referenz: { dokument: 'CRA (EU) 2024/2847', stelle: 'Art. 14 Abs. 4 lit. c' }
     review_status: pending

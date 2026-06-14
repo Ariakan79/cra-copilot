@@ -216,6 +216,19 @@ describe('Option 1: Integritäts-Anker im Melde-Entwurf', () => {
     expect(anker?.wert).toBe(e.integritaet.kopfHash);
   });
 
+  it('Abschluss-Entwurf befüllt CVSS aus dem verknüpften Finding vor', async () => {
+    const { findingId } = await produktMitFinding();
+    const id = await eroeffneAusFinding(t.db, {
+      findingId,
+      titel: 'X',
+      begruendung: 'y',
+      eroeffnetVon: 'A',
+    });
+    const e = await entwurf(t.db, id, 'abschluss');
+    const cvss = e.felder.find((f) => f.id === 'cvss');
+    expect(cvss?.wert).toBe('7.4'); // aus OSV-Fixture (lodash)
+  });
+
   it('eingereichte Meldung trägt den Anker dauerhaft im unveränderlichen Inhalt', async () => {
     const { findingId } = await produktMitFinding();
     const id = await eroeffneAusFinding(t.db, {
