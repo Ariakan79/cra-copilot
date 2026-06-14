@@ -328,3 +328,24 @@ osv.dev/ENISA" (Datenlokalität, ADR-021/030).
 
 Im bestehenden `integration`-Job mitgedeckt; keine neuen externen Abhängigkeiten
 (kein Echt-Versand an Behörden in Tests).
+
+---
+
+## 10. Querschnitt — Hash-Verkettung (ADR-035, Status: zur Freigabe)
+
+Gegen echtes PostgreSQL (Testcontainers):
+
+- K1 **Kettenwachstum:** jeder geschützte Append (Evidenz, Lieferung,
+  eingereichte Meldestufe) erzeugt genau einen `audit_kette`-Eintrag mit
+  fortlaufender `seq` und korrekt verkettetem `vorgaenger_hash`.
+- K2 **Verifikation intakt:** `pruefeIntegritaet()` meldet „intakt bis seq N"
+  für eine unveränderte Kette.
+- K3 **Zeilenmanipulation erkannt:** Trigger temporär deaktiviert, eine
+  Evidenz-/Lieferzeile geändert → Verifikation meldet Bruch (payload_hash-Mismatch)
+  mit der betroffenen `seq`.
+- K4 **Kettenmanipulation erkannt:** ein Kettenglied gelöscht/umsortiert →
+  Verifikation meldet gebrochene Verkettung.
+- K5 **Genesis:** erster Eintrag hat leeren `vorgaenger_hash`; Kette ist ab
+  Eintrag 1 verifizierbar.
+- K6 **`audit_kette` selbst unveränderlich:** UPDATE/DELETE auf einen
+  Ketteneintrag schlägt fehl (Trigger).

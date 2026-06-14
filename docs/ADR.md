@@ -803,3 +803,64 @@ vorschlagen:** spart einen Klick. **Verworfen, weil** „aktiv ausgenutzt" eine
 Tatsachenfeststellung ist, die CVSS/Triage nicht hergeben — und eine Fehlmeldung
 an die Behörde reale Folgen hat. Die Schwelle ist bewusst eine menschliche
 Entscheidung.
+
+---
+
+# Querschnitt — Integrität
+
+## ADR-035 — Hash-Verkettung der unveränderlichen Datensätze
+
+**Status:** vorgeschlagen — zur Freigabe
+
+**Kontext:** Die DB-Trigger (ADR-015/024/031) verhindern Ändern/Löschen über den
+normalen Zugriffsweg, schützen aber nicht gegen einen privilegierten Insider, der
+einen Trigger deaktiviert und eine eingefrorene Zeile umschreibt. Der Director
+fordert **Manipulationsevidenz**: nachträgliche Änderungen müssen *erkennbar*
+werden, auch wenn die Prävention umgangen wurde.
+
+**Entscheidung:** Eine fortlaufende, kryptografische **Hash-Kette** über die
+drei beweisrelevanten, append-only Datensatzarten — Evidenzknoten,
+SBOM-Lieferungen und **eingereichte** Meldestufen.
+
+- **Dediziertes `audit_kette`-Tabellenmodell:** Jeder geschützte Append erzeugt
+  zusätzlich einen Ketteneintrag
+  `{ seq, entity, entity_id, payload_hash, vorgaenger_hash, hash }`.
+  `audit_kette` ist selbst per Trigger unveränderlich.
+- **Aufgabenteilung App ↔ DB:**
+  - Die Anwendung berechnet `payload_hash = SHA-256(kanonische JSON der
+    unveränderlichen Geschäftsfelder)` — sie kennt Feldauswahl und kanonische Form.
+  - Ein `BEFORE INSERT`-Trigger auf `audit_kette` vergibt **atomar** `seq`,
+    `vorgaenger_hash` (Hash des letzten Eintrags) und
+    `hash = SHA-256(vorgaenger_hash || seq || entity || entity_id ||
+    payload_hash)` via `pgcrypto.digest()`. Ein `pg_advisory_xact_lock`
+    serialisiert das Anhängen (genügt im self-hosted, geringvolumigen Betrieb).
+- **Verifikation** (Funktion + Endpunkt `GET /integritaet`): (1) Kettenglieder
+  durchlaufen und jeden `hash` neu berechnen — bricht bei Umsortierung/Löschung;
+  (2) jeden referenzierten Geschäftsdatensatz neu hashen und mit `payload_hash`
+  vergleichen — bricht bei nachträglicher Zeilenänderung. Ergebnis: „intakt bis
+  seq N" oder „Bruch an seq K (Grund)".
+- **Genesis:** erster Eintrag mit `vorgaenger_hash = '' ` (Konstante).
+
+**Gegenposition A — Hash-Spalten direkt an jeder Geschäftstabelle
+(`zeile_hash`, `vorgaenger_hash`):** co-lokal, keine zweite Tabelle.
+**Verworfen, weil** die Kettenlogik dann über drei Tabellen mit je eigener
+Kanonisierung verteilt ist, heterogene Datensätze keine gemeinsame Ordnung haben
+und es keine einzelne Verifikations-/Nachweisfläche gibt. Eine Kette ist klarer.
+
+**Gegenposition B — Linkage komplett in der App berechnen:** kein Trigger.
+**Verworfen, weil** das Lesen des Ketten-Kopfes und das Einfügen dann
+app-seitig gegen Races serialisiert werden müssten; der DB-Trigger macht das
+atomar und überlebt auch direkte SQL-Inserts in `audit_kette`.
+
+**Restgrenze (bewusst, dokumentiert):** Hash-Verkettung liefert
+Manipulations*evidenz*, keine -*verhinderung*. Ein Superuser, der die gesamte
+Kette konsistent neu berechnet, bleibt unentdeckt, **solange der Kopf-Hash nicht
+extern verankert ist.** Der vervollständigende Schritt ist daher ein
+periodisches **externes Anchoring** des aktuellen Kopf-Hashes (z. B. signierter
+Export an einen WORM-Speicher / ein zweites System). Das ist in diesem ADR
+vorgesehen, aber als optionaler Folgeschritt ausgewiesen — der Kettenmechanismus
+funktioniert auch ohne und macht jede *partielle/gezielte* Manipulation sichtbar.
+
+**Tests (TEST_STRATEGY §10):** Kette wächst je Append; Verifikation meldet
+„intakt"; simulierte Manipulation (Trigger temporär aus, Zeile ändern) wird als
+Bruch erkannt; gelöschtes/umsortiertes Kettenglied wird erkannt; Genesis korrekt.
