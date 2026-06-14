@@ -869,7 +869,7 @@ Bruch erkannt; gelöschtes/umsortiertes Kettenglied wird erkannt; Genesis korrek
 
 ## ADR-036 — Freiwilliges BSI-Erstanschreiben (Meldebereitschaft) mit Ketten-Anchoring
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-14)
 
 **Kontext:** Der CRA kennt **keinen** verpflichtenden Erst-/Baseline-Report an
 die Behörde; Art-14-Meldungen sind ereignisgetrieben. Der Director möchte
@@ -904,7 +904,7 @@ Anker explizit nachweisbar.
 
 ## ADR-037 — Pflicht-Artefakte: security.txt (Art. 13 Abs. 6) & Nutzerbenachrichtigung (Art. 14 Abs. 8)
 
-**Status:** vorgeschlagen — zur Freigabe
+**Status:** akzeptiert (Freigabe Director 2026-06-14)
 
 **Kontext:** Die Art-14-Checkliste deckt zwei Pflichten auf, die das Werkzeug
 bisher nur *erfasst*, aber nicht *erzeugt*: die Bereitstellung eines
@@ -915,8 +915,13 @@ betroffener **Nutzer** über Vorfall und Abhilfemaßnahmen (Art. 14 Abs. 8).
 - Generierung nach RFC 9116 **aus der Block-4-Evidenz** (`s_cvd_kontaktstelle`
   → `Contact:`; optional `Expires`, `Preferred-Languages`, `Policy`/`CSAF`).
   Einzige Quelle ist die erfasste Evidenz (keine Doppelpflege).
-- Self-hosted: das Portal **serviert** `/.well-known/security.txt` und bietet
-  den Inhalt zum Download (falls auf separatem Webspace gehostet).
+- Self-hosted: das Portal **serviert** `/.well-known/security.txt` (abgeleiteter
+  Aktuell-Zustand) und bietet den Inhalt zum Download.
+- **Veröffentlichungs-Ereignis verkettet (ADR-035):** Beim (Neu-)Veröffentlichen
+  wird der exakte Inhalt als unveränderliches Ereignis in die Hash-Kette
+  geschrieben — nachweisbar, *welche security.txt zu welchem Zeitpunkt*
+  bereitgestellt war (lückenloser Art-13-Abs-6-Nachweis). Der Live-Endpunkt
+  bleibt abgeleitet; jede Publikation hinterlässt einen verketteten Beleg.
 
 **Entscheidung — Nutzerbenachrichtigung:**
 - Eigenes Artefakt **am Meldevorgang** (nicht als vierte Meldestufe — anderer
