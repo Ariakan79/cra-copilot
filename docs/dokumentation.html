@@ -212,7 +212,7 @@
         Behördenmeldung.
       </div>
       <div class="meta">
-        Stand: 13. Juni 2026 · Fassung 1.0<br />
+        Stand: 14. Juni 2026 · Fassung 1.1<br />
         Inhalt: Anforderungen &amp; Referenzen · Workflow · Mehrwert des Vorgehens<br />
         <span class="leise"
           >Hinweis: Dieses Dokument ist eine technische Projektdokumentation und
@@ -311,9 +311,37 @@
             <td>
               Meldevorgang aus einem als „aktiv ausgenutzt" eingestuften Finding
               oder als freie Vorfallmeldung; Fristenuhr, Eskalation und
-              generierter Melde-Entwurf zum manuellen Absenden.
+              generierter Melde-Entwurf zum manuellen Absenden — inklusive des
+              Kopf-Hashes der Nachweis-Kette als Integritäts-Anker.
             </td>
             <td>Art. 14 (Meldung), Art. 16 (Plattform)</td>
+          </tr>
+          <tr>
+            <td><strong>Nutzerbenachrichtigung</strong></td>
+            <td>
+              Generierter Entwurf zur Information betroffener Nutzer über Vorfall
+              und Abhilfemaßnahmen; Versand unveränderlich festgehalten.
+            </td>
+            <td>Art. 14 Abs. 8</td>
+          </tr>
+          <tr>
+            <td><strong>Meldekontakt</strong> (security.txt)</td>
+            <td>
+              Erzeugung einer <code>security.txt</code> (RFC 9116) aus der erfassten
+              Kontaktstelle; Bereitstellung unter <code>/.well-known/</code>; jede
+              Veröffentlichung als verketteter Beleg.
+            </td>
+            <td>Art. 13 Abs. 6</td>
+          </tr>
+          <tr>
+            <td><strong>Nachweisführung</strong> (Manipulationsevidenz)</td>
+            <td>
+              Append-only Datensätze (Evidenz, Lieferungen, Meldungen) in einer
+              kryptografischen Hash-Kette; Verifikation erkennt nachträgliche
+              Änderungen. Optionales freiwilliges BSI-Erstanschreiben verankert
+              den Stand extern.
+            </td>
+            <td>Art. 13 Abs. 14 (Aufbewahrung)</td>
           </tr>
           <tr>
             <td><strong>Support-Zeitraum</strong> festlegen &amp; kommunizieren</td>
@@ -476,13 +504,27 @@
         Zweitlogiken, keine Methodik-Duplikation.
       </p>
 
-      <h3>4.3 Beweisbarkeit durch Unveränderlichkeit</h3>
+      <h3>4.3 Beweisbarkeit durch Unveränderlichkeit und Hash-Verkettung</h3>
       <p>
-        Evidenzknoten, SBOM-Lieferungen und eingereichte Meldungen sind
-        append-only und auf Datenbankebene gegen Änderung gesichert. Wer hat wann
-        auf welcher Grundlage was festgestellt oder gemeldet — das ist
-        nachweisbar. Für ein Compliance-Produkt ist diese lückenlose Historie
-        kein Beiwerk, sondern das Kernversprechen.
+        Evidenzknoten, SBOM-Lieferungen, eingereichte Meldungen, veröffentlichte
+        security.txt und Behörden-Anschreiben sind append-only und auf
+        Datenbankebene per Trigger gegen Änderung gesichert. Darüber liegt eine
+        <strong>kryptografische Hash-Kette</strong>: Jeder dieser Datensätze wird
+        beim Anlegen verkettet (SHA-256 über den Inhalt, verknüpft mit dem
+        Vorgänger). Eine Verifikation rechnet die Kette nach und hasht jeden
+        Datensatz erneut — damit werden <em>sowohl</em> nachträglich geänderte
+        Zeilen <em>als auch</em> entfernte oder umsortierte Kettenglieder
+        erkennbar, selbst wenn der Schutz-Trigger umgangen wurde. Das liefert
+        Manipulations<em>evidenz</em>, nicht nur -prävention.
+      </p>
+      <p>
+        Damit auch ein privilegierter Insider, der die gesamte Kette konsistent
+        neu rechnet, auffällt, kann der aktuelle Kopf-Hash <strong>extern
+        verankert</strong> werden: Er geht in jede Behördenmeldung ein und kann
+        über ein freiwilliges BSI-Erstanschreiben (Meldebereitschaft) mit
+        behördlicher Eingangsbestätigung zeitlich bezeugt werden. Für ein
+        Compliance-Produkt ist diese lückenlose, nachweisbare Historie kein
+        Beiwerk, sondern das Kernversprechen.
       </p>
 
       <h3>4.4 Datenhoheit über die gesamte Kette</h3>
@@ -550,7 +592,8 @@
       <ul class="ref-liste">
         <li>Art. 2 Anwendungsbereich · Art. 3 Begriffsbestimmungen</li>
         <li>Art. 13 Pflichten der Hersteller (Abs. 8: Support-Zeitraum)</li>
-        <li>Art. 14 Meldepflichten (24h/72h/Abschluss) · Art. 16 einheitliche Meldeplattform</li>
+        <li>Art. 13 Abs. 6 Meldekontakt (security.txt) · Abs. 8 Support-Zeitraum · Abs. 14 Aufbewahrung</li>
+        <li>Art. 14 Meldepflichten (24h/72h/Abschluss) · Abs. 8 Nutzerinformation · Art. 16 einheitliche Meldeplattform</li>
         <li>Art. 28/30 CE-Kennzeichnung &amp; EU-Konformitätserklärung (Anhang V)</li>
         <li>Art. 31, Anhang VII technische Dokumentation</li>
         <li>Art. 71 Zeitpunkt der Anwendung (Meldepflichten 09/2026, volle Anwendung 12/2027)</li>
@@ -578,6 +621,9 @@
           CycloneDX (SBOM-Standard): <a href="https://cyclonedx.org/">cyclonedx.org</a>
           · SPDX: <a href="https://spdx.dev/">spdx.dev</a>
         </li>
+        <li>
+          RFC 9116 (security.txt): <a href="https://www.rfc-editor.org/rfc/rfc9116">rfc-editor.org/rfc/rfc9116</a>
+        </li>
       </ul>
 
       <div class="box warn" style="margin-top: 1.4em">
@@ -589,7 +635,7 @@
       </div>
 
       <footer class="fuss">
-        CRA-Copilot · Projektdokumentation 1.0 · 13. Juni 2026 — Erstellt zur
+        CRA-Copilot · Projektdokumentation 1.1 · 14. Juni 2026 — Erstellt zur
         technischen Erläuterung; keine Rechtsberatung.
       </footer>
     </div>
