@@ -6,3 +6,4 @@ test-results/
 pnpm-lock.yaml
 *.gen.json
 *.md
+THIRD-PARTY-LICENSES.txt
