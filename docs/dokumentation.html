@@ -207,17 +207,16 @@
       <h1>CRA-Copilot</h1>
       <div class="balken"></div>
       <div class="untertitel">
-        Ein Compliance-Werkzeug zum EU Cyber Resilience Act (Verordnung (EU)
-        2024/2847) für deutsche KMU — von der Betroffenheitsanalyse bis zur
-        Behördenmeldung.
+        Ein Compliance-Werkzeug zum EU Cyber Resilience Act (Verordnung (EU) 2024/2847) für deutsche
+        KMU — von der Betroffenheitsanalyse bis zur Behördenmeldung.
       </div>
       <div class="meta">
         Stand: 14. Juni 2026 · Fassung 1.1<br />
         Inhalt: Anforderungen &amp; Referenzen · Workflow · Mehrwert des Vorgehens<br />
         <span class="leise"
-          >Hinweis: Dieses Dokument ist eine technische Projektdokumentation und
-          keine Rechtsberatung. Alle regulatorischen Verweise sind vor
-          Produktiveinsatz juristisch zu prüfen.</span
+          >Hinweis: Dieses Dokument ist eine technische Projektdokumentation und keine
+          Rechtsberatung. Alle regulatorischen Verweise sind vor Produktiveinsatz juristisch zu
+          prüfen.</span
         >
       </div>
     </section>
@@ -226,39 +225,35 @@
       <!-- ============================ 1. Überblick ============================ -->
       <h2>1. Überblick</h2>
       <p>
-        Der <strong>Cyber Resilience Act</strong> (CRA, Verordnung (EU)
-        2024/2847) verpflichtet Hersteller, Importeure und Händler von „Produkten
-        mit digitalen Elementen", über den gesamten Produktlebenszyklus für
-        Cybersicherheit zu sorgen — von der sicheren Entwicklung über ein
-        Schwachstellenmanagement bis zu Melde- und Dokumentationspflichten. Für
-        kleine und mittlere Unternehmen (KMU) ist die Umsetzung ohne
-        Werkzeugunterstützung aufwändig und fehleranfällig.
+        Der <strong>Cyber Resilience Act</strong> (CRA, Verordnung (EU) 2024/2847) verpflichtet
+        Hersteller, Importeure und Händler von „Produkten mit digitalen Elementen", über den
+        gesamten Produktlebenszyklus für Cybersicherheit zu sorgen — von der sicheren Entwicklung
+        über ein Schwachstellenmanagement bis zu Melde- und Dokumentationspflichten. Für kleine und
+        mittlere Unternehmen (KMU) ist die Umsetzung ohne Werkzeugunterstützung aufwändig und
+        fehleranfällig.
       </p>
       <p>
-        <strong>CRA-Copilot</strong> begleitet diesen Weg in vier aufeinander
-        aufbauenden Stufen mit <em>einem</em> Domänenmodell und
-        <em>einer</em> Regelbasis. Es übersetzt die regulatorischen Pflichten in
-        ein geführtes, evidenzbasiertes Verfahren und liefert am Ende belastbare
-        Artefakte: Klassifizierung, Pflichtenkatalog, technische Dokumentation,
-        SBOM-Überwachung und vorbereitete Behördenmeldungen.
+        <strong>CRA-Copilot</strong> begleitet diesen Weg in vier aufeinander aufbauenden Stufen mit
+        <em>einem</em> Domänenmodell und <em>einer</em> Regelbasis. Es übersetzt die regulatorischen
+        Pflichten in ein geführtes, evidenzbasiertes Verfahren und liefert am Ende belastbare
+        Artefakte: Klassifizierung, Pflichtenkatalog, technische Dokumentation, SBOM-Überwachung und
+        vorbereitete Behördenmeldungen.
       </p>
 
       <div class="box">
         <strong>Grundhaltung des Werkzeugs.</strong> Das System
-        <em>strukturiert und formuliert</em>, es <em>bewertet aber nicht
-        automatisch</em>. Jede sicherheits- oder meldungsrelevante Entscheidung
-        trägt einen menschlichen Urheber. Regulatorische Verweise werden als
-        versionierte Daten gepflegt — juristische Korrekturen sind ohne
-        Software-Änderung möglich.
+        <em>strukturiert und formuliert</em>, es <em>bewertet aber nicht automatisch</em>. Jede
+        sicherheits- oder meldungsrelevante Entscheidung trägt einen menschlichen Urheber.
+        Regulatorische Verweise werden als versionierte Daten gepflegt — juristische Korrekturen
+        sind ohne Software-Änderung möglich.
       </div>
 
       <!-- ============================ 2. Anforderungen ============================ -->
       <h2>2. Anforderungen aus dem CRA und ihre Umsetzung</h2>
       <p>
-        Die folgende Tabelle ordnet die wesentlichen CRA-Pflichten den
-        Funktionen des Werkzeugs zu. Die Spalte „Referenz" verweist auf die
-        einschlägige Stelle in der Verordnung bzw. auf weiterführende
-        Normen/Quellen (vollständige Linkliste in Abschnitt 5).
+        Die folgende Tabelle ordnet die wesentlichen CRA-Pflichten den Funktionen des Werkzeugs zu.
+        Die Spalte „Referenz" verweist auf die einschlägige Stelle in der Verordnung bzw. auf
+        weiterführende Normen/Quellen (vollständige Linkliste in Abschnitt 5).
       </p>
 
       <table>
@@ -273,98 +268,92 @@
           <tr>
             <td><strong>Anwendungsbereich &amp; Rolle</strong> bestimmen</td>
             <td>
-              Öffentlicher Betroffenheits-Wizard ermittelt Rolle, Produktart,
-              EU-Inverkehrbringen und Ausnahmebereiche; rein clientseitig, keine
-              Datenübertragung.
+              Öffentlicher Betroffenheits-Wizard ermittelt Rolle, Produktart, EU-Inverkehrbringen
+              und Ausnahmebereiche; rein clientseitig, keine Datenübertragung.
             </td>
             <td>Art. 2 (Anwendungsbereich), Art. 3 (Begriffe)</td>
           </tr>
           <tr>
             <td><strong>Klassifizierung</strong> (wichtig/kritisch)</td>
             <td>
-              Regel-Engine schlägt die Kategorie (Standard / wichtig Klasse I/II
-              / kritisch) aus den Produktangaben vor; im Aufnahme-Cockpit
-              bestätigt oder mit Begründung überschrieben.
+              Regel-Engine schlägt die Kategorie (Standard / wichtig Klasse I/II / kritisch) aus den
+              Produktangaben vor; im Aufnahme-Cockpit bestätigt oder mit Begründung überschrieben.
             </td>
             <td>Anhang III, Anhang IV; DVO (EU) 2025/2392</td>
           </tr>
           <tr>
             <td><strong>Grundlegende Sicherheitsanforderungen</strong></td>
             <td>
-              Strukturierte Erhebung des Erfüllungsgrads je Anforderung
-              (sichere Defaults, Zugriffskontrolle, Update-Mechanismus …); jede
-              Lücke erzeugt einen priorisierten Eintrag der Gap-Liste.
+              Strukturierte Erhebung des Erfüllungsgrads je Anforderung (sichere Defaults,
+              Zugriffskontrolle, Update-Mechanismus …); jede Lücke erzeugt einen priorisierten
+              Eintrag der Gap-Liste.
             </td>
             <td>Anhang I Teil I</td>
           </tr>
           <tr>
             <td><strong>Schwachstellenmanagement</strong> &amp; SBOM</td>
             <td>
-              Erfassung des Prozesses; Portal nimmt SBOMs (CycloneDX/SPDX)
-              entgegen und gleicht sie kontinuierlich gegen einen lokalen
-              OSV-Spiegel ab (Findings + Triage).
+              Erfassung des Prozesses; Portal nimmt SBOMs (CycloneDX/SPDX) entgegen und gleicht sie
+              kontinuierlich gegen einen lokalen OSV-Spiegel ab (Findings + Triage).
             </td>
             <td>Anhang I Teil II; BSI TR-03183-2; OSV</td>
           </tr>
           <tr>
             <td><strong>Meldepflichten</strong> (24h/72h/Abschluss)</td>
             <td>
-              Meldevorgang aus einem als „aktiv ausgenutzt" eingestuften Finding
-              oder als freie Vorfallmeldung; Fristenuhr, Eskalation und
-              generierter Melde-Entwurf zum manuellen Absenden — inklusive des
-              Kopf-Hashes der Nachweis-Kette als Integritäts-Anker.
+              Meldevorgang aus einem als „aktiv ausgenutzt" eingestuften Finding oder als freie
+              Vorfallmeldung; Fristenuhr, Eskalation und generierter Melde-Entwurf zum manuellen
+              Absenden — inklusive des Kopf-Hashes der Nachweis-Kette als Integritäts-Anker.
             </td>
             <td>Art. 14 (Meldung), Art. 16 (Plattform)</td>
           </tr>
           <tr>
             <td><strong>Nutzerbenachrichtigung</strong></td>
             <td>
-              Generierter Entwurf zur Information betroffener Nutzer über Vorfall
-              und Abhilfemaßnahmen; Versand unveränderlich festgehalten.
+              Generierter Entwurf zur Information betroffener Nutzer über Vorfall und
+              Abhilfemaßnahmen; Versand unveränderlich festgehalten.
             </td>
             <td>Art. 14 Abs. 8</td>
           </tr>
           <tr>
             <td><strong>Meldekontakt</strong> (security.txt)</td>
             <td>
-              Erzeugung einer <code>security.txt</code> (RFC 9116) aus der erfassten
-              Kontaktstelle; Bereitstellung unter <code>/.well-known/</code>; jede
-              Veröffentlichung als verketteter Beleg.
+              Erzeugung einer <code>security.txt</code> (RFC 9116) aus der erfassten Kontaktstelle;
+              Bereitstellung unter <code>/.well-known/</code>; jede Veröffentlichung als verketteter
+              Beleg.
             </td>
             <td>Art. 13 Abs. 6</td>
           </tr>
           <tr>
             <td><strong>Nachweisführung</strong> (Manipulationsevidenz)</td>
             <td>
-              Append-only Datensätze (Evidenz, Lieferungen, Meldungen) in einer
-              kryptografischen Hash-Kette; Verifikation erkennt nachträgliche
-              Änderungen. Optionales freiwilliges BSI-Erstanschreiben verankert
-              den Stand extern.
+              Append-only Datensätze (Evidenz, Lieferungen, Meldungen) in einer kryptografischen
+              Hash-Kette; Verifikation erkennt nachträgliche Änderungen. Optionales freiwilliges
+              BSI-Erstanschreiben verankert den Stand extern.
             </td>
             <td>Art. 13 Abs. 14 (Aufbewahrung)</td>
           </tr>
           <tr>
             <td><strong>Support-Zeitraum</strong> festlegen &amp; kommunizieren</td>
             <td>
-              Verbindliche Festlegung des Unterstützungszeitraums mit Begründung;
-              kundensichtbare Support-Zeitraum-Erklärung als Artefakt.
+              Verbindliche Festlegung des Unterstützungszeitraums mit Begründung; kundensichtbare
+              Support-Zeitraum-Erklärung als Artefakt.
             </td>
             <td>Art. 13 Abs. 8</td>
           </tr>
           <tr>
             <td><strong>Technische Dokumentation</strong> &amp; CE</td>
             <td>
-              Gap-Analyse gegen die Anhang-VII-Gliederung; Markierung, was
-              vorhanden, generierbar oder zu liefern ist; Vorbereitung der
-              Konformitätserklärung.
+              Gap-Analyse gegen die Anhang-VII-Gliederung; Markierung, was vorhanden, generierbar
+              oder zu liefern ist; Vorbereitung der Konformitätserklärung.
             </td>
             <td>Art. 31, Anhang VII; Art. 28/30, Anhang V</td>
           </tr>
           <tr>
             <td><strong>Benutzerinformationen</strong></td>
             <td>
-              Prüfung, ob Kontaktstelle, Support-Zeitraum und Update-Anleitung in
-              Produkt/Doku integriert sind.
+              Prüfung, ob Kontaktstelle, Support-Zeitraum und Update-Anleitung in Produkt/Doku
+              integriert sind.
             </td>
             <td>Anhang II</td>
           </tr>
@@ -372,195 +361,188 @@
       </table>
 
       <div class="box warn">
-        <strong>Geltungstermine.</strong> Die Meldepflichten gelten ab dem 11.
-        September 2026, die vollständige Anwendung des CRA ab dem 11. Dezember
-        2027 (Art. 71). Das Werkzeug ordnet jeder Pflicht den passenden
-        Zeithorizont zu.
+        <strong>Geltungstermine.</strong> Die Meldepflichten gelten ab dem 11. September 2026, die
+        vollständige Anwendung des CRA ab dem 11. Dezember 2027 (Art. 71). Das Werkzeug ordnet jeder
+        Pflicht den passenden Zeithorizont zu.
       </div>
 
       <!-- ============================ 3. Workflow ============================ -->
       <h2 class="seitenumbruch">3. Workflow — die vier Stufen</h2>
       <p>
-        CRA-Copilot bildet den Compliance-Weg als durchgängige Kette ab. Alle
-        vier Oberflächen greifen auf <em>dasselbe</em> Backend und
-        <em>dieselbe</em> Regelbasis zu — es gibt keine doppelte Methodik.
+        CRA-Copilot bildet den Compliance-Weg als durchgängige Kette ab. Alle vier Oberflächen
+        greifen auf <em>dasselbe</em> Backend und <em>dieselbe</em> Regelbasis zu — es gibt keine
+        doppelte Methodik.
       </p>
 
       <div class="flow">
         <div class="stufe">
           <div class="nr">STUFE 1</div>
           <strong>Wizard</strong>
-          <span>Betroffenheit &amp; Klassifizierung. Öffentlich, clientseitig,
-            keine Datenübertragung. Ergebnis: Ersteinschätzung + Pflichtenübersicht.</span>
+          <span
+            >Betroffenheit &amp; Klassifizierung. Öffentlich, clientseitig, keine Datenübertragung.
+            Ergebnis: Ersteinschätzung + Pflichtenübersicht.</span
+          >
         </div>
         <div class="pfeil">→</div>
         <div class="stufe">
           <div class="nr">STUFE 2</div>
           <strong>Cockpit</strong>
-          <span>Geführtes Aufnahme-Interview (Blöcke 0–8). Jede Antwort ein
-            Evidenzknoten. Ergebnis: Stammdaten, Gap-Liste, SBOM-Profil.</span>
+          <span
+            >Geführtes Aufnahme-Interview (Blöcke 0–8). Jede Antwort ein Evidenzknoten. Ergebnis:
+            Stammdaten, Gap-Liste, SBOM-Profil.</span
+          >
         </div>
         <div class="pfeil">→</div>
         <div class="stufe">
           <div class="nr">STUFE 3</div>
           <strong>Portal</strong>
-          <span>SBOM-Ingestion, lokaler OSV-Abgleich, Heartbeat, Findings-Triage.
-            Self-hosted beim Kunden.</span>
+          <span
+            >SBOM-Ingestion, lokaler OSV-Abgleich, Heartbeat, Findings-Triage. Self-hosted beim
+            Kunden.</span
+          >
         </div>
         <div class="pfeil">→</div>
         <div class="stufe">
           <div class="nr">STUFE 4</div>
           <strong>Meldung</strong>
-          <span>Meldevorgang nach Art. 14 mit Fristenuhr (24h/72h/Abschluss),
-            Eskalation und generiertem Entwurf.</span>
+          <span
+            >Meldevorgang nach Art. 14 mit Fristenuhr (24h/72h/Abschluss), Eskalation und
+            generiertem Entwurf.</span
+          >
         </div>
       </div>
 
       <h3>Stufe 1 — Betroffenheits-Wizard</h3>
       <p>
-        Ein anonymer Selbsttest beantwortet die erste Frage jedes Anbieters:
-        „Betrifft mich der CRA, und wie?" Der Wizard läuft vollständig im Browser
-        — als Produktversprechen, technisch durch einen Test abgesichert, der
-        jeden ausgehenden Netzwerk-Aufruf unterbindet. Ergebnis ist eine
-        Kategorie mit Begründungspfad, ein Pflichtenkatalog mit Fristen und eine
-        druckbare Ersteinschätzung.
+        Ein anonymer Selbsttest beantwortet die erste Frage jedes Anbieters: „Betrifft mich der CRA,
+        und wie?" Der Wizard läuft vollständig im Browser — als Produktversprechen, technisch durch
+        einen Test abgesichert, der jeden ausgehenden Netzwerk-Aufruf unterbindet. Ergebnis ist eine
+        Kategorie mit Begründungspfad, ein Pflichtenkatalog mit Fristen und eine druckbare
+        Ersteinschätzung.
       </p>
 
       <h3>Stufe 2 — Aufnahme-Cockpit</h3>
       <p>
-        Im moderierten Workshop wird das Produkt entlang von neun Themenblöcken
-        (Mandant &amp; Rollen, Produktabgrenzung, Klassifizierung, Risikokontext,
-        Schwachstellenmanagement, Support, Lieferkette, SBOM-Profil,
-        Dokumentation) strukturiert erfasst. Kernprinzipien:
+        Im moderierten Workshop wird das Produkt entlang von neun Themenblöcken (Mandant &amp;
+        Rollen, Produktabgrenzung, Klassifizierung, Risikokontext, Schwachstellenmanagement,
+        Support, Lieferkette, SBOM-Profil, Dokumentation) strukturiert erfasst. Kernprinzipien:
       </p>
       <ul>
         <li>
-          <strong>Evidenz statt Freitext:</strong> Jede Aussage wird als
-          unveränderlicher Evidenzknoten mit Quelle (Person, Datum,
-          Gesprächsleiter) persistiert; Korrekturen erzeugen neue Knoten, der
-          Verlauf bleibt lückenlos.
+          <strong>Evidenz statt Freitext:</strong> Jede Aussage wird als unveränderlicher
+          Evidenzknoten mit Quelle (Person, Datum, Gesprächsleiter) persistiert; Korrekturen
+          erzeugen neue Knoten, der Verlauf bleibt lückenlos.
         </li>
         <li>
-          <strong>Lücken sind First-Class:</strong> „unbekannt" und „existiert
-          nicht" sind gültige, getrennte Antworten; jede Lücke wird zur
-          priorisierten Hausaufgabe mit Annex-Bezug.
+          <strong>Lücken sind First-Class:</strong> „unbekannt" und „existiert nicht" sind gültige,
+          getrennte Antworten; jede Lücke wird zur priorisierten Hausaufgabe mit Annex-Bezug.
         </li>
         <li>
-          <strong>Klassifizierungsvorschlag:</strong> Dieselbe Regel-Engine wie
-          im Wizard schlägt die Kategorie vor; der Gesprächsleiter bestätigt oder
-          überschreibt sie mit dokumentierter Begründung.
+          <strong>Klassifizierungsvorschlag:</strong> Dieselbe Regel-Engine wie im Wizard schlägt
+          die Kategorie vor; der Gesprächsleiter bestätigt oder überschreibt sie mit dokumentierter
+          Begründung.
         </li>
       </ul>
 
       <h3>Stufe 3 — Kundenportal (Monitoring)</h3>
       <p>
-        Das Portal wird <strong>beim Kunden betrieben</strong> (self-hosted) und
-        nimmt die SBOMs aus der CI entgegen. Die Software-Stückliste wird
-        kontinuierlich gegen einen <strong>lokal gespiegelten</strong> Stand der
-        Open-Source-Schwachstellendatenbank OSV abgeglichen — die
-        Komponentenliste verlässt das System nicht. Zwei Takte sind bewusst
+        Das Portal wird <strong>beim Kunden betrieben</strong> (self-hosted) und nimmt die SBOMs aus
+        der CI entgegen. Die Software-Stückliste wird kontinuierlich gegen einen
+        <strong>lokal gespiegelten</strong> Stand der Open-Source-Schwachstellendatenbank OSV
+        abgeglichen — die Komponentenliste verlässt das System nicht. Zwei Takte sind bewusst
         getrennt: die SBOM-Erneuerung ist <em>ereignisgetrieben</em>
         (Produktänderung), die Schwachstellen-Neubewertung läuft
-        <em>kontinuierlich</em> gegen das unveränderte SBOM. Ein „Heartbeat"
-        überwacht nur die Lieferdisziplin, nicht die CVE-Aktualität.
+        <em>kontinuierlich</em> gegen das unveränderte SBOM. Ein „Heartbeat" überwacht nur die
+        Lieferdisziplin, nicht die CVE-Aktualität.
       </p>
 
       <h3>Stufe 4 — Meldeworkflow (Art. 14)</h3>
       <p>
-        Wird ein Finding durch einen Menschen als „aktiv ausgenutzt" eingestuft
-        — oder ein Vorfall ohne zugeordnete Schwachstelle gemeldet — eröffnet das
-        Portal einen Meldevorgang mit drei Stufen und abgeleiteten Fristen:
+        Wird ein Finding durch einen Menschen als „aktiv ausgenutzt" eingestuft — oder ein Vorfall
+        ohne zugeordnete Schwachstelle gemeldet — eröffnet das Portal einen Meldevorgang mit drei
+        Stufen und abgeleiteten Fristen:
         <strong>Frühwarnung binnen 24 Stunden</strong>,
-        <strong>Meldung binnen 72 Stunden</strong> und Abschlussbericht (14 Tage
-        bei aktiv ausgenutzter Schwachstelle bzw. ein Monat bei schwerwiegendem
-        Vorfall). Das System erzeugt je Stufe einen strukturierten Entwurf; das
-        Absenden über die offizielle ENISA/CSIRT-Plattform bleibt ein bewusster,
-        menschlicher Schritt. Eingereichte Stufen sind als Nachweis
-        unveränderlich.
+        <strong>Meldung binnen 72 Stunden</strong> und Abschlussbericht (14 Tage bei aktiv
+        ausgenutzter Schwachstelle bzw. ein Monat bei schwerwiegendem Vorfall). Das System erzeugt
+        je Stufe einen strukturierten Entwurf; das Absenden über die offizielle
+        ENISA/CSIRT-Plattform bleibt ein bewusster, menschlicher Schritt. Eingereichte Stufen sind
+        als Nachweis unveränderlich.
       </p>
 
       <!-- ============================ 4. Mehrwert ============================ -->
       <h2 class="seitenumbruch">4. Mehrwert des Vorgehens</h2>
       <p>
-        Der Nutzen entsteht weniger aus einzelnen Funktionen als aus durchgängig
-        angewandten Konstruktionsprinzipien:
+        Der Nutzen entsteht weniger aus einzelnen Funktionen als aus durchgängig angewandten
+        Konstruktionsprinzipien:
       </p>
 
       <h3>4.1 Regulatorik als Daten, nicht als Code</h3>
       <p>
-        Artikel- und Annex-Verweise, Schwellenwerte und Fristen liegen in
-        versionierten Datendateien mit Review-Status. Eine juristische Korrektur
-        (z. B. eine angepasste Frist oder eine neue harmonisierte Norm) ist eine
-        Datenänderung mit Freigabe-Vermerk — keine Software-Auslieferung. Das
-        senkt die Pflegekosten und macht den fachlichen Review unabhängig vom
-        Entwicklungszyklus.
+        Artikel- und Annex-Verweise, Schwellenwerte und Fristen liegen in versionierten Datendateien
+        mit Review-Status. Eine juristische Korrektur (z. B. eine angepasste Frist oder eine neue
+        harmonisierte Norm) ist eine Datenänderung mit Freigabe-Vermerk — keine
+        Software-Auslieferung. Das senkt die Pflegekosten und macht den fachlichen Review unabhängig
+        vom Entwicklungszyklus.
       </p>
 
       <h3>4.2 Eine Methodik, vier Oberflächen</h3>
       <p>
-        Wizard, Cockpit und Portal teilen sich Regel-Engine und Domänenmodell.
-        Die Klassifizierung, die der Anbieter im Selbsttest sieht, ist
-        dieselbe, die im Workshop verbindlich gemacht wird — keine widersprüchlichen
-        Zweitlogiken, keine Methodik-Duplikation.
+        Wizard, Cockpit und Portal teilen sich Regel-Engine und Domänenmodell. Die Klassifizierung,
+        die der Anbieter im Selbsttest sieht, ist dieselbe, die im Workshop verbindlich gemacht wird
+        — keine widersprüchlichen Zweitlogiken, keine Methodik-Duplikation.
       </p>
 
       <h3>4.3 Beweisbarkeit durch Unveränderlichkeit und Hash-Verkettung</h3>
       <p>
-        Evidenzknoten, SBOM-Lieferungen, eingereichte Meldungen, veröffentlichte
-        security.txt und Behörden-Anschreiben sind append-only und auf
-        Datenbankebene per Trigger gegen Änderung gesichert. Darüber liegt eine
-        <strong>kryptografische Hash-Kette</strong>: Jeder dieser Datensätze wird
-        beim Anlegen verkettet (SHA-256 über den Inhalt, verknüpft mit dem
-        Vorgänger). Eine Verifikation rechnet die Kette nach und hasht jeden
-        Datensatz erneut — damit werden <em>sowohl</em> nachträglich geänderte
-        Zeilen <em>als auch</em> entfernte oder umsortierte Kettenglieder
-        erkennbar, selbst wenn der Schutz-Trigger umgangen wurde. Das liefert
-        Manipulations<em>evidenz</em>, nicht nur -prävention.
+        Evidenzknoten, SBOM-Lieferungen, eingereichte Meldungen, veröffentlichte security.txt und
+        Behörden-Anschreiben sind append-only und auf Datenbankebene per Trigger gegen Änderung
+        gesichert. Darüber liegt eine
+        <strong>kryptografische Hash-Kette</strong>: Jeder dieser Datensätze wird beim Anlegen
+        verkettet (SHA-256 über den Inhalt, verknüpft mit dem Vorgänger). Eine Verifikation rechnet
+        die Kette nach und hasht jeden Datensatz erneut — damit werden <em>sowohl</em> nachträglich
+        geänderte Zeilen <em>als auch</em> entfernte oder umsortierte Kettenglieder erkennbar,
+        selbst wenn der Schutz-Trigger umgangen wurde. Das liefert Manipulations<em>evidenz</em>,
+        nicht nur -prävention.
       </p>
       <p>
-        Damit auch ein privilegierter Insider, der die gesamte Kette konsistent
-        neu rechnet, auffällt, kann der aktuelle Kopf-Hash <strong>extern
-        verankert</strong> werden: Er geht in jede Behördenmeldung ein und kann
-        über ein freiwilliges BSI-Erstanschreiben (Meldebereitschaft) mit
-        behördlicher Eingangsbestätigung zeitlich bezeugt werden. Für ein
-        Compliance-Produkt ist diese lückenlose, nachweisbare Historie kein
-        Beiwerk, sondern das Kernversprechen.
+        Damit auch ein privilegierter Insider, der die gesamte Kette konsistent neu rechnet,
+        auffällt, kann der aktuelle Kopf-Hash <strong>extern verankert</strong> werden: Er geht in
+        jede Behördenmeldung ein und kann über ein freiwilliges BSI-Erstanschreiben
+        (Meldebereitschaft) mit behördlicher Eingangsbestätigung zeitlich bezeugt werden. Für ein
+        Compliance-Produkt ist diese lückenlose, nachweisbare Historie kein Beiwerk, sondern das
+        Kernversprechen.
       </p>
 
       <h3>4.4 Datenhoheit über die gesamte Kette</h3>
       <p>
-        Der Wizard überträgt nichts, das Cockpit läuft lokal, das Portal wird
-        beim Kunden betrieben, und der Schwachstellenabgleich erfolgt gegen einen
-        lokalen OSV-Spiegel. Sensible Architekturinformationen (die
-        Abhängigkeitsliste eines Produkts) verlassen die Kundeninfrastruktur
-        nicht. Die einzige bewusste Ausnahme ist die menschlich ausgelöste
+        Der Wizard überträgt nichts, das Cockpit läuft lokal, das Portal wird beim Kunden betrieben,
+        und der Schwachstellenabgleich erfolgt gegen einen lokalen OSV-Spiegel. Sensible
+        Architekturinformationen (die Abhängigkeitsliste eines Produkts) verlassen die
+        Kundeninfrastruktur nicht. Die einzige bewusste Ausnahme ist die menschlich ausgelöste
         Meldung an die Behörde.
       </p>
 
       <h3>4.5 Mensch entscheidet, Maschine strukturiert</h3>
       <p>
-        Das System bewertet keine Risiken automatisch und meldet nichts von
-        selbst. Die Schwelle „aktiv ausgenutzt" etwa ist eine bewusste
-        Tatsachenfeststellung mit Urheber — eine Fehlmeldung an die Behörde hat
-        reale Folgen. Diese Trennung schützt vor Automatisierungs-Fehlern und
-        hält die Verantwortung dort, wo sie hingehört.
+        Das System bewertet keine Risiken automatisch und meldet nichts von selbst. Die Schwelle
+        „aktiv ausgenutzt" etwa ist eine bewusste Tatsachenfeststellung mit Urheber — eine
+        Fehlmeldung an die Behörde hat reale Folgen. Diese Trennung schützt vor
+        Automatisierungs-Fehlern und hält die Verantwortung dort, wo sie hingehört.
       </p>
 
       <h3>4.6 Qualität ist nachgewiesen</h3>
       <p>
-        Die fachliche Logik ist durch tabellengetriebene Fallkataloge und
-        Eigenschafts-Tests abgesichert, die Persistenz gegen eine echte
-        PostgreSQL-Datenbank, die Oberflächen durch schlanke End-to-End-Tests
-        inklusive der „keine-Datenübertragung"-Zusicherung. Jede Änderung läuft
-        nur bei grünem Teststand in die Hauptlinie.
+        Die fachliche Logik ist durch tabellengetriebene Fallkataloge und Eigenschafts-Tests
+        abgesichert, die Persistenz gegen eine echte PostgreSQL-Datenbank, die Oberflächen durch
+        schlanke End-to-End-Tests inklusive der „keine-Datenübertragung"-Zusicherung. Jede Änderung
+        läuft nur bei grünem Teststand in die Hauptlinie.
       </p>
 
       <div class="box">
-        <strong>Zusammengefasst:</strong> CRA-Copilot verwandelt einen
-        unübersichtlichen, juristisch getriebenen Pflichtenkatalog in einen
-        geführten, nachweisbaren und datensouveränen Prozess — vom ersten
-        „Betrifft mich das?" bis zur fristgerechten Behördenmeldung, mit dem
-        Menschen an jeder bewertenden Stelle.
+        <strong>Zusammengefasst:</strong> CRA-Copilot verwandelt einen unübersichtlichen, juristisch
+        getriebenen Pflichtenkatalog in einen geführten, nachweisbaren und datensouveränen Prozess —
+        vom ersten „Betrifft mich das?" bis zur fristgerechten Behördenmeldung, mit dem Menschen an
+        jeder bewertenden Stelle.
       </div>
 
       <!-- ============================ 5. Referenzen ============================ -->
@@ -568,15 +550,14 @@
       <h3>Verordnung &amp; Durchführung</h3>
       <ul class="ref-liste">
         <li>
-          Verordnung (EU) 2024/2847 (Cyber Resilience Act), konsolidierter Text —
-          EUR-Lex:
+          Verordnung (EU) 2024/2847 (Cyber Resilience Act), konsolidierter Text — EUR-Lex:
           <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202402847"
             >eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202402847</a
           >
         </li>
         <li>
-          Durchführungsverordnung (EU) 2025/2392 (technische Beschreibungen der
-          Produktkategorien nach Anhang III/IV):
+          Durchführungsverordnung (EU) 2025/2392 (technische Beschreibungen der Produktkategorien
+          nach Anhang III/IV):
           <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202502392"
             >eur-lex.europa.eu/legal-content/DE/TXT/?uri=OJ:L_202502392</a
           >
@@ -592,8 +573,14 @@
       <ul class="ref-liste">
         <li>Art. 2 Anwendungsbereich · Art. 3 Begriffsbestimmungen</li>
         <li>Art. 13 Pflichten der Hersteller (Abs. 8: Support-Zeitraum)</li>
-        <li>Art. 13 Abs. 6 Meldekontakt (security.txt) · Abs. 8 Support-Zeitraum · Abs. 14 Aufbewahrung</li>
-        <li>Art. 14 Meldepflichten (24h/72h/Abschluss) · Abs. 8 Nutzerinformation · Art. 16 einheitliche Meldeplattform</li>
+        <li>
+          Art. 13 Abs. 6 Meldekontakt (security.txt) · Abs. 8 Support-Zeitraum · Abs. 14
+          Aufbewahrung
+        </li>
+        <li>
+          Art. 14 Meldepflichten (24h/72h/Abschluss) · Abs. 8 Nutzerinformation · Art. 16
+          einheitliche Meldeplattform
+        </li>
         <li>Art. 28/30 CE-Kennzeichnung &amp; EU-Konformitätserklärung (Anhang V)</li>
         <li>Art. 31, Anhang VII technische Dokumentation</li>
         <li>Art. 71 Zeitpunkt der Anwendung (Meldepflichten 09/2026, volle Anwendung 12/2027)</li>
@@ -614,29 +601,29 @@
           <a href="https://www.enisa.europa.eu/">enisa.europa.eu</a>
         </li>
         <li>
-          OSV — Open Source Vulnerabilities (Schwachstellendatenbank &amp;
-          Schema): <a href="https://osv.dev/">osv.dev</a>
+          OSV — Open Source Vulnerabilities (Schwachstellendatenbank &amp; Schema):
+          <a href="https://osv.dev/">osv.dev</a>
         </li>
         <li>
-          CycloneDX (SBOM-Standard): <a href="https://cyclonedx.org/">cyclonedx.org</a>
-          · SPDX: <a href="https://spdx.dev/">spdx.dev</a>
+          CycloneDX (SBOM-Standard): <a href="https://cyclonedx.org/">cyclonedx.org</a> · SPDX:
+          <a href="https://spdx.dev/">spdx.dev</a>
         </li>
         <li>
-          RFC 9116 (security.txt): <a href="https://www.rfc-editor.org/rfc/rfc9116">rfc-editor.org/rfc/rfc9116</a>
+          RFC 9116 (security.txt):
+          <a href="https://www.rfc-editor.org/rfc/rfc9116">rfc-editor.org/rfc/rfc9116</a>
         </li>
       </ul>
 
       <div class="box warn" style="margin-top: 1.4em">
-        <strong>Rechtlicher Hinweis.</strong> Diese Dokumentation dient der
-        technischen Erläuterung des Werkzeugs CRA-Copilot. Sie ersetzt keine
-        Rechtsberatung. Sämtliche Artikel- und Anhang-Verweise sowie Fristen sind
-        vor einem Produktiveinsatz juristisch zu prüfen; im Werkzeug sind
-        regulatorische Inhalte entsprechend als prüfpflichtig markiert.
+        <strong>Rechtlicher Hinweis.</strong> Diese Dokumentation dient der technischen Erläuterung
+        des Werkzeugs CRA-Copilot. Sie ersetzt keine Rechtsberatung. Sämtliche Artikel- und
+        Anhang-Verweise sowie Fristen sind vor einem Produktiveinsatz juristisch zu prüfen; im
+        Werkzeug sind regulatorische Inhalte entsprechend als prüfpflichtig markiert.
       </div>
 
       <footer class="fuss">
-        CRA-Copilot · Projektdokumentation 1.1 · 14. Juni 2026 — Erstellt zur
-        technischen Erläuterung; keine Rechtsberatung.
+        CRA-Copilot · Projektdokumentation 1.1 · 14. Juni 2026 — Erstellt zur technischen
+        Erläuterung; keine Rechtsberatung.
       </footer>
     </div>
   </body>

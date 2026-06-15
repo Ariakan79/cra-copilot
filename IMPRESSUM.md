@@ -77,8 +77,9 @@ Veröffentlichungszeitpunkt.
 | PostgreSQL 17 (+ Erweiterung `pgcrypto`) | PostgreSQL License | Datenbank, lokal via Docker betrieben |
 | Open Source Vulnerabilities (OSV) | CC-BY 4.0 | Schwachstellendaten; **lokaler Spiegel**, operatorgetrieben befüllt (kein Live-Abruf, ADR-022) |
 
-> Eine maschinell aktuelle und vollständige Auflistung **aller** transitiven
-> Abhängigkeiten inklusive Lizenztext lässt sich jederzeit aus dem installierten
-> Baum erzeugen, z. B. mit `pnpm licenses list` oder
-> `npx license-checker --summary`. Maßgeblich für den exakten Bestand ist die
+> **Vollständige Attributionsliste (Volltext):** Die Datei
+> [`THIRD-PARTY-LICENSES.txt`](THIRD-PARTY-LICENSES.txt) enthält die Urheberrechts-
+> und Lizenzhinweise **aller Produktiv-Abhängigkeiten im Volltext** (maschinell
+> erzeugt aus dem installierten Baum). Neu erzeugen mit
+> `pnpm run licenses:third-party`. Maßgeblich für den exakten Bestand ist die
 > `pnpm-lock.yaml` dieses Repositorys.

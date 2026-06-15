@@ -12,7 +12,8 @@
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
     "build": "pnpm -r run build",
-    "e2e": "pnpm --filter @cra-copilot/wizard run e2e"
+    "e2e": "pnpm --filter @cra-copilot/wizard run e2e",
+    "licenses:third-party": "pnpm licenses list --prod --json | node scripts/gen-third-party-licenses.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",
