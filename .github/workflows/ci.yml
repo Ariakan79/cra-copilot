@@ -50,6 +50,14 @@ jobs:
           cache: pnpm
       - name: Install
         run: pnpm install --frozen-lockfile
+      # api/cockpit/portal importieren die generierten *.gen.json der Datenpakete.
+      # Anders als der rekursive Lauf im einheit-Job loest ein direkter --filter
+      # den gen-Schritt der Datenpakete nicht aus, daher hier explizit erzeugen.
+      - name: Datenpakete erzeugen (*.gen.json)
+        run: |
+          pnpm --filter @cra-copilot/rules-engine run gen
+          pnpm --filter @cra-copilot/aufnahme-katalog run gen
+          pnpm --filter @cra-copilot/meldung-vorlagen run gen
       - name: Typecheck (api, cockpit, portal)
         run: |
           pnpm --filter @cra-copilot/api run typecheck
