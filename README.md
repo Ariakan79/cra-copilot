@@ -142,10 +142,22 @@ Jede inhaltliche CRA-Aussage trägt ein Feld `review_status` (`pending`/`approve
 ein Daten-Release (`rules-vX.Y`, `katalog-vX.Y`, `meldung-vX.Y`) setzt **0
 offene Reviews** voraus.
 
+## Mitwirken
+
+Beiträge sind willkommen — siehe [CONTRIBUTING.md](CONTRIBUTING.md). Für jeden
+Beitrag gilt das [Contributor License Agreement](CLA.md); die Zustimmung erfolgt
+niederschwellig per DCO-Sign-off (`git commit -s`). Das ist nötig, damit
+Beiträge sowohl in der nicht-kommerziellen als auch in der kommerziellen Lizenz
+genutzt werden können.
+
 ## Lizenz
 
-- **Quellcode:** [PolyForm Noncommercial License 1.0.0](LICENSE) — frei zur
-  nicht-kommerziellen Verwendung. Kommerzielle Nutzung bedarf einer gesonderten
-  Vereinbarung.
+CRA-Copilot wird im **Dual-Licensing-Modell** angeboten:
+
+- **Quellcode (nicht-kommerziell):** [PolyForm Noncommercial License 1.0.0](LICENSE)
+  — frei zur nicht-kommerziellen Verwendung.
+- **Quellcode (kommerziell):** gesonderte kommerzielle Lizenz auf Anfrage —
+  siehe [COMMERCIAL.md](COMMERCIAL.md), Kontakt **license@ariakan.eu**.
 - **Dokumentation & regulatorische Daten:** [CC BY-NC 4.0](docs/LICENSE.md).
-- **Open-Source-Komponenten & Anbieterkennzeichnung:** [IMPRESSUM.md](IMPRESSUM.md).
+- **Open-Source-Komponenten & Anbieterkennzeichnung:** [IMPRESSUM.md](IMPRESSUM.md),
+  vollständige Attribution in [THIRD-PARTY-LICENSES.txt](THIRD-PARTY-LICENSES.txt).
