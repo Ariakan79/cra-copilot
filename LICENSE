@@ -142,7 +142,8 @@ of your licenses.
 Dieses Werkzeug wird **kostenfrei zur nicht-kommerziellen Verwendung**
 bereitgestellt. Jede kommerzielle Nutzung (u. a. Verkauf, kostenpflichtige
 Dienstleistung, kommerzieller Betrieb für Dritte) ist von dieser Lizenz **nicht**
-gedeckt und bedarf einer gesonderten Vereinbarung mit dem Rechteinhaber.
+gedeckt und bedarf einer gesonderten kommerziellen Lizenz. Anfragen zur
+kommerziellen Nutzung: **license@ariakan.eu** (siehe `COMMERCIAL.md`).
 
 Die **Dokumentation und die regulatorischen Daten** (Verzeichnis `docs/` sowie
 die YAML-Datendateien in `packages/*/data/`) stehen ergänzend unter der
